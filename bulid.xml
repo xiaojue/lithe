@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="GBK"?>
+<project name="MyTask" basedir="." default="loadfile">
+	<!-- 定义全局变量和需要的目录 -->
+	<property name="yui-compressor" value="tool/yuicompressor.jar"/>
+	<property name="bulid.dir" value="bulid"/>
+	<property name="src.dir" value="src"/>
+	<property name="lithe.source" value="lithe.js"/>
+	<property name="lithe.min" value="lithe-min.js"/>
+	<!-- 删除现有目录-->
+	<delete dir="${bulid.dir}"/>
+	<!-- 创建基本目录-->
+	<mkdir dir="${bulid.dir}"/>
+   
+    <target name="loadfile">
+    	 <!-- 复制目录文件-->
+        <copy todir="${bulid.dir}" encoding="GBK" outputencoding="GBK">
+			<fileset dir="${src.dir}/core/" includes="core.js"/>
+			<fileset dir="${src.dir}/lang/" includes="lang.js"/>
+			<fileset dir="${src.dir}/ua/" includes="ua.js"/>
+			<fileset dir="${src.dir}/dom/" includes="dom.js"/>
+			<fileset dir="${src.dir}/event/" includes="event.js"/>
+			<fileset dir="${src.dir}/anim/" includes="anim.js"/>
+			<fileset dir="${src.dir}/io/" includes="io.js"/>
+			<fileset dir="${src.dir}/loader/" includes="loader.js"/>
+        </copy>
+		<!-- 合并源文件文件 -->
+		<concat destfile="${bulid.dir}\${lithe.source}" encoding="GBK" outputencoding="GBK">
+	                <filelist  dir="${bulid.dir}" 
+					files="core.js
+					lang.js
+					ua.js
+					dom.js
+					event.js
+					anim.js
+					io.js
+					loader.js"/>
+		</concat>
+		<!--删除合并文件-->
+		<delete>
+			 <fileset dir="${bulid.dir}">
+                <filename name="*.js"/>
+                <not>
+                    <filename name="${lithe.source}"/>
+                </not>
+            </fileset>
+		</delete>
+		 <!-- 压缩min文件 -->
+		<apply executable="java" parallel="false" failonerror="true">
+			<fileset dir="${bulid.dir}" includes="*.js" />
+			<arg line="-jar" />
+			<arg path="${yui-compressor}" />
+			<srcfile/>
+			<arg line="-o" />
+			<mapper type="glob" from="*.js" to="${bulid.dir}/*-min.css" />
+			<targetfile/>
+		</apply>
+    </target>
+</project>
