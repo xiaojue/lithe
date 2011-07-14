@@ -1,1 +1,1 @@
-lithe javascript lib by 小爝
+lithe javascript LIB by 小爝
