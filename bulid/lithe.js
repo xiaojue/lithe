@@ -79,15 +79,10 @@
 	
 	win.lithe=lithe;
 	
-})(this);
-
-
-
-
-/**
+})(this);/**
  * @author longxiao.fq
  * dom.js
- * ¿É×öÓÅ»¯
+ * ï¿½ï¿½ï¿½ï¿½ï¿½Å»ï¿½
  */
 (function(host,doc){
 	
@@ -95,7 +90,7 @@
 		
 		var _fn={
 				/**
-				 * Ö§³ÖÀàÐÍ
+				 * Ö§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 				 * #id
 				 * .class
 				 * tag
@@ -107,18 +102,18 @@
 						indexcls=text.indexOf('.'),
 						cls=text.slice(indexcls+1),
 						tag=text.slice(0,indexcls);
-					//´¦Àíµ¥¸öÑ¡Ôñ·ûµÄ¶àÖÖÇé¿ö
+					//ï¿½ï¿½ï¿½?ï¿½ï¿½Ñ¡ï¿½ï¿½ï¿½Ä¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 					if(indexid!=-1){
-						//Èç¹ûÓÐ#Ö±½Ó·µ»Ø
+						//ï¿½ï¿½ï¿½ï¿½ï¿½#Ö±ï¿½Ó·ï¿½ï¿½ï¿½
 						return [doc.getElementById(id)];	
 					}else if(indexcls!=-1 && indexcls!=0){
-						//ÓÐcls²¢ÇÒº¬ÓÐtag
+						//ï¿½ï¿½clsï¿½ï¿½ï¿½Òºï¿½ï¿½ï¿½tag
 						return that._getElementsByClassName(cls,parent,tag);	
 					}else if(indexcls!=-1 && indexcls==0){
-						//º¬ÓÐcls£¬²¢ÇÒ½öÓÐcls
+						//ï¿½ï¿½ï¿½ï¿½clsï¿½ï¿½ï¿½ï¿½ï¿½Ò½ï¿½ï¿½ï¿½cls
 						return that._getElementsByClassName(text.slice(1),parent);	
 					}else{
-						//Ö»º¬ÓÐtag
+						//Ö»ï¿½ï¿½ï¿½ï¿½tag
 						return Array.prototype.slice.call(parent.getElementsByTagName(text),0);	
 					}
 				},
@@ -147,18 +142,18 @@
 						that=myCore.DOM,
 						selectors=selectors,
 						realselector='',
-						order=[], //Ñ¡ÔñÆ÷ÐòÁÐ	
+						order=[], //Ñ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	
 						result,
 						results;	
 								
 					if(typeof(selectors)!='string') return null;
 					
-					//Ê×ÏÈ°´ÕÕ¿Õ¸ñ·Ö×é
+					//ï¿½ï¿½ï¿½È°ï¿½ï¿½Õ¿Õ¸ï¿½ï¿½ï¿½ï¿½
 					order=selectors.split(' ');
 					
-					//ÏÈÕÒµÚÒ»¸öid£¬È·¶¨ÐòÁÐµÄ×î¸ß¼¶
-					//Èç¹ûÃ»ÓÐidÔòÕÒtag£¬
-					//Èç¹ûÃ»ÓÐtagÔòÕÒclass
+					//ï¿½ï¿½ï¿½Òµï¿½Ò»ï¿½ï¿½idï¿½ï¿½È·ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ß¼ï¿½
+					//ï¿½ï¿½ï¿½Ã»ï¿½ï¿½idï¿½ï¿½ï¿½ï¿½tagï¿½ï¿½
+					//ï¿½ï¿½ï¿½Ã»ï¿½ï¿½tagï¿½ï¿½ï¿½ï¿½class
 					for(var i=order.length-1;i>=0;i--){
 						var selector=order[i].slice(0,1);
 						if(selector=='#'){
@@ -173,14 +168,14 @@
 							}
 						}
 					}
-					//È·¶¨×îºóµÄÐòÁÐ,ÅÅ³ý¶àIDÇé¿ö
+					//È·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,ï¿½Å³ï¿½ï¿½IDï¿½ï¿½ï¿½
 					order=realselector.slice(1).split(' ').reverse();
 					
 					if(order.length==1){
-						//Ã»¿Õ¸ñ£¬µ¥Ñ¡ÔñµÄÖ±½Ó·µ»ØÖµ
+						//Ã»ï¿½Õ¸ñ£¬µï¿½Ñ¡ï¿½ï¿½ï¿½Ö±ï¿½Ó·ï¿½ï¿½ï¿½Öµ
 						return that._findChild(doc,order[0]);
 					}else{
-						//¶à¸ö¿Õ¸ñµÄµü´úÑ°ÕÒ
+						//ï¿½ï¿½ï¿½ï¿½Õ¸ï¿½Äµï¿½ï¿½Ñ°ï¿½ï¿½
 						for(var i=0;i<order.length;i++){
 							if(i==order.length-1) return results;
 							
