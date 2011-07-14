@@ -82,19 +82,12 @@
 })(this);/**
  * @author longxiao.fq
  * dom.js
- * �����Ż�
  */
 (function(host,doc){
 	
 	var DOM=function(){
 		
 		var _fn={
-				/**
-				 * ֧������
-				 * #id
-				 * .class
-				 * tag
-				 */
 				_findChild:function(parent,text){
 					var that=myCore.DOM,
 						indexid=text.indexOf('#'),
@@ -102,18 +95,13 @@
 						indexcls=text.indexOf('.'),
 						cls=text.slice(indexcls+1),
 						tag=text.slice(0,indexcls);
-					//���?��ѡ���Ķ������
 					if(indexid!=-1){
-						//�����#ֱ�ӷ���
 						return [doc.getElementById(id)];	
 					}else if(indexcls!=-1 && indexcls!=0){
-						//��cls���Һ���tag
 						return that._getElementsByClassName(cls,parent,tag);	
 					}else if(indexcls!=-1 && indexcls==0){
-						//����cls�����ҽ���cls
 						return that._getElementsByClassName(text.slice(1),parent);	
 					}else{
-						//ֻ����tag
 						return Array.prototype.slice.call(parent.getElementsByTagName(text),0);	
 					}
 				},
@@ -142,18 +130,14 @@
 						that=myCore.DOM,
 						selectors=selectors,
 						realselector='',
-						order=[], //ѡ��������	
+						order=[], 
 						result,
 						results;	
 								
 					if(typeof(selectors)!='string') return null;
 					
-					//���Ȱ��տո����
 					order=selectors.split(' ');
 					
-					//���ҵ�һ��id��ȷ�����е���߼�
-					//���û��id����tag��
-					//���û��tag����class
 					for(var i=order.length-1;i>=0;i--){
 						var selector=order[i].slice(0,1);
 						if(selector=='#'){
@@ -168,14 +152,11 @@
 							}
 						}
 					}
-					//ȷ����������,�ų��ID���
 					order=realselector.slice(1).split(' ').reverse();
 					
 					if(order.length==1){
-						//û�ո񣬵�ѡ���ֱ�ӷ���ֵ
 						return that._findChild(doc,order[0]);
 					}else{
-						//����ո�ĵ��Ѱ��
 						for(var i=0;i<order.length;i++){
 							if(i==order.length-1) return results;
 							
@@ -277,7 +258,7 @@
 				}
 				
 				// A fallback to window.onload, that will always work
-				//jQuery.event.add( window, "load", jQuery.ready );
+				//host.event.add( window, "load", jQuery.ready );
 			},
 			
 			ready:function(){

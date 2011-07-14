@@ -62,7 +62,7 @@
 				}
 				
 				// A fallback to window.onload, that will always work
-				//jQuery.event.add( window, "load", jQuery.ready );
+				//host.event.add( window, "load", jQuery.ready );
 			},
 			
 			ready:function(){

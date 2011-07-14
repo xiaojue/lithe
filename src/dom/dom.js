@@ -1,19 +1,12 @@
 /**
  * @author longxiao.fq
  * dom.js
- * 可做优化
  */
 (function(host,doc){
 	
 	var DOM=function(){
 		
 		var _fn={
-				/**
-				 * 支持类型
-				 * #id
-				 * .class
-				 * tag
-				 */
 				_findChild:function(parent,text){
 					var that=myCore.DOM,
 						indexid=text.indexOf('#'),
@@ -21,18 +14,13 @@
 						indexcls=text.indexOf('.'),
 						cls=text.slice(indexcls+1),
 						tag=text.slice(0,indexcls);
-					//处理单个选择符的多种情况
 					if(indexid!=-1){
-						//如果有#直接返回
 						return [doc.getElementById(id)];	
 					}else if(indexcls!=-1 && indexcls!=0){
-						//有cls并且含有tag
 						return that._getElementsByClassName(cls,parent,tag);	
 					}else if(indexcls!=-1 && indexcls==0){
-						//含有cls，并且仅有cls
 						return that._getElementsByClassName(text.slice(1),parent);	
 					}else{
-						//只含有tag
 						return Array.prototype.slice.call(parent.getElementsByTagName(text),0);	
 					}
 				},
@@ -61,18 +49,14 @@
 						that=myCore.DOM,
 						selectors=selectors,
 						realselector='',
-						order=[], //选择器序列	
+						order=[], 
 						result,
 						results;	
 								
 					if(typeof(selectors)!='string') return null;
 					
-					//首先按照空格分组
 					order=selectors.split(' ');
 					
-					//先找第一个id，确定序列的最高级
-					//如果没有id则找tag，
-					//如果没有tag则找class
 					for(var i=order.length-1;i>=0;i--){
 						var selector=order[i].slice(0,1);
 						if(selector=='#'){
@@ -87,14 +71,11 @@
 							}
 						}
 					}
-					//确定最后的序列,排除多ID情况
 					order=realselector.slice(1).split(' ').reverse();
 					
 					if(order.length==1){
-						//没空格，单选择的直接返回值
 						return that._findChild(doc,order[0]);
 					}else{
-						//多个空格的迭代寻找
 						for(var i=0;i<order.length;i++){
 							if(i==order.length-1) return results;
 							
