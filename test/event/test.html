@@ -3,10 +3,21 @@
 	<head>
 		<title>lithe anim test</title>
 		<script src="../lithe.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			(function(l){
+				var DOM=l.DOM,Event=l.Event;
+				Event.ready(function(){
+					alert(DOM.get('#test-domready').innerHTML)
+				});
+				Event.ready(function(){
+					console.log(DOM.get('#test-domready'))
+				});
+			})(lithe);
+		</script>
 	</head>
 	<body>
-		<script type="text/javascript">
-			
-		</script>
+		<div id="test-domready">
+			domready
+		</div>
 	</body>
 </html>

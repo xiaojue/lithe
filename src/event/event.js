@@ -6,24 +6,26 @@
 	
 	var Event=function(){
 		
-		var readyBound=false;
+		var readyBound=false,
+			_readyFnMap=[],
+			_Global_CustomEvent={};
 		
 		var _fn={
 				
 			customEvent:{
 				fire:function(name,args){
-					var map=host.Event._Global_CustomEvent;
+					var map=_Global_CustomEvent;
 					if(map.hasOwnProperty(name)) map[name](args);	
 				},
 				bind:function(name,fun,cover){
-					var map=host.Event._Global_CustomEvent;
+					var map=_Global_CustomEvent;
 					if(!map.hasOwnProperty(name) || cover){
 						map[name]=fun;
 					}
 				}
 			},
 			
-		    _bindReady:function(){
+			_bindReady:function(){
 				if ( readyBound ) return;
 				readyBound = true;
 				// Mozilla, Opera and webkit nightlies currently support
@@ -32,7 +34,7 @@
 				// Use the handy event callback
 					document.addEventListener( "DOMContentLoaded", function(){
 					document.removeEventListener( "DOMContentLoaded", arguments.callee, false );
-					host.Event.ready();
+					_fn.ready();
 				}, false );
 				// If IE event model is used
 				} else if ( document.attachEvent ) {
@@ -41,13 +43,13 @@
 					document.attachEvent("onreadystatechange", function(){
 						if ( document.readyState === "complete" ) {
 							document.detachEvent( "onreadystatechange", arguments.callee );
-							host.Event.ready();
+							_fn.ready();
 						}
 					});
 				// If IE and not an iframe
 				// continually check to see if the document is ready
 					if ( document.documentElement.doScroll && typeof window.frameElement === "undefined" ) (function(){
-					if ( host.Event._isDOMready ) return;
+					if ( _fn._isDOMready ) return;
 						try {
 						// If IE is used, use the trick by Diego Perini
 						// http://javascript.nwbox.com/IEContentLoaded/
@@ -57,7 +59,7 @@
 							return;
 						}
 							// and execute any waiting functions
-							host.Event.ready();
+							_fn.ready();
 					})();
 				}
 				
@@ -66,10 +68,9 @@
 			},
 			
 			ready:function(){
-				host.Event._isDOMready=true;
-				host._readyFnMap.push(fn);
-				if(host._isDOMready){
-					host.each(host._readyFnMap,function(index,fn){
+				_fn._isDOMready=true;
+				if(_fn._isDOMready){
+					host.each(_readyFnMap,function(index,fn){
 						fn();
 					});
 				}
@@ -78,18 +79,18 @@
 			_isDOMready:false,
 			
 			DOMready:function(fn){
-				if(!host.Event._isDOMready) {
-					host.Event._bindReady();
+				_readyFnMap.push(fn);
+				if(!_fn._isDOMready) {
+					_fn._bindReady();
 				}else{
-					host.Event.ready();
+					_fn.ready();
 				}
 			}
 		};
 		
 		return {
-			_readyFnMap:[],
-			_Global_CustomEvent:{},
-			customEvent:_fn.customEvent
+			customEvent:_fn.customEvent,
+			ready:_fn.DOMready
 		};
 		
 	}();

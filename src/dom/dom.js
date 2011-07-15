@@ -8,7 +8,7 @@
 		
 		var _fn={
 				_findChild:function(parent,text){
-					var that=myCore.DOM,
+					var that=_fn,
 						indexid=text.indexOf('#'),
 						id=text.slice(indexid+1),
 						indexcls=text.indexOf('.'),
@@ -45,8 +45,8 @@
 					return results;
 				},
 				_selector:function(selectors){
-					var fn=myCore.fn,
-						that=myCore.DOM,
+					var fn=_fn,
+						that=_fn,
 						selectors=selectors,
 						realselector='',
 						order=[], 
@@ -91,12 +91,12 @@
 					}	
 				},
 				query:function(selector){
-					var that=myCore.DOM;
+					var that=_fn;
 					if(doc.querySelectorAll) return doc.querySelectorAll(selector);	
 					return that._selector(selector);
 				},
 				get:function(selector){
-					var that=myCore.DOM;
+					var that=_fn;
 					if(doc.querySelector) return doc.querySelector(selector);	
 					var	result=that._selector(selector);
 					if((typeof(result)=="object") && (result instanceof Array)) return result[0];
