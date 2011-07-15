@@ -8,10 +8,33 @@
 		
 		var readyBound=false,
 			_readyFnMap=[],
-			_Global_CustomEvent={};
+			_Global_CustomEvent={},
+			_fixEvent=function(event){
+			 	event.preventDefault = fixEvent.preventDefault;
+			    event.stopPropagation = fixEvent.stopPropagation;
+			    return event;
+			},
+			_handleEvent=function(event) {
+			    var returnValue = true , i=0;
+			    event = event || _fixEvent(window.event);
+			    var handlers = this._eventMaps[event.type] , length = handlers.length;
+			    for ( ; i < length ; i++) {
+			        if ( handlers[i].call( this , event) === false ){
+			            returnValue = false;
+			        }
+			    }
+			    return returnValue;
+			};
+			
+			_fixEvent.preventDefault = function() {
+			    this.returnValue = false;
+			};
+			_fixEvent.stopPropagation = function() {
+			    this.cancelBubble = true;
+			};
 		
 		var _fn={
-				
+			/*customEvent*/	
 			customEvent:{
 				fire:function(name,args){
 					var map=_Global_CustomEvent;
@@ -24,7 +47,7 @@
 					}
 				}
 			},
-			
+			/*dom ready*/
 			_bindReady:function(){
 				if ( readyBound ) return;
 				readyBound = true;
@@ -64,7 +87,7 @@
 				}
 				
 				// A fallback to window.onload, that will always work
-				//host.event.add( window, "load", jQuery.ready );
+				_fn.bind( window, "load", _fn.ready );
 			},
 			
 			ready:function(){
@@ -85,12 +108,38 @@
 				}else{
 					_fn.ready();
 				}
+			},
+			/*bind and remove event*/
+			bind: function(element , type , fun){
+                if(!element._eventMaps) element._eventMaps={};
+                
+                var handlers=element._eventMaps[type];
+                
+                if(!handlers){
+                	 handlers = element._eventMaps[type] = [];
+                	 if(element['on' + type]) {        
+                         handlers[0] = element['on' + type];
+                     }
+                }
+                
+                if( handlers.indexOf(fun) >= 0) handlers[handlers.length] = fun;
+                
+                element['on' + type] = _handleEvent;
+            },
+			unbind:function(element , type , fun){
+            	if (element._eventMaps && element._eventMaps[type]) {
+            		 var index = element._eventMaps[type].indexOf(fun);
+            		 if ( !index ) return;
+            		 return element._eventMaps[type].splice(index,1);
+                }
 			}
 		};
 		
 		return {
 			customEvent:_fn.customEvent,
-			ready:_fn.DOMready
+			ready:_fn.DOMready,
+			add:_fn.bind,
+			removeEvent:_fn.unbind
 		};
 		
 	}();
