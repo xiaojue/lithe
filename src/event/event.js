@@ -47,7 +47,7 @@
 				// If IE and not an iframe
 				// continually check to see if the document is ready
 					if ( document.documentElement.doScroll && typeof window.frameElement === "undefined" ) (function(){
-					if ( jQuery.isReady ) return;
+					if ( host.Event._isDOMready ) return;
 						try {
 						// If IE is used, use the trick by Diego Perini
 						// http://javascript.nwbox.com/IEContentLoaded/
@@ -78,8 +78,11 @@
 			_isDOMready:false,
 			
 			DOMready:function(fn){
-				if(host.Event._isDOMready) 
-				host.Event._bindReady();
+				if(!host.Event._isDOMready) {
+					host.Event._bindReady();
+				}else{
+					host.Event.ready();
+				}
 			}
 		};
 		

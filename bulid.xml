@@ -4,6 +4,8 @@
 	<property name="yui-compressor" value="tool/yuicompressor.jar"/>
 	<property name="bulid.dir" value="bulid"/>
 	<property name="src.dir" value="src"/>
+	<property name="demo.dir" value="demo"/>
+	<property name="test.dir" value="test"/>
 	<property name="lithe.source" value="lithe.js"/>
 	<property name="lithe.min" value="lithe-min.js"/>
 	<!-- 删除现有目录-->
@@ -22,6 +24,7 @@
 			<fileset dir="${src.dir}/anim/" includes="anim.js"/>
 			<fileset dir="${src.dir}/io/" includes="io.js"/>
 			<fileset dir="${src.dir}/loader/" includes="loader.js"/>
+			<fileset dir="${src.dir}/test/" includes="test.js"/>
         </copy>
 		<!-- 合并源文件文件 -->
 		<concat destfile="${bulid.dir}\${lithe.source}" encoding="UTF-8" outputencoding="UTF-8">
@@ -33,7 +36,8 @@
 					event.js
 					anim.js
 					io.js
-					loader.js"/>
+					loader.js
+					test.js"/>
 		</concat>
 		<!--删除合并文件-->
 		<delete>
@@ -54,5 +58,12 @@
 			<mapper type="glob" from="*.js" to="${bulid.dir}/*-min.js" />
 			<targetfile/>
 		</apply>
+		
+		 <copy todir="${demo.dir}" encoding="UTF-8" outputencoding="UTF-8">
+			<fileset dir="${bulid.dir}" includes="lithe.js"/>
+        </copy>
+		<copy todir="${test.dir}" encoding="UTF-8" outputencoding="UTF-8">
+			<fileset dir="${bulid.dir}" includes="lithe.js"/>
+        </copy>
     </target>
 </project>
