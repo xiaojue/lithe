@@ -34,9 +34,11 @@
 				ie:/Trident\/([\d.]*)/
 			};
 		
-		
+		/**
+		 * 根据ua匹配相应内核的浏览器版本号
+		 */
 		function matchnumber(s){
-			
+							
 		}
 		
 		
