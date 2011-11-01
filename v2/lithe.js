@@ -11,11 +11,12 @@
 		var typeDet = function() {
 			var types = ["Array", "Object", "String", "Number"],
 			ret = {};
-			for (var i = 0; i < types.length; i++) {
-				var type = types[i];
-				ret['is' + type] = function(arg) {
-					return Object.prototype.toString.call(arg) === "[object " + type + "]";
-				}
+			for (var i = 0; i < types.length; i++) { (function(i) {
+					var type = types[i];
+					ret['is' + type] = function(arg) {
+						return Object.prototype.toString.call(arg) === "[object " + type + "]";
+					}
+				})(i);
 			}
 			return ret;
 		} (),
@@ -111,7 +112,7 @@
 			queue: [],
 			queuefn: [],
 			mods: {},
-			namespace:{},
+			namespace: {},
 			_firequeue: function(fn) {
 				var that = this;
 				function checkready(ary) {
@@ -130,15 +131,15 @@
 					//console.log('interval')
 					if (checkready(that.queue)) {
 						each(that.queue, function(index, o) {
-							if(!that.mods[o['api']]['fired']){
+							if (!that.mods[o['api']]['fired']) {
 								//console.log(o['api'])
 								that.mods[o['api']]['source']();
-								that.mods[o['api']]['fired']=true;
+								that.mods[o['api']]['fired'] = true;
 							}
 						}); //api按照顺序释放
 						each(that.queuefn, function(index, fn) {
-						that.queuefn.splice(index,1,undef);
-						if(fn) fn();
+							that.queuefn.splice(index, 1, undef);
+							if (fn) fn();
 						}); //callback 按照顺序释放
 						clearInterval(timer);
 					}
@@ -148,7 +149,7 @@
 			require: function(api, callback, debug) {
 				var that = this,
 				filename = debug ? debug: '.js';
-				url = root +'/'+  api + '/' + api + filename;
+				url = root + '/' + api + '/' + api + filename;
 
 				function has(ary, val) {
 					var ishas = false;
@@ -161,14 +162,16 @@
 					return ishas;
 				}
 
-				if (!has(that.queue, api)){ 
-				
-				get(url, 'js', function(){done(api)});
-				that.queue.push({
-					api: api,
-					ready: false
-				});
-				
+				if (!has(that.queue, api)) {
+
+					get(url, 'js', function() {
+						done(api)
+					});
+					that.queue.push({
+						api: api,
+						ready: false
+					});
+
 				}
 
 				function done(name) {
@@ -177,14 +180,17 @@
 							api: val,
 							ready: false
 						});
-						that.require(val, function(){done(val)}, debug);
+						that.require(val, function() {
+							done(val)
+						},
+						debug);
 					});
 				}
 				that._firequeue(callback);
 			},
 			define: function(api, source, requires) {
-				this.mods[api]={};
-				this.mods[api]['requires'] = requires ? requires : {};
+				this.mods[api] = {};
+				this.mods[api]['requires'] = requires ? requires: {};
 				this.mods[api]['source'] = source;
 				each(this.queue, function(index, o) {
 					if (o['api'] == api) {
@@ -214,13 +220,13 @@
 			};
 		});
 
-		mix(public,loader);
+		mix(public, loader);
 
 		return public;
 
 	})(['anim', 'io', 'event', 'ua', 'css', 'selector', 'jquery']);
 
-	window.lithe=lithe;
+	window.lithe = lithe;
 
 })(window, document);
 
