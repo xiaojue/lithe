@@ -41,34 +41,6 @@
 			});
 			return o;
 		},
-		extend = function(r, s, px, sx) {
-			if (!s || ! r) return r;
-			var create = Object.create ? function(proto, c) {
-				return Object.create(proto, {
-					constructor: {
-						value: c
-					}
-				});
-			}: function(proto, c) {
-				function F() {}
-				F.prototype = proto;
-				var o = new F();
-				o.constructor = c;
-				return o;
-			},
-			sp = s.prototype,
-			rp;
-			rp = create(sp, r);
-			r.prototype = mix(rp, r.prototype);
-			r.superclass = create(sp, s);
-			if (px) {
-				mix(rp, px);
-			}
-			if (sx) {
-				mix(r, sx);
-			}
-			return r;
-		},
 		root = function() {
 			var files = DOC.getElementsByTagName('script'),
 			self = files[files.length - 1],
