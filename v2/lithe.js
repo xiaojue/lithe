@@ -9,7 +9,7 @@
 	var lithe = (function(API) {
 
 		var typeDet = function() {
-			var types = ["Array", "Object", "String", "Number"],
+			var types = ["Array", "Object", "String", "Number" , "Function"],
 			ret = {};
 			for (var i = 0; i < types.length; i++) { (function(i) {
 					var type = types[i];
@@ -178,7 +178,6 @@
 		mix(public, {
 			each: each,
 			mix: mix,
-			extend: extend,
 			getResoure: get
 		},
 		false, true);
@@ -201,4 +200,3 @@
 	window.lithe = lithe;
 
 })(window, document);
-
