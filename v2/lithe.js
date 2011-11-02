@@ -2,36 +2,78 @@
 * @author fuqiang[designsor@gmail.com]
 * @version 20111030
 * @fileoverview 新版lithe,全部框架颗粒到函数与方法,使用全局代理与loader为基础实现。
+* api设计部分:
+* 类型检测
+* 加载模块（js 和 css）
+* 数据交互（json 和 jsonp）
 */
 
 (function(W, DOC, undef) {
 
 	var lithe = (function(API) {
 
-		var typeDet = function() {
-			var types = ["Array", "Object", "String", "Number" , "Function"],
-			ret = {};
-			for (var i = 0; i < types.length; i++) { (function(i) {
-					var type = types[i];
-					ret['is' + type] = function(arg) {
-						return Object.prototype.toString.call(arg) === "[object " + type + "]";
-					}
-				})(i);
-			}
-			return ret;
-		} (),
-		each = function(arg, callback) {
-			for (var i in arg) {
+    var each=function(arg,callback){
+      for (var i in arg) {
 				if (callback(i, arg[i]) === false) break;
 			}
-		},
-		mix = function(o, s, cover, deep) {
+    }
+
+		var lang = function() {
+			var types = ["Array", "Object", "String", "Number", "Function"],
+			ret = {};
+			ret.isTypeof = function(o) {
+				return Object.prototype.toString.call(o);
+			};
+      each(types,function(index,type){
+        ret['is' + type] = function(arg) {
+						return ret.isTypeof(arg) === "[object " + type + "]";
+				}
+      });
+			return ret;
+		} ();
+
+		lang.inArray = function(array,val) {
+			for (var i = 0; i < array.length; i++) {
+				if (lang.isEqual(array[i], val)) return true;
+			}
+			return false;
+		}
+
+		lang.isEmptyArray = function(array) {
+			return (lang.isArray(array) && array.length == 0);
+		}
+
+		lang.isEmptyObject = function(object) {
+			if (!lang.isObject(object)) return false;
+			for (var i in object) return false;
+			return true;
+		}
+
+		lang.isEqual = function(s, o) {
+
+			if (lang.isTypeof(s) !== lang.isTypeof(o)) return false;
+
+			if (!lang.isArray(s) && ! lang.isObject(s) && ! lang.isArray(o) && ! lang.isObject(o)) return s === o; //严格类型
+
+      if(lang.isFunction(s) && lang.isFunction(o)) return s.toString()===o.toString();
+
+			for (var i in s) {
+				if (o[i] && !lang.isArray(o[i]) && !lang.isObject(o[i]) && lang.isTypeof(o[i]) === lang.isTypeof(s[i]) && o[i] === s[i] || ((isEmptyObject(s[i]) && isEmptyObject(o[i])) || (isEmptyArray(s[i]) && isEmptyArray(o[i])))) {
+					continue;
+				} else {
+					return isEqual(s[i], o[i]);
+				}
+			};
+			return true;
+    };
+
+		var	mix = function(o, s, cover, deep) {
 			each(s, function(i, v) {
 				if (!deep) {
 					if (!o.hasOwnProperty(i) || cover) o[i] = v;
 				} else {
 					if (!o.hasOwnProperty(i) || cover) {
-						if (typeDet.isObject(v)) {
+            if (lang.isObject(v) && !lang.isEmptyObject(v)) {
 							mix(o, v, cover, deep);
 						} else {
 							o[i] = v;
@@ -112,7 +154,7 @@
 						each(that.queuefn, function(index, fn) {
 							that.queuefn.splice(index, 1, undef);
 							if (fn) fn();
-              else that.queuefn.splice(index,1);
+							else that.queuefn.splice(index, 1);
 						}); //callback 按照顺序释放
 						clearInterval(timer);
 					}
@@ -136,7 +178,6 @@
 				}
 
 				if (!has(that.queue, api)) {
-
 					get(url, 'js', function() {
 						done(api)
 					});
@@ -144,7 +185,6 @@
 						api: api,
 						ready: false
 					});
-
 				}
 
 				function done(name) {
@@ -172,27 +212,27 @@
 					}
 				});
 			}
-		},
-		public = mix({},
-		typeDet);
+		};
+
+		var public = {};
 
 		mix(public, {
 			each: each,
 			mix: mix,
-			getResoure: get
-		},
-		false, true);
+			getResoure: get,
+			loader: loader
+		},false, true);
+
+    mix(public,{lang:lang});
 
 		each(API, function(index, api) {
 			public[api] = function() {
 				var arg = Array.prototype.slice.call(arguments, 0);
-				loader.require(api, function() {
+				public.require(api, function() {
 					public['namespace'][api].apply(public, arg);
 				});
 			};
 		});
-
-		mix(public, loader);
 
 		return public;
 
@@ -201,3 +241,4 @@
 	window.lithe = lithe;
 
 })(window, document);
+
