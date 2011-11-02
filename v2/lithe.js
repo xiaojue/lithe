@@ -210,7 +210,12 @@
 		mix(public, {
 			each: each,
 			mix: mix,
-			getResoure: get,
+			getScript: function(url, callback, charset) {
+				get(url, 'js', callback, charset);
+			},
+			getCss: function(url, callback, charset) {
+				get(url, 'css', callback, charset);
+			},
 			loader: loader
 		},
 		false, true);
@@ -232,7 +237,7 @@
 
 	})(['anim', 'io', 'event', 'ua', 'css', 'selector', 'jquery']);
 
-	window.lithe = lithe;
+	W.lithe = lithe;
 
 })(window, document);
 
