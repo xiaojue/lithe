@@ -135,11 +135,11 @@
 				var timer;
 				timer = setInterval(function() {
 					if (checkready(that.queue)) {
-            while(that.queuefn.length!=0){
-              var i = 0;
-              that.queuefn[i]();
-              that.queuefn.shift();
-            }
+						while (that.queuefn.length != 0) {
+							var i = 0;
+							that.queuefn[i]();
+							that.queuefn.shift();
+						}
 						clearInterval(timer);
 					}
 				},
@@ -147,8 +147,8 @@
 			},
 			require: function(api, callback) {
 				var that = this,
-        name=api.name,
-        url = api.path;
+				name = api.name,
+				url = api.path;
 
 				function has(ary, val) {
 					var ishas = false;
@@ -181,24 +181,24 @@
 				that._firequeue(callback);
 			},
 			define: function(api, source, requires) {
-        var that=this;
-        var _api={
-          name:'',
-          path:'',
-          csspath:'',
-          version:'',
-          author:'',
-          fileoverview:''
-        };
-        mix(_api,api,true);
-        var name=_api['name'];
+				var that = this;
+				var _api = {
+					name: '',
+					path: '',
+					csspath: '',
+					version: '',
+					author: '',
+					fileoverview: ''
+				};
+				mix(_api, api, true);
+				var name = _api['name'];
 				that.mods[name] = {};
 				that.mods[name]['requires'] = requires ? requires: [];
 				that.mods[name]['source'] = source;
 				each(that.queue, function(index, o) {
 					if (o['api'] == name) {
 						o['ready'] = true;
-            that['namespace'][name]=that.mods[name]['source']();
+						that['namespace'][name] = that.mods[name]['source']();
 						return false;
 					}
 				});
@@ -225,11 +225,12 @@
 		});
 
 		each(API, function(index, api) {
-      var name=api.name,path=api.path;
+			var name = api.name,
+			path = api.path;
 			public[name] = function() {
 				var arg = Array.prototype.slice.call(arguments, 0);
 				public.require(api, function() {
-					public['namespace'][name].apply(public, arg);
+            public['namespace'][name].apply(null,arg);
 				});
 			};
 		});
@@ -237,13 +238,16 @@
 		return public;
 
 	})([{
-        name:'css',
-        path:'css/css.js'
-      },
-      {
-        name:'io',
-        path:'io/io.js'
-      }]);
+		name: 'css',
+		path: 'css/css.js'
+	},
+	{
+		name: 'io',
+		path: 'io/io.js'
+	},{
+    name:'jquery',
+    path:'jquery/jquery.js'
+  }]);
 
 	W.lithe = lithe;
 
