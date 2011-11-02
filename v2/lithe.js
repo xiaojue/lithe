@@ -229,7 +229,7 @@
 			path = api.path;
 			public[name] = function(callback) {
 				public.require(api, function() {
-            callback(public['namespace'][name]);
+					callback(public['namespace'][name]);
 				});
 			};
 		});
@@ -237,16 +237,37 @@
 		return public;
 
 	})([{
+		name: 'dom',
+		path: 'dom/dom.js',
+	},
+	{
+		name: 'event',
+		path: 'event/event.js',
+	},
+	{
+		name: 'anim',
+		path: 'anim/anim.js',
+	},
+	{
+		name: 'ua',
+		path: 'ua/ua.js',
+	},
+	{
 		name: 'css',
 		path: 'css/css.js'
 	},
 	{
 		name: 'io',
 		path: 'io/io.js'
-	},{
-    name:'jquery',
-    path:'jquery/jquery.js'
-  }]);
+	},
+	{
+		name: 'tools',
+		path: 'tools/tools.js'
+	},
+	{
+		name: 'jquery',
+		path: 'jquery/jquery.js'
+	}]);
 
 	W.lithe = lithe;
 
