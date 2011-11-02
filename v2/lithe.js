@@ -112,6 +112,7 @@
 						each(that.queuefn, function(index, fn) {
 							that.queuefn.splice(index, 1, undef);
 							if (fn) fn();
+              else that.queuefn.splice(index,1);
 						}); //callback 按照顺序释放
 						clearInterval(timer);
 					}
