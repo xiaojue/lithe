@@ -134,13 +134,12 @@
 				that.queuefn.push(fn);
 				var timer;
 				timer = setInterval(function() {
-				//console.log('interval')
 					if (checkready(that.queue)) {
-						each(that.queuefn, function(index, fn) {
-							that.queuefn.splice(index, 1, undef);
-							if (fn) fn();
-							else that.queuefn.splice(index, 1);
-						}); //callback 按照顺序释放
+            while(that.queuefn.length!=0){
+              var i = 0;
+              that.queuefn[i]();
+              that.queuefn.shift();
+            }
 						clearInterval(timer);
 					}
 				},
