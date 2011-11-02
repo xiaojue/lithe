@@ -5,7 +5,11 @@
 </head>
 <body>
 <script>
-lithe.css('css','callback')
+lithe.css('css','callback1');
+lithe.css('css','callback2');
+lithe.io(function(){
+  lithe.css('css','callback3')
+});
 </script>
 </body>
 </html>

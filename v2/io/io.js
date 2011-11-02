@@ -1,7 +1,13 @@
-lithe.define('io',function(){
-	var io=function(arg1,callback){
-		console.log(arg1);
+lithe.define({
+    name:'io',
+    csspath:'',
+    version:'20111102',
+    author:'fuqiang[designsor@gmail.com]',
+    fileoverview:'IO模块'
+},function(){
+  var io=function(callback){
 		if(callback) callback();
 	}
-	lithe.namespace.io=io;
-});
+	return io;
+})
+

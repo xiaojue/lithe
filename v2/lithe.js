@@ -134,15 +134,8 @@
 				that.queuefn.push(fn);
 				var timer;
 				timer = setInterval(function() {
-					console.log('interval')
+				//console.log('interval')
 					if (checkready(that.queue)) {
-						each(that.queue, function(index, o) {
-							if (!that.mods[o['api']]['fired']) {
-								//console.log(o['api'])
-								that.mods[o['api']]['source']();
-								that.mods[o['api']]['fired'] = true;
-							}
-						}); //api按照顺序释放
 						each(that.queuefn, function(index, fn) {
 							that.queuefn.splice(index, 1, undef);
 							if (fn) fn();
@@ -151,11 +144,12 @@
 						clearInterval(timer);
 					}
 				},
-				1000);
+				50);
 			},
 			require: function(api, callback) {
 				var that = this,
-				url = root + '/' + api + '/' + api + '.js';
+        name=api.name,
+        url = api.path;
 
 				function has(ary, val) {
 					var ishas = false;
@@ -168,12 +162,12 @@
 					return ishas;
 				}
 
-				if (!has(that.queue, api)) {
+				if (!has(that.queue, name)) {
 					get(url, 'js', function() {
-						done(api)
+						done(name)
 					});
 					that.queue.push({
-						api: api,
+						api: name,
 						ready: false
 					});
 				}
@@ -188,12 +182,24 @@
 				that._firequeue(callback);
 			},
 			define: function(api, source, requires) {
-				this.mods[api] = {};
-				this.mods[api]['requires'] = requires ? requires: [];
-				this.mods[api]['source'] = source;
-				each(this.queue, function(index, o) {
-					if (o['api'] == api) {
+        var that=this;
+        var _api={
+          name:'',
+          path:'',
+          csspath:'',
+          version:'',
+          author:'',
+          fileoverview:''
+        };
+        mix(_api,api,true);
+        var name=_api['name'];
+				that.mods[name] = {};
+				that.mods[name]['requires'] = requires ? requires: [];
+				that.mods[name]['source'] = source;
+				each(that.queue, function(index, o) {
+					if (o['api'] == name) {
 						o['ready'] = true;
+            that['namespace'][name]=that.mods[name]['source']();
 						return false;
 					}
 				});
@@ -220,17 +226,25 @@
 		});
 
 		each(API, function(index, api) {
-			public[api] = function() {
+      var name=api.name,path=api.path;
+			public[name] = function() {
 				var arg = Array.prototype.slice.call(arguments, 0);
 				public.require(api, function() {
-					public['namespace'][api].apply(public, arg);
+					public['namespace'][name].apply(public, arg);
 				});
 			};
 		});
 
 		return public;
 
-	})(['anim', 'io', 'event', 'ua', 'css', 'selector', 'jquery']);
+	})([{
+        name:'css',
+        path:'css/css.js'
+      },
+      {
+        name:'io',
+        path:'io/io.js'
+      }]);
 
 	W.lithe = lithe;
 
