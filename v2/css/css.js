@@ -3,4 +3,4 @@ lithe.define('css',function(){
 		console.log(arg1+':'+arg2);
 	}
 	lithe.namespace.css=css;
-});
+},['io']);

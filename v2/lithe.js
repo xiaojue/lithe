@@ -134,7 +134,7 @@
 				that.queuefn.push(fn);
 				var timer;
 				timer = setInterval(function() {
-					//console.log('interval')
+					console.log('interval')
 					if (checkready(that.queue)) {
 						each(that.queue, function(index, o) {
 							if (!that.mods[o['api']]['fired']) {
@@ -151,12 +151,11 @@
 						clearInterval(timer);
 					}
 				},
-				10);
+				1000);
 			},
-			require: function(api, callback, debug) {
+			require: function(api, callback) {
 				var that = this,
-				filename = debug ? debug: '.js';
-				url = root + '/' + api + '/' + api + filename;
+				url = root + '/' + api + '/' + api + '.js';
 
 				function has(ary, val) {
 					var ishas = false;
@@ -178,23 +177,19 @@
 						ready: false
 					});
 				}
+
 				function done(name) {
 					each(that.mods[name]['requires'], function(index, val) {
-						that.queue.push({
-							api: val,
-							ready: false
-						});
 						that.require(val, function() {
 							done(val)
-						},
-						debug);
+						});
 					});
 				}
 				that._firequeue(callback);
 			},
 			define: function(api, source, requires) {
 				this.mods[api] = {};
-				this.mods[api]['requires'] = requires ? requires: {};
+				this.mods[api]['requires'] = requires ? requires: [];
 				this.mods[api]['source'] = source;
 				each(this.queue, function(index, o) {
 					if (o['api'] == api) {
