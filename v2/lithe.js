@@ -11,69 +11,61 @@
 (function(W, DOC, undef) {
 
 	var lithe = (function(API) {
-
-    var each=function(arg,callback){
-      for (var i in arg) {
+		var each = function(arg, callback) {
+			for (var i in arg) {
 				if (callback(i, arg[i]) === false) break;
 			}
-    }
-
-		var lang = function() {
+		},
+		lang = function() {
 			var types = ["Array", "Object", "String", "Number", "Function"],
-			ret = {};
-			ret.isTypeof = function(o) {
-				return Object.prototype.toString.call(o);
-			};
-      each(types,function(index,type){
-        ret['is' + type] = function(arg) {
-						return ret.isTypeof(arg) === "[object " + type + "]";
+			ret = {
+				isTypeof: function(o) {
+					return Object.prototype.toString.call(o);
+				},
+				isEmptyArray: function(array) {
+					return (lang.isArray(array) && array.length == 0);
+				},
+				isEmptyObject: function(object) {
+					if (!lang.isObject(object)) return false;
+					for (var i in object) return false;
+					return true;
+				},
+				isEqual: function(s, o) {
+					if (lang.isTypeof(s) !== lang.isTypeof(o)) return false;
+
+					if (!lang.isArray(s) && ! lang.isObject(s) && ! lang.isArray(o) && ! lang.isObject(o)) return s === o; //严格类型
+					if (lang.isFunction(s) && lang.isFunction(o)) return s.toString() === o.toString();
+
+					for (var i in s) {
+						if (o[i] && ! lang.isArray(o[i]) && ! lang.isObject(o[i]) && lang.isTypeof(o[i]) === lang.isTypeof(s[i]) && o[i] === s[i] || ((isEmptyObject(s[i]) && isEmptyObject(o[i])) || (isEmptyArray(s[i]) && isEmptyArray(o[i])))) {
+							continue;
+						} else {
+							return isEqual(s[i], o[i]);
+						}
+					};
+					return true;
+				},
+				inArray: function(array, val) {
+					for (var i = 0; i < array.length; i++) {
+						if (lang.isEqual(array[i], val)) return true;
+					}
+					return false;
 				}
-      });
+			};
+			each(types, function(index, type) {
+				ret['is' + type] = function(arg) {
+					return ret.isTypeof(arg) === "[object " + type + "]";
+				}
+			});
 			return ret;
-		} ();
-
-		lang.inArray = function(array,val) {
-			for (var i = 0; i < array.length; i++) {
-				if (lang.isEqual(array[i], val)) return true;
-			}
-			return false;
-		}
-
-		lang.isEmptyArray = function(array) {
-			return (lang.isArray(array) && array.length == 0);
-		}
-
-		lang.isEmptyObject = function(object) {
-			if (!lang.isObject(object)) return false;
-			for (var i in object) return false;
-			return true;
-		}
-
-		lang.isEqual = function(s, o) {
-
-			if (lang.isTypeof(s) !== lang.isTypeof(o)) return false;
-
-			if (!lang.isArray(s) && ! lang.isObject(s) && ! lang.isArray(o) && ! lang.isObject(o)) return s === o; //严格类型
-
-      if(lang.isFunction(s) && lang.isFunction(o)) return s.toString()===o.toString();
-
-			for (var i in s) {
-				if (o[i] && !lang.isArray(o[i]) && !lang.isObject(o[i]) && lang.isTypeof(o[i]) === lang.isTypeof(s[i]) && o[i] === s[i] || ((isEmptyObject(s[i]) && isEmptyObject(o[i])) || (isEmptyArray(s[i]) && isEmptyArray(o[i])))) {
-					continue;
-				} else {
-					return isEqual(s[i], o[i]);
-				}
-			};
-			return true;
-    };
-
-		var	mix = function(o, s, cover, deep) {
+		} (),
+		mix = function(o, s, cover, deep) {
 			each(s, function(i, v) {
 				if (!deep) {
 					if (!o.hasOwnProperty(i) || cover) o[i] = v;
 				} else {
 					if (!o.hasOwnProperty(i) || cover) {
-            if (lang.isObject(v) && !lang.isEmptyObject(v)) {
+						if (lang.isObject(v) && ! lang.isEmptyObject(v)) {
 							mix(o, v, cover, deep);
 						} else {
 							o[i] = v;
@@ -186,7 +178,6 @@
 						ready: false
 					});
 				}
-
 				function done(name) {
 					each(that.mods[name]['requires'], function(index, val) {
 						that.queue.push({
@@ -221,9 +212,12 @@
 			mix: mix,
 			getResoure: get,
 			loader: loader
-		},false, true);
+		},
+		false, true);
 
-    mix(public,{lang:lang});
+		mix(public, {
+			lang: lang
+		});
 
 		each(API, function(index, api) {
 			public[api] = function() {
