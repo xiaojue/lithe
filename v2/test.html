@@ -6,20 +6,32 @@
 <body>
   <div id="jquery"></div>
 <script>
-  lithe.css('css','callback1');
-  lithe.css('css','callback2');
-  lithe.css('css','callback3');
-  lithe.css('css','callback4');
-  /*
-lithe.io(function(){
-  lithe.css('css','callback5');
-  lithe.io(function(){
-    lithe.css('css','6')
+	lithe.css(function(css){
+		css('css','1');
+	});
+	lithe.css(function(css){
+		css('css','2');
+	});
+	lithe.css(function(css){
+		css('css','3');
+	});
+
+lithe.io(function(io){
+  lithe.css(function(css){
+		css('css','4');
+	});
+  lithe.io(function(io){
+    lithe.css(function(css){
+			css('css','5');
+		});
   });
 });
-*/
-lithe.jquery(function(){
+
+lithe.jquery(function($){
+	$('#jquery').text('jquery is ready');
+	console.log('jquery:6')
 });
+
 </script>
 </body>
 </html>

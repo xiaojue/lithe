@@ -227,10 +227,9 @@
 		each(API, function(index, api) {
 			var name = api.name,
 			path = api.path;
-			public[name] = function() {
-				var arg = Array.prototype.slice.call(arguments, 0);
+			public[name] = function(callback) {
 				public.require(api, function() {
-            public['namespace'][name].apply(null,arg);
+            callback(public['namespace'][name]);
 				});
 			};
 		});
