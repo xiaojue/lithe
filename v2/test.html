@@ -5,7 +5,8 @@
 </head>
 <body>
   <div id="jquery"></div>
-<script>
+  <script>
+    /*
 	lithe.css(function(css){
 		css('css','1');
 	});
@@ -30,7 +31,14 @@ lithe.io(function(io){
 lithe.jquery(function($){
 	$('#jquery').text('jquery is ready');
 	console.log('jquery:6')
-});
+});*/
+lithe.use(['css','jquery','io'],function(css,jquery,io){
+  css('css',1);
+  jquery('#jquery').text('jquery is ready');
+  io(function(){
+    console.log('io3');
+  });
+})
 
 </script>
 </body>

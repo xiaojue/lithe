@@ -203,7 +203,23 @@
 					}
 				});
 			}
-		};
+		},
+    use=function(mods,callback){
+      var APIS=[];
+      each(mods,function(i,mod){
+          each(API,function(j,api){
+              var name = api.name;
+              if(name==mod){
+                public.require(api,function(){
+                    APIS.push(public['namespace'][name]);
+                    if(APIS.length==mods.length){
+                      callback.apply(null,APIS);
+                    }
+                });
+              }
+          });
+        });
+    };
 
 		var public = {};
 
@@ -216,7 +232,8 @@
 			getCss: function(url, callback, charset) {
 				get(url, 'css', callback, charset);
 			},
-			loader: loader
+			loader: loader,
+      use:use
 		},
 		false, true);
 
@@ -225,8 +242,7 @@
 		});
 
 		each(API, function(index, api) {
-			var name = api.name,
-			path = api.path;
+        var name = api.name;
 			public[name] = function(callback) {
 				public.require(api, function() {
 					callback(public['namespace'][name]);
