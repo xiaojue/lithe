@@ -1,1 +1,0 @@
-﻿lithe javascript LIB by xiaojue
