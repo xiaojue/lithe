@@ -1,7 +1,17 @@
-﻿lithe javascript LIB by xiaojue
-===============================
+﻿lithe javascript lib 
+====================
   
-### v1 - give up halfway
+V1
+--
+is abortive
   
-### v2 - modules javascript
+V2   
+--
+base for modules
   
+Contact
+-------
+  
+  - Author:Fuqiang
+  - Blog:<http://www.designsor.com>
+  - Email:<designsor@gmail.com>
