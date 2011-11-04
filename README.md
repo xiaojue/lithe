@@ -3,11 +3,11 @@
   
 V1
 --
-is abortive
+Abortive
   
 V2   
 --
-base for modules
+Dependent on module
   
 Contact
 -------
