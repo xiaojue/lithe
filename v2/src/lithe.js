@@ -10,7 +10,8 @@
 
 (function(W, DOC, undef) {
 
-	var lithe = (function(API) {
+	var publicObjectObejct,
+    lithe = (function(API) {
 		var each = function(arg, callback) {
 			for (var i in arg) {
 				if (callback(i, arg[i]) === false) break;
@@ -23,7 +24,7 @@
 					return Object.prototype.toString.call(o);
 				},
 				isEmptyArray: function(array) {
-					return (lang.isArray(array) && array.length == 0);
+					return (lang.isArray(array) && array.length === 0);
 				},
 				isEmptyObject: function(object) {
 					if (!lang.isObject(object)) return false;
@@ -42,7 +43,7 @@
 						} else {
 							return isEqual(s[i], o[i]);
 						}
-					};
+					}
 					return true;
 				},
 				inArray: function(array, val) {
@@ -55,8 +56,8 @@
 			each(types, function(index, type) {
 				ret['is' + type] = function(arg) {
 					return ret.isTypeof(arg) === "[object " + type + "]";
-				}
-			});
+        };
+      });
 			return ret;
 		} (),
 		mix = function(o, s, cover, deep) {
@@ -94,7 +95,7 @@
 							if (callback) callback();
 							ele.onload = ele.onreadystatechange = null;
 						}
-					}
+          };
 				},
 				'css': function() {
 					ele = DOC.createElement('link');
@@ -106,7 +107,7 @@
 						if (callback) callback();
 						img.onerror = null;
 						img = null;
-					}
+          };
 					img.src = url;
 				}
 			};
@@ -129,13 +130,13 @@
 							return false;
 						}
 					});
-					return isReady;
-				};
+        return isReady;
+				}
 				that.queuefn.push(fn);
 				var timer;
 				timer = setInterval(function() {
 					if (checkready(that.queue)) {
-						while (that.queuefn.length != 0) {
+						while (that.queuefn.length !== 0) {
 							var i = 0;
 							that.queuefn[i]();
 							that.queuefn.shift();
@@ -156,14 +157,14 @@
 						if (o['api'] == val) {
 							ishas = true;
 							return false;
-						};
+						}
 					});
 					return ishas;
 				}
 
 				if (!has(that.queue, name)) {
 					get(url, 'js', function() {
-						done(name)
+              done(name);
 					});
 					that.queue.push({
 						api: name,
@@ -174,7 +175,7 @@
 				function done(name) {
 					each(that.mods[name]['requires'], function(index, val) {
 						that.require(val, function() {
-							done(val)
+                done(val);
 						});
 					});
 				}
@@ -204,26 +205,25 @@
 				});
 			}
 		},
-    use=function(mods,callback){
-      var APIS=[];
-      each(mods,function(i,mod){
-          each(API,function(j,api){
-              var name = api.name;
-              if(name==mod){
-                public.require(api,function(){
-                    APIS.push(public['namespace'][name]);
-                    if(APIS.length==mods.length){
-                      callback.apply(null,APIS);
-                    }
-                });
-              }
-          });
-        });
-    };
+		use = function(mods, callback) {
+			var APIS = [];
+			each(mods, function(i, mod) {
+				each(API, function(j, api) {
+					var name = api.name;
+					if (name === mod) {
+						publicObjectObejct.require(api, function() {
+							APIS.push(publicObjectObejct['namespace'][name]);
+							if (APIS.length == mods.length) {
+								callback.apply(null, APIS);
+							}
+						});
+					}
+				});
+			});
+		};
 
-		var public = {};
 
-		mix(public, {
+		mix(publicObject, {
 			each: each,
 			mix: mix,
 			getScript: function(url, callback, charset) {
@@ -233,40 +233,40 @@
 				get(url, 'css', callback, charset);
 			},
 			loader: loader,
-      use:use
+			use: use
 		},
 		false, true);
 
-		mix(public, {
+		mix(publicObject, {
 			lang: lang
 		});
 
 		each(API, function(index, api) {
-        var name = api.name;
-			public[name] = function(callback) {
-				public.require(api, function() {
-					callback(public['namespace'][name]);
+			var name = api.name;
+			publicObject[name] = function(callback) {
+				publicObject.require(api, function() {
+					callback(publicObject['namespace'][name]);
 				});
 			};
 		});
 
-		return public;
+		return publicObject;
 
 	})([{
 		name: 'dom',
-		path: 'dom/dom.js',
+		path: 'dom/dom.js'
 	},
 	{
 		name: 'event',
-		path: 'event/event.js',
+		path: 'event/event.js'
 	},
 	{
 		name: 'anim',
-		path: 'anim/anim.js',
+		path: 'anim/anim.js'
 	},
 	{
 		name: 'ua',
-		path: 'ua/ua.js',
+		path: 'ua/ua.js'
 	},
 	{
 		name: 'css',
@@ -288,4 +288,3 @@
 	W.lithe = lithe;
 
 })(window, document);
-
