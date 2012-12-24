@@ -1,17 +1,4 @@
 ﻿lithe javascript lib 
 ====================
   
-V1
---
-Abortive
-  
-V2   
---
-Dependent on module
-  
-Contact
--------
-  
-  - Author:Fuqiang
-  - Blog:<http://www.designsor.com>
-  - Email:<designsor@gmail.com>
+  轻巧，简单的构建web应用框架，符合commonjs规范和amd，cmd规范写法。
