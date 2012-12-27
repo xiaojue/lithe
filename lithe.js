@@ -114,6 +114,38 @@
 			baseElement ? header.insertBefore(node, baseElement) : header.appendChild(node);
 			currentScript = undefined;
 		},
+		getScript: function(url, cb, charset) {
+			var node = tool._createNode('script', charset);
+			node.onload = node.onerror = node.onreadystatechange = function() {
+				if (/loaded|complete|undefined/.test(node.readyState)) {
+					node.onload = node.onerror = node.onreadystatechange = null;
+					if (node.parentNode) node.parentNode.removeChild(node);
+					node = undefined;
+					if (tool.isFunction(cb)) cb();
+				}
+			};
+			node.async = 'async';
+			node.src = url;
+			tool._insertScript(node);
+		},
+		getCss: function(url, cb, charset) {
+			var node = this._createNode('link', charset);
+			if (less536Webkit || less9Firefox) {
+				setTimeout(function() {
+					tool._poll(node, cb);
+				},
+				1);
+			} else {
+				node.onload = node.onerror = function() {
+					node.onload = node.onerror = null;
+					node = undefined;
+					if (tool.isFunction(cb)) cb();
+				};
+			}
+			node.rel = 'stylesheet';
+			node.href = url;
+			tool._insertScript(node);
+		},
 		dirname: function(path) {
 			var s = path.match(/[^?]*(?=\/.*$)/);
 			return (s ? s[0] : '.') + '/';
@@ -184,38 +216,6 @@
 				if (id.indexOf('://') > 0 || id.indexOf('//') === 0) return id;
 				else return tool.resolve(id, BASEPATH);
 			});
-		},
-		getScript: function(url, cb, charset) {
-			var node = tool._createNode('script', charset);
-			node.onload = node.onerror = node.onreadystatechange = function() {
-				if (/loaded|complete|undefined/.test(node.readyState)) {
-					node.onload = node.onerror = node.onreadystatechange = null;
-					if (node.parentNode) node.parentNode.removeChild(node);
-					node = undefined;
-					if (tool.isFunction(cb)) cb();
-				}
-			};
-			node.async = 'async';
-			node.src = url;
-			tool._insertScript(node);
-		},
-		getCss: function(url, cb, charset) {
-			var node = this._createNode('link', charset);
-			if (less536Webkit || less9Firefox) {
-				setTimeout(function() {
-					tool._poll(node, cb);
-				},
-				1);
-			} else {
-				node.onload = node.onerror = function() {
-					node.onload = node.onerror = null;
-					node = undefined;
-					if (tool.isFunction(cb)) cb();
-				};
-			}
-			node.rel = 'stylesheet';
-			node.href = url;
-			tool._insertScript(node);
 		}
 	});
 
