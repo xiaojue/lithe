@@ -228,7 +228,7 @@
 		this.dependencies = [];
 		this.exports = null;
 		this.parent = [];
-        this.requires = {};
+		this.requires = {};
 		this.factory = noop;
 	}
 
