@@ -43,9 +43,6 @@
 		isObject: function(v) {
 			return val === obj(val);
 		},
-		attr: function(node, key) {
-
-		},
 		forEach: Arr.forEach ? function(arr, fn) {
 			arr.forEach(fn);
 		}: function(arr, fn) {
