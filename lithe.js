@@ -292,7 +292,7 @@
 			if (!tool.isString(id) || ! tool.isFunction(factory)) {
 				throw 'define failed';
 			}
-            id = tool.createUrl([id]);
+			id = tool.createUrl([id]);
 			var deps = tool.getDependencies(factory.toString()),
 			mod = module.cache[id] || (module.cache[id] = new module(id));
 			if (mod.status < module.status.save) {
@@ -383,3 +383,4 @@
 	module.use(mainjs);
 
 })();
+
