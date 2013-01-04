@@ -16,7 +16,7 @@
 	scripts = doc.getElementsByTagName('script'),
 	currentLoadedScript = scripts[scripts.length - 1],
 	BASEPATH = currentLoadedScript.src || currentLoadedScript.getAttribute('src'),
-    mainjs = currentLoadedScript.getAttribute('data-main'),
+	mainjs = currentLoadedScript.getAttribute('data-main'),
 	CHARSET = 'utf-8',
 	baseElement = header.getElementsByTagName('base')[0],
 	commentRegExp = /(\/\*([\s\S]*?)\*\/|([^:]|^)\/\/(.*)$)/mg,
@@ -292,19 +292,17 @@
 			if (!tool.isString(id) || ! tool.isFunction(factory)) {
 				throw 'define failed';
 			}
+            id = tool.createUrl([id]);
 			var deps = tool.getDependencies(factory.toString()),
 			mod = module.cache[id] || (module.cache[id] = new module(id));
 			if (mod.status < module.status.save) {
-				mod.id = meta.id;
+				mod.id = id;
 				mod.dependencies = tool.createUrl(deps);
 				mod.factory = factory;
 				mod.status = module.status.save;
 			}
-		}
-	});
-
-	extend(module.prototype, {
-		_use: function(ids, cb) {
+		},
+		use: function(ids, cb) {
 			tool.isString(ids) && (ids = [ids]);
 			var urls = tool.createUrl(ids);
 
@@ -318,7 +316,7 @@
 		_fetch: function(urls, cb) {
 			var STATUS = module.status,
 			loadUris = tool.filter(urls, function(url) {
-				return url && module.cache[url].status < STATUS.ready;
+				return url && (!module.cache[url] || module.cache[url].status < STATUS.ready);
 			}),
 			len = loadUris.length;
 			if (len === 0) {
@@ -335,7 +333,7 @@
 						if (mod.status >= STATUS.save) {
 							var deps = tool.getPureDependencies(mod);
 							if (deps.length) {
-								module.prototype._fetch(deps, function() {
+								module._fetch(deps, function() {
 									restart(mod);
 								});
 							} else {
@@ -351,7 +349,10 @@
 					(queue === 0) && cb();
 				}
 			}
-		},
+		}
+	});
+
+	extend(module.prototype, {
 		_compile: function() {
 			var mod = this,
 			STATUS = module.status;
@@ -377,8 +378,8 @@
 		}
 	});
 
-    win.define = module.define;
-    var globalModule = new module(mainjs);
-    globalModule._use(mainjs);
+	win.define = module.define;
+
+	module.use(mainjs);
 
 })();
