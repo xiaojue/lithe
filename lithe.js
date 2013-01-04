@@ -16,10 +16,15 @@
 	scripts = doc.getElementsByTagName('script'),
 	currentLoadedScript = scripts[scripts.length - 1],
 	BASEPATH = currentLoadedScript.src || currentLoadedScript.getAttribute('src'),
+    mainjs = currentLoadedScript.getAttribute('data-main'),
+	CHARSET = 'utf-8',
 	baseElement = header.getElementsByTagName('base')[0],
 	commentRegExp = /(\/\*([\s\S]*?)\*\/|([^:]|^)\/\/(.*)$)/mg,
 	jsRequireRegExp = /[^.]\s*require\s*\(\s*["']([^'"\s]+)["']\s*\)/g,
-	currentScript,
+	fetching = {},
+	callbacks = {},
+	fetched = {},
+	circularStack = [],
 	extend = function(source, options) {
 		if (arguments.length === 1) return source;
 		else {
@@ -110,9 +115,7 @@
 			return node;
 		},
 		_insertScript: function(node) {
-			currentScript = node;
 			baseElement ? header.insertBefore(node, baseElement) : header.appendChild(node);
-			currentScript = undefined;
 		},
 		getScript: function(url, cb, charset) {
 			var node = tool._createNode('script', charset);
@@ -128,23 +131,70 @@
 			node.src = url;
 			tool._insertScript(node);
 		},
-		getCss: function(url, cb, charset) {
-			var node = this._createNode('link', charset);
-			if (less536Webkit || less9Firefox) {
-				setTimeout(function() {
-					tool._poll(node, cb);
-				},
-				1);
-			} else {
-				node.onload = node.onerror = function() {
-					node.onload = node.onerror = null;
-					node = undefined;
-					if (tool.isFunction(cb)) cb();
-				};
+		_fetch: function(url, cb) {
+			if (fetched[url]) {
+				cb();
+				return;
 			}
-			node.rel = 'stylesheet';
-			node.href = url;
-			tool._insertScript(node);
+			if (fetching[url]) {
+				callbacks[url].push(cb);
+				return;
+			}
+			fetching[url] = true;
+			callbacks[url] = [cb];
+			tool.getScript(url, function() {
+				fetched[url] = true;
+				delete fetching[url];
+				var fns = callbacks[url];
+				if (fns) {
+					delete callbacks[url];
+					tool.forEach(fns, function(fn) {
+						fn();
+					});
+				}
+			},
+			CHARSET);
+		},
+		getDependencies: function(code) {
+			var deps = [];
+			code.replace(commentRegExp, '').replace(jsRequireRegExp, function(match, dep) {
+				deps.push(dep);
+			});
+			return tool.unique(deps);
+		},
+		getPureDependencies: function(mod) {
+			var id = mod.id;
+			return tool.filter(mod.dependencies, function(dep) {
+				circularStack.push(id);
+				var isCircular = tool.isCircularWaiting(module.cache[dep]);
+				if (isCircular) {
+					//the circular is ready
+					circularStack.push(id);
+				}
+				circularStack.pop();
+				return ! isCircular;
+			});
+		},
+		isCircularWaiting: function(mod) {
+			if (!mod || mod.status !== module.status.save) return false;
+			circularStack.push(mod.uri);
+			var deps = mod.dependencies;
+			if (deps.length) {
+				if (tool.isOverlap(deps, circularStack)) return true;
+				for (var i = 0; i < deps.length; i++) {
+					if (tool.isCircularWaiting(module.cache[deps[i]])) return true;
+				}
+			}
+			circularStack.pop();
+			return false;
+		},
+		isOverlap: function(arrA, arrB) {
+			var arrC = arrA.concat(arrB);
+			return arrC.length > tool.unique(arrC).length;
+		},
+		runModuleContext: function(fn, mod) {
+			var ret = fn(mod.require, mod.exports, mod);
+			if (ret !== undefined) mod.exports = ret;
 		},
 		dirname: function(path) {
 			var s = path.match(/[^?]*(?=\/.*$)/);
@@ -231,24 +281,25 @@
 
 	extend(module, {
 		cache: {},
-		compiles: [],
 		status: {
 			'created': 0,
-			'loading': 1,
-			'loaded': 2,
-			'save': 3,
-			'ready': 4,
-			'compiling': 5,
-			'compiled': 6
+			'save': 1,
+			'ready': 2,
+			'compiling': 3,
+			'compiled': 4
 		},
-		define: function() {
-
-		},
-		require: function() {
-
-		},
-		find: function() {
-
+		define: function(id, factory) {
+			if (!tool.isString(id) || ! tool.isFunction(factory)) {
+				throw 'define failed';
+			}
+			var deps = tool.getDependencies(factory.toString()),
+			mod = module.cache[id] || (module.cache[id] = new module(id));
+			if (mod.status < module.status.save) {
+				mod.id = meta.id;
+				mod.dependencies = tool.createUrl(deps);
+				mod.factory = factory;
+				mod.status = module.status.save;
+			}
 		}
 	});
 
@@ -265,12 +316,69 @@
 			});
 		},
 		_fetch: function(urls, cb) {
-
+			var STATUS = module.status,
+			loadUris = tool.filter(urls, function(url) {
+				return url && module.cache[url].status < STATUS.ready;
+			}),
+			len = loadUris.length;
+			if (len === 0) {
+				cb();
+				return;
+			}
+			var queue = len;
+			for (var i = 0; i < len; i++) { (function(url) {
+					var mod = module.cache[url] || (module.cache[url] = new module(url));
+					mod.status < module.status.save ? tool._fetch(url, success) : success();
+					function success() {
+						//before success the define method all ready changed mod and created new dependencies
+						mod = module.cache[url];
+						if (mod.status >= STATUS.save) {
+							var deps = tool.getPureDependencies(mod);
+							if (deps.length) {
+								module.prototype._fetch(deps, function() {
+									restart(mod);
+								});
+							} else {
+								restart(mod);
+							}
+						} else {
+							//404 or no module
+							restart();
+						}
+					}
+				})(loadUris[i]);
+				function restart(mod) { (mod || {}).status < STATUS.ready && (mod.status = STATUS.ready); --queue;
+					(queue === 0) && cb();
+				}
+			}
 		},
 		_compile: function() {
-
+			var mod = this,
+			STATUS = module.status;
+			if (mod.status === STATUS.compiled) return mod.exports;
+			if (mod.status < STATUS.save) return null;
+			mod.status = STATUS.compiling;
+			function require(id) {
+				var child = module.cache[tool.createUrl([id])];
+				if (!child) return null;
+				if (child.status === STATUS.compiled) return child.exports;
+				child.parent = mod;
+				return child._compile();
+			}
+			require.cache = module.cache;
+			mod.require = require;
+			mod.exports = {};
+			var fun = mod.factory;
+			if (tool.isFunction(fun)) {
+				tool.runModuleContext(fun, mod);
+			}
+			mod.status = STATUS.compiled;
+			return mod.exports;
 		}
 	});
 
-})();
+    win.define = module.define;
+    var globalModule = new module(mainjs);
+    globalModule._use(mainjs);
 
+})();
