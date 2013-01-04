@@ -42,12 +42,6 @@
 		isFunction: function(v) {
 			return toString.call(v) === '[object Function]';
 		},
-		isArray: function(v) {
-			return toString.call(v) === '[object Array]';
-		},
-		isObject: function(v) {
-			return val === obj(val);
-		},
 		forEach: Arr.forEach ? function(arr, fn) {
 			arr.forEach(fn);
 		}: function(arr, fn) {
@@ -383,4 +377,3 @@
 	module.use(mainjs);
 
 })();
-
