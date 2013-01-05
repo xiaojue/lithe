@@ -18,7 +18,7 @@
 		scripts = doc.getElementsByTagName('script'),
 		currentLoadedScript = scripts[scripts.length - 1],
 		BASEPATH = currentLoadedScript.getAttribute('data-path') || currentLoadedScript.src || currentLoadedScript.getAttribute('src'),
-        CONFIG = currentLoadedScript.getAttribute('data-config'),
+		CONFIG = currentLoadedScript.getAttribute('data-config'),
 		mainjs = currentLoadedScript.getAttribute('data-main'),
 		CHARSET = 'utf-8',
 		baseElement = header.getElementsByTagName('base')[0],
@@ -45,9 +45,9 @@
 			isFunction: function(v) {
 				return toString.call(v) === '[object Function]';
 			},
-            isObject:function(v){
-                return v === Obj(v);
-            },
+			isObject: function(v) {
+				return v === Obj(v);
+			},
 			forEach: Arr.forEach ? function(arr, fn) {
 				arr.forEach(fn);
 			}: function(arr, fn) {
@@ -262,8 +262,8 @@
 			},
 			createUrl: function(ids) {
 				return tool.map(ids, function(id) {
-                    //alias
-                    if(tool.isObject(CONFIG) && CONFIG.hasOwnProperty('alias') && CONFIG.alias.hasOwnProperty(id)) id = CONFIG.alias[id];
+					//alias
+					if (tool.isObject(CONFIG) && CONFIG.hasOwnProperty('alias') && CONFIG.alias.hasOwnProperty(id)) id = CONFIG.alias[id];
 					//isAbsolute
 					if (id.indexOf('://') > 0 || id.indexOf('//') === 0) return id;
 					else return tool.resolve(id, BASEPATH);
@@ -382,18 +382,18 @@
 
 		//browser api
 		global.define = module.define;
-        global.lithe = extend({
-            use:module.use
-        });
-        //use by prev config loaded
-        if(CONFIG){
-            module.use(CONFIG,function(cg){
-                CONFIG = cg;
-		        module.use(mainjs);
-            });
-        }else{
-		    module.use(mainjs);
-        }
+		global.lithe = extend({
+			use: module.use
+		});
+		//use by prev config loaded
+		if (CONFIG) {
+			module.use(CONFIG, function(cg) {
+				CONFIG = cg;
+				module.use(mainjs);
+			});
+		} else {
+			module.use(mainjs);
+		}
 	} else {
 		//node api 
 		exports.require = noop;
