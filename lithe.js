@@ -46,7 +46,7 @@
 				return toString.call(v) === '[object Function]';
 			},
             isObject:function(v){
-                return v === Obj(val);
+                return v === Obj(v);
             },
 			forEach: Arr.forEach ? function(arr, fn) {
 				arr.forEach(fn);
@@ -388,6 +388,7 @@
         //use by prev config loaded
         if(CONFIG){
             module.use(CONFIG,function(cg){
+                CONFIG = cg;
 		        module.use(mainjs);
             });
         }else{
