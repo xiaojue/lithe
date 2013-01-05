@@ -17,7 +17,7 @@
 		less9Firefox = UA.indexOf('Firefox') > 0 && ! ('onload' in doc.createElement('link')),
 		scripts = doc.getElementsByTagName('script'),
 		currentLoadedScript = scripts[scripts.length - 1],
-		BASEPATH = currentLoadedScript.src || currentLoadedScript.getAttribute('src'),
+		BASEPATH = currentLoadedScript.getAttribute('data-path') || currentLoadedScript.src || currentLoadedScript.getAttribute('src'),
 		mainjs = currentLoadedScript.getAttribute('data-main'),
 		CHARSET = 'utf-8',
 		baseElement = header.getElementsByTagName('base')[0],
