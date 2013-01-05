@@ -378,8 +378,8 @@
 		global.define = module.define;
 		module.use(mainjs);
 	} else {
-		//node api
-		exports.require = require('./lithe-require.js').require;
+		//node api 
+		exports.require = noop;
 	}
 
 })(this);
