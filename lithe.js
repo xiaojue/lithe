@@ -308,7 +308,7 @@
 				tool.isString(ids) && (ids = [ids]);
 				var urls = tool.createUrl(ids);
 
-				this._fetch(urls, function() {
+				module._fetch(urls, function() {
 					var args = tool.map(urls, function(url) {
 						return url ? module.cache[url]._compile() : null;
 					});
