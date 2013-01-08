@@ -43,7 +43,7 @@ lithe.use('path/to/app',function(app){
 });
 //or
 lithe.use('a.js','b.js',function(a,b){
-  //a and b is required;
+  //a and b has required;
 });
 ```
 
@@ -62,7 +62,7 @@ define('config',function(require,exports,module){
 define('someOtherJs',function(){
   var app = require('app'),
   file = require('file');
-  //now the path/to/app and path/to/file is required
+  //now the path/to/app and path/to/file has required
 });
 ```
 
