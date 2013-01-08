@@ -4,9 +4,9 @@
 
 ---
 
-public api
+## public api
 
-## define
+### define
 
 ```js
 //path/to/file.js
@@ -23,7 +23,7 @@ define('path/to/file',function(require,exports,module){
 });
 ```
 
-## require
+### require
 
 ```js
 //path/to/app.js
@@ -34,7 +34,7 @@ define('path/to/app',function(require,exports,module){
   module.exports = 'i am app.js';
 });
 ```
-## lithe.use
+### lithe.use
 
 ```js
 //anywhere
@@ -47,7 +47,7 @@ lithe.use('a.js','b.js',function(a,b){
 });
 ```
 
-## config
+### config
 
 ```js
 define('config',function(require,exports,module){
@@ -66,7 +66,7 @@ define('someOtherJs',function(){
 });
 ```
 
-## 如何部署？
+### 如何部署？
 
 ```html
 <script src="/lithe.js" data-config="/config.js" data-path="http://domain.com/" data-main="app.js"></script>
