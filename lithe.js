@@ -395,8 +395,7 @@
 		}
 	} else {
 		//node api 
-		exports.require = noop;
+		var buildTool = require('./lithe-build.js').tool;
+        exports.tool = buildTool;
 	}
-
 })(this);
-
