@@ -1,10 +1,10 @@
 # Lithe
 
-一个前端javascript模块加载器，保持cmd实现和amd方法的调用，尽量做到精简小巧，方便上手和部署于各种项目。
+A browser-side script loader,compatible with the de facto standards(NodeJS/CommonJS).
 
 ---
 
-## public api
+## public api for browser
 
 ### define
 
@@ -66,10 +66,42 @@ define('someOtherJs',function(){
 });
 ```
 
-### 如何部署？
+## public api for node
 
-```html
-<script src="/lithe.js" data-config="/config.js" data-path="http://domain.com/" data-main="app.js"></script>
+```js
+//npm install lithe
+//npm install -d
+var tool = require('lithe').tool
 ```
 
-嗯，就是这么简单！
+### tool.findJsAllrequires([filepath],[alias]) 
+
+```js
+var requires = tool.findJsAllrequires('../app.js',{'$':'path/to/jquery'});
+//app.js's requires are findout and alias will be replaced  
+```
+### tool.concatFile([files],[target])
+
+```js
+tool.concatFile(['/path/to/file1.js','/path/to/file2.js'],'/path/to/file1&file2.js');
+//file1 and file2 will be merger
+```
+
+### tool.uglifyJs([filepath],[target])
+
+```js
+tool.uglifyJs('/path/to/file1&file2.js','path/to/file1&file2-min.js');
+//Equivalent uglifyjs --reserved-names require -o path/to/file1&file2-min.js /path/to/file1&file2.js
+```
+## How to deploy in the web browser？
+
+```html
+<script src="/lithe.js" 
+        data-config="/config.js"
+        data-path="http://domain.com/"
+        data-main="app.js">
+</script>
+```
+## License
+
+BSD license
