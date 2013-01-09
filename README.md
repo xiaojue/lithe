@@ -1,6 +1,7 @@
 # Lithe
 
 A browser-side script loader,compatible with the de facto standards(NodeJS/CommonJS).
+It's very simple and small,compressed with gzip after only 2.5kb.
 
 ---
 
