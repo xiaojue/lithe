@@ -388,6 +388,7 @@
 		if (CONFIG) {
 			module.use(CONFIG, function(cg) {
 				CONFIG = cg;
+                if(CONFIG.hasOwnProperty('base')) BASEPATH = CONFIG.base;
 				module.use(mainjs);
 			});
 		} else {
