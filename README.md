@@ -1,7 +1,7 @@
 # Lithe
 
 A browser-side script loader,compatible with the de facto standards(NodeJS/CommonJS).
-It's very simple and small,only 2.5kb gzipped.
+It's very simple and small,only 2.6kb gzipped.
 
 ---
 
@@ -53,10 +53,15 @@ lithe.use('a.js','b.js',function(a,b){
 ```js
 define('config',function(require,exports,module){
    module.exports = {
+      base:'http://localhost/debug/path', 
+      //it will replace the real BASEPATH
+      timestamp:new Date().valueOf(), 
+      //for debug or update timestamp ? All javascript modules will be used
       alias:{
         'app':'path/to/app',
         'file':'path/to/file'
-      } 
+      }
+      //logogram
    };
 });
 
