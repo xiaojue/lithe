@@ -18,8 +18,8 @@
 		scripts = doc.getElementsByTagName('script'),
 		currentLoadedScript = scripts[scripts.length - 1],
 		BASEPATH = currentLoadedScript.getAttribute('data-path') || currentLoadedScript.src || currentLoadedScript.getAttribute('src'),
-        ALIAS,
-        TIMESTAMP,
+		ALIAS,
+		TIMESTAMP,
 		CONFIG = currentLoadedScript.getAttribute('data-config'),
 		mainjs = currentLoadedScript.getAttribute('data-main'),
 		CHARSET = 'utf-8',
@@ -267,14 +267,14 @@
 					//alias
 					if (ALIAS && ALIAS.hasOwnProperty(id)) id = ALIAS[id];
 					//isAbsolute
-					if (id.indexOf('://') > 0 || id.indexOf('//') === 0){
-                        if (TIMESTAMP) id = id + '?' + TIMESTAMP;
-                        return id;
-                    }else{ 
-                        id = tool.resolve(id, BASEPATH);
-                        if (TIMESTAMP) id = id + '?' + TIMESTAMP;
-                        return id;
-                    }
+					if (id.indexOf('://') > 0 || id.indexOf('//') === 0) {
+						if (TIMESTAMP) id = id + '?' + TIMESTAMP;
+						return id;
+					} else {
+						id = tool.resolve(id, BASEPATH);
+						if (TIMESTAMP) id = id + '?' + TIMESTAMP;
+						return id;
+					}
 				});
 			}
 		});
@@ -395,9 +395,9 @@
 		//use by prev config loaded
 		if (CONFIG) {
 			module.use(CONFIG, function(cg) {
-                if(cg.hasOwnProperty('alias')) ALIAS = cg.alias;
-                if(cg.hasOwnProperty('base')) BASEPATH = cg.base;
-                if(cg.hasOwnProperty('timestamp')) TIMESTAMP = cg.timestamp;
+				if (cg.hasOwnProperty('alias')) ALIAS = cg.alias;
+				if (cg.hasOwnProperty('base')) BASEPATH = cg.base;
+				if (cg.hasOwnProperty('timestamp')) TIMESTAMP = cg.timestamp;
 				module.use(mainjs);
 			});
 		} else {
@@ -409,3 +409,4 @@
 		exports.tool = buildTool;
 	}
 })(this);
+
