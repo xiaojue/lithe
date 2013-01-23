@@ -16,8 +16,6 @@
 		toString = Obj.prototype.toString,
 		header = doc.head || doc.getElementsByTagName('head')[0] || doc.documentElement,
 		UA = navigator.userAgent,
-		less536Webkit = Number(UA.replace(/.*AppleWebKit\/(\d+)\..*/, '$1')) < 536,
-		less9Firefox = UA.indexOf('Firefox') > 0 && ! ('onload' in doc.createElement('link')),
 		scripts = doc.getElementsByTagName('script'),
 		currentLoadedScript = scripts[scripts.length - 1],
 		BASEPATH = currentLoadedScript.getAttribute('data-path') || currentLoadedScript.src || currentLoadedScript.getAttribute('src'),
@@ -94,22 +92,6 @@
 					o[item] = 1;
 				});
 				return tool.keys(o);
-			},
-			_poll: function(node, cb) {
-				var loaded;
-				if (less536Webkit && node['sheet']) loaded = true;
-				else if (less9Firefox && node['sheet']) {
-					try {
-						if (node['sheet'].cssRules) loaded = true;
-					} catch(e) {
-						if (e.name === 'NS_ERROR_DOM_SECURITY_ERR') loaded = true;
-					}
-				}
-				setTimeout(function() {
-					if (loaded && tool.isFunction(cb)) cb();
-					else if (!loaded) tool._poll(node, cb);
-				},
-				1);
 			},
 			_createNode: function(tag, charset) {
 				var node = doc.createElement(tag);
@@ -237,7 +219,7 @@
 				if (lastChar === '#') {
 					url = url.slice(0, - 1);
 				}
-				else if (url.indexOf('?') === - 1 && ! (/\.(?:css|js)$/).test(url)) {
+				else if (url.indexOf('?') === - 1 && ! (/\.(?:js)$/).test(url)) {
 					url += '.js';
 				}
 				if (url.indexOf(':80/') > 0) {
@@ -409,4 +391,3 @@
 		exports.hfs = require('./lib/lithe-hfs.js');
 	}
 })(this);
-
