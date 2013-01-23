@@ -1,32 +1,45 @@
-var litheTool = require('./lithe.js').tool;
-var path = require('path');
-var dir = process.cwd();
-var cdpath = function(val){
-    return path.resolve(dir,val);
-};
-var alias = {
-	'$': 'lithe-modules/jquery-1.8.2.min',
-	'util': 'lithe-modules/util',
-	'class': 'lithe-modules/class',
-	'events': 'lithe-modules/events',
-	'backbone': 'lithe-modules/backbone',
-	'es5-safe': 'lithe-modules/es5-safe',
-	'underscore': 'lithe-modules/underscore',
-	'mousewheel': 'lithe-modules/jquery.mousewheel',
-	'drag': 'lithe-modules/jquery.event.drag-2.2',
-	'touchy': 'lithe-modules/jquery.touchy.min'
-};
-//查找依赖
-var ret = litheTool.findJsAllrequires('../app.js',alias);
-console.log(ret);
-/*
-[ '/home/fuqiang/dev/haml/5/lithe-modules/jquery-1.8.2.min.js',
-'/home/fuqiang/dev/haml/5/lithe-modules/util.js',
-'/home/fuqiang/dev/haml/5/routes.js',
-'/home/fuqiang/dev/haml/5/lithe-modules/underscore.js',
-'/home/fuqiang/dev/haml/5/lithe-modules/backbone.js' ]
-*/
-//合并
-litheTool.concatFile(ret,cdpath('./app-all.js'));
-//压缩
-litheTool.uglifyJs(cdpath('./app-all.js'),cdpath('./app-all-min.js'));
+var fs = require('fs'),
+optimist = require('optimist'),
+lithe = require('lithe'),
+dir = process.cwd(),
+tool = lithe.tool,
+litheOptions = tool.options,
+hfs = lithe.hfs,
+path = require('path');
+
+var options = optimist.usage('Build Js for conf', {
+	'src': {
+		description: 'The base directory to dist.'
+	},
+	'dist': {
+		description: 'The directory dist file to be saved.'
+	}
+}).argv;
+
+if (!options.src || ! options.dist) {
+	optimist.showHelp();
+	process.exit();
+}
+
+var basepath = path.resolve(dir, options.src),
+distpath = path.resolve(dir, options.dist);
+
+litheOptions.basepath = basepath;
+litheOptions.uglifyPath = dir + 'node_modules/uglify-js/bin/uglifyjs';
+
+//打包conf的例子代码-自动过滤svn git文件
+hfs.walk(basepath + '/conf', function(confs) {
+	confs.forEach(function(conf) {
+		conf = path.resolve(dir, conf);
+		var requires = tool.findJsAllrequires(conf),
+		targetfile = distpath + '/conf/' + path.basename(conf);
+		requires.push(conf);
+		tool.concatFile(requires, targetfile);
+		tool.uglifyJs(targetfile, targetfile);
+	});
+},
+{
+	filter: function(el) {
+		if (path.extname(el).indexOf('.js') > - 1) return true;
+	}
+});
