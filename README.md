@@ -76,8 +76,14 @@ define('someOtherJs',function(){
 
 ```js
 //npm install lithe
-//npm install -d
-var tool = require('lithe').tool
+var lithe = require('lithe'),
+tool = lithe.tool,
+hfs = lithe.hfs,
+options = tool.options;
+
+options.basepath = 'your project bae dir';
+options.uglifyPath = 'your uglifyjs dir';
+options.alias = {}; //your short alias config
 ```
 
 ### tool.findJsAllrequires([filepath],[alias]) 
@@ -99,10 +105,55 @@ tool.concatFile(['/path/to/file1.js','/path/to/file2.js'],'/path/to/file1&file2.
 tool.uglifyJs('/path/to/file1&file2.js','path/to/file1&file2-min.js');
 //Equivalent uglifyjs --reserved-names require -o path/to/file1&file2-min.js /path/to/file1&file2.js
 ```
+
+### hfs.cpdirSync([sourceDir],[targetDir])
+
+```js
+hfs.cpdirSync('/path/to/dir1','/path/to/dir2');
+//copy the folder by sync,if targetDir not exist it will be created.
+//.git and .svn will be continue.
+```
+
+### hfs.delSync([path])
+
+```js
+hfs.delSync('/path/to/dir');
+hfs.delSync('/path/to/file');
+//del the folder or file sync
+//.git and .svn will be continue.
+```
+
+### hfs.mkdirSync([target])
+
+```js
+hfs.mkdirSync('/path/dir')
+//if the '/path' folder not exist,it will be created.
+```
+
+### hfs.walk([path],[callback],[options])
+
+```js
+hfs.walk('/path/',function(files){
+    console.log(files); 'return path folder all js files';    
+},{
+    filter:function(file){
+	  if (path.extname(el).indexOf('.js') > - 1) return true;
+    }
+});
+//it's worked sync
+```
+
+### hfs.writeFileSync([filepath],[data],[encoding = utf8])
+
+```js
+hfs.writeFileSync('/path/file',"abcd");
+//if path folder not exist,it will be created.
+```
+
 ## How to deploy in the web browser？
 
 ```html
-<script src="/lithe.js" 
+<script src="/lithe.js"
         data-config="/config.js"
         data-path="http://domain.com/"
         data-main="app.js">

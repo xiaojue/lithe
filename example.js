@@ -43,3 +43,5 @@ hfs.walk(basepath + '/conf', function(confs) {
 		if (path.extname(el).indexOf('.js') > - 1) return true;
 	}
 });
+
+//调用方法 可直接node example.js --src srcdir --dist distsrc
