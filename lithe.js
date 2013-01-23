@@ -10,8 +10,8 @@
 		noop = function() {},
 		Arr = Array.prototype,
 		Obj = Object,
-        ALIAS,
-        TIMESTAMP,
+		ALIAS,
+		TIMESTAMP,
 		CHARSET = 'utf-8',
 		toString = Obj.prototype.toString,
 		header = doc.head || doc.getElementsByTagName('head')[0] || doc.documentElement,
@@ -267,14 +267,14 @@
 					//alias
 					if (ALIAS && ALIAS.hasOwnProperty(id)) id = ALIAS[id];
 					//isAbsolute
-					if (id.indexOf('://') > 0 || id.indexOf('//') === 0){
-                        if (TIMESTAMP) id = id + '?' + TIMESTAMP;
-                        return id;
-                    }else{ 
-                        id = tool.resolve(id, BASEPATH);
-                        if (TIMESTAMP) id = id + '?' + TIMESTAMP;
-                        return id;
-                    }
+					if (id.indexOf('://') > 0 || id.indexOf('//') === 0) {
+						if (TIMESTAMP) id = id + '?' + TIMESTAMP;
+						return id;
+					} else {
+						id = tool.resolve(id, BASEPATH);
+						if (TIMESTAMP) id = id + '?' + TIMESTAMP;
+						return id;
+					}
 				});
 			}
 		});
@@ -395,9 +395,9 @@
 		//use by prev config loaded
 		if (CONFIG) {
 			module.use(CONFIG, function(cg) {
-                if(cg.hasOwnProperty('alias')) ALIAS = cg.alias;
-                if(cg.hasOwnProperty('base')) BASEPATH = cg.base;
-                if(cg.hasOwnProperty('timestamp')) TIMESTAMP = cg.timestamp;
+				if (cg.hasOwnProperty('alias')) ALIAS = cg.alias;
+				if (cg.hasOwnProperty('base')) BASEPATH = cg.base;
+				if (cg.hasOwnProperty('timestamp')) TIMESTAMP = cg.timestamp;
 				module.use(mainjs);
 			});
 		} else {
@@ -409,3 +409,4 @@
 		exports.hfs = require('./lib/lithe-hfs.js');
 	}
 })(this);
+
