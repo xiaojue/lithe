@@ -81,7 +81,7 @@ tool = lithe.tool,
 hfs = lithe.hfs,
 options = tool.options;
 
-options.basepath = 'your project bae dir';
+options.basepath = 'your project base dir';
 options.uglifyPath = 'your uglifyjs dir';
 options.alias = {}; //your short alias config
 ```
