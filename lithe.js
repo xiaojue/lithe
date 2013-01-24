@@ -177,7 +177,12 @@
 				return arrC.length > tool.unique(arrC).length;
 			},
 			runModuleContext: function(fn, mod) {
-				var ret = fn(mod.require, mod.exports, mod);
+				var ret;
+				try {
+					ret = fn(mod.require, mod.exports, mod);
+				} catch(e) {
+					throw mod.id + ':' + e;
+				}
 				if (ret !== undef) mod.exports = ret;
 			},
 			dirname: function(path) {
@@ -391,3 +396,4 @@
 		exports.hfs = require('./lib/lithe-hfs.js');
 	}
 })(this);
+
