@@ -84,12 +84,13 @@ options = tool.options;
 options.basepath = 'your project base dir';
 options.uglifyPath = 'your uglifyjs dir';
 options.alias = {}; //your short alias config
+
 ```
 
-### tool.findJsAllrequires([filepath],[alias]) 
+### tool.findJsAllrequires([filepath]) 
 
 ```js
-var requires = tool.findJsAllrequires('../app.js',{'$':'path/to/jquery'});
+var requires = tool.findJsAllrequires('../app.js');
 //app.js's requires are findout and alias will be replaced  
 ```
 ### tool.concatFile([files],[target])
