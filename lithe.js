@@ -377,19 +377,25 @@
 		//browser api
 		global.define = module.define;
 		global.lithe = extend({
-			use: module.use
+			use: module.use,
+			start: function(mainjs) {
+				//use by prev config loaded
+				if (CONFIG) {
+					module.use(CONFIG, function(cg) {
+						if (cg.hasOwnProperty('alias')) ALIAS = cg.alias;
+						if (cg.hasOwnProperty('base')) BASEPATH = cg.base;
+						if (cg.hasOwnProperty('timestamp')) TIMESTAMP = cg.timestamp;
+						module.use(mainjs);
+					});
+				} else {
+					module.use(mainjs);
+				}
+
+			}
 		});
-		//use by prev config loaded
-		if (CONFIG) {
-			module.use(CONFIG, function(cg) {
-				if (cg.hasOwnProperty('alias')) ALIAS = cg.alias;
-				if (cg.hasOwnProperty('base')) BASEPATH = cg.base;
-				if (cg.hasOwnProperty('timestamp')) TIMESTAMP = cg.timestamp;
-				module.use(mainjs);
-			});
-		} else {
-			module.use(mainjs);
-		}
+
+        if(mainjs) global.lithe.start(mainjs);
+
 	} else {
 		//node api 
 		exports.tool = require('./lib/lithe-tool.js');
