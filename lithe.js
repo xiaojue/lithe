@@ -378,19 +378,18 @@
 		global.define = module.define;
 		global.lithe = extend({
 			use: module.use,
-			start: function(mainjs) {
+			start: function(mainjs,callback) {
 				//use by prev config loaded
 				if (CONFIG) {
 					module.use(CONFIG, function(cg) {
 						if (cg.hasOwnProperty('alias')) ALIAS = cg.alias;
 						if (cg.hasOwnProperty('base')) BASEPATH = cg.base;
 						if (cg.hasOwnProperty('timestamp')) TIMESTAMP = cg.timestamp;
-						module.use(mainjs);
+						module.use(mainjs,callback);
 					});
 				} else {
-					module.use(mainjs);
+					module.use(mainjs,callback);
 				}
-
 			}
 		});
 
@@ -402,4 +401,3 @@
 		exports.hfs = require('./lib/lithe-hfs.js');
 	}
 })(this);
-
