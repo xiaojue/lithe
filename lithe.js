@@ -361,9 +361,6 @@
 				});
 			},
 			buildNameSpace: function(cg, cb) {
-				var _main = NAMESPACE['_main'];
-				_main.alias = cg.alias;
-				_main.timestamp = cg.timestamp;
 				tool.addConfigs(cg, function(configs) {
 					tool.forEach(configs, function(config) {
 						var ns = NAMESPACE[config.name];
@@ -614,6 +611,8 @@
 						tool.addNameSpace(cg);
 						tool.buildNameSpace(cg, function() {
 							var _main = NAMESPACE['_main'];
+				            _main.alias = cg.alias;
+				            _main.timestamp = cg.timestamp;
 							if (cg.basepath) _main.basepath = cg.basepath;
 							if (cg.debug && tool.isFunction(cg.debugswitch)) mainjs = cg.debugswitch(mainjs) || mainjs;
 							module.use(mainjs, callback);
