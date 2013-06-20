@@ -21,7 +21,6 @@
 		},
 		BASEPATH = attr(currentLoadedScript, 'data-path') || currentLoadedScript.src || attr(currentLoadedScript, 'src'),
 		CONFIG = attr(currentLoadedScript, 'data-config'),
-		DEBUG = attr(currentLoadedScript, 'data-debug') == 'true',
 		mainjs = attr(currentLoadedScript, 'data-main'),
 		baseElement = header.getElementsByTagName('base')[0],
 		commentRegExp = /(\/\*([\s\S]*?)\*\/|([^:]|^)\/\/(.*)$)/mg,
@@ -112,7 +111,7 @@
 				node.onload = node.onerror = node.onreadystatechange = function() {
 					if (/loaded|complete|undefined/.test(node.readyState)) {
 						node.onload = node.onerror = node.onreadystatechange = null;
-						if (node.parentNode && ! DEBUG) node.parentNode.removeChild(node);
+						if (node.parentNode) node.parentNode.removeChild(node);
 						node = undef;
 						if (tool.isFunction(cb)) cb();
 					}
@@ -616,7 +615,7 @@
 						tool.buildNameSpace(cg, function() {
 							var _main = NAMESPACE['_main'];
 							if (cg.basepath) _main.basepath = cg.basepath;
-							if (DEBUG && tool.isFunction(cg.debugswitch)) mainjs = cg.debugswitch(mainjs) || mainjs;
+							if (cg.debug && tool.isFunction(cg.debugswitch)) mainjs = cg.debugswitch(mainjs) || mainjs;
 							module.use(mainjs, callback);
 						});
 					});
@@ -626,10 +625,8 @@
 			}
 		});
 
-		if (DEBUG) {
-			global.lithe.cache = module.cache;
-			global.lithe.NAMESPACE = NAMESPACE;
-		}
+		global.lithe.cache = module.cache;
+		global.lithe.NAMESPACE = NAMESPACE;
 
 		if (mainjs) global.lithe.start(mainjs);
 	} else {
@@ -638,3 +635,4 @@
 		exports.hfs = require('./lib/lithe-hfs.js');
 	}
 })(this);
+
