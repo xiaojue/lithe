@@ -1,3 +1,8 @@
+/**
+ * @author xiaojue[designsor@gmail.com]
+ * @fileoverview lithe main file
+ * @version 0.1.2
+ */
 (function(global, undef) {
 
 	var isBrowser = !! (typeof window !== undef && global.navigator && global.document);
@@ -21,6 +26,7 @@
 		},
 		BASEPATH = attr(currentLoadedScript, 'data-path') || currentLoadedScript.src || attr(currentLoadedScript, 'src'),
 		CONFIG = attr(currentLoadedScript, 'data-config'),
+		DEBUG = attr(currentLoadedScript, 'data-debug') === 'true',
 		mainjs = attr(currentLoadedScript, 'data-main'),
 		baseElement = header.getElementsByTagName('base')[0],
 		commentRegExp = /(\/\*([\s\S]*?)\*\/|([^:]|^)\/\/(.*)$)/mg,
@@ -111,7 +117,7 @@
 				node.onload = node.onerror = node.onreadystatechange = function() {
 					if (/loaded|complete|undefined/.test(node.readyState)) {
 						node.onload = node.onerror = node.onreadystatechange = null;
-						if (node.parentNode) node.parentNode.removeChild(node);
+						if (node.parentNode && ! DEBUG) node.parentNode.removeChild(node);
 						node = undef;
 						if (tool.isFunction(cb)) cb();
 					}
@@ -441,6 +447,14 @@
 				name = name || tool.filename(path);
 				var url = ns === '_main' ? name: ns + ':' + name;
 				return tool.createUrl([url])[0];
+			},
+			_save: function(url) {
+				if (anonymouse.length) {
+					tool.forEach(anonymouse, function(meta) {
+						meta.id = tool.pathToid(url, meta.id);
+						module._save(meta.id, meta);
+					});
+				}
 			}
 		});
 
@@ -499,14 +513,33 @@
 					anonymouse.push(meta);
 				}
 			},
-			use: function(ids, cb) {
+			_createUrls: function(ids) {
 				tool.isString(ids) && (ids = [ids]);
 				var urls = tool.createUrl(ids);
+				return urls;
+			},
+			use: function(ids, cb) {
+				var urls = module._createUrls(ids);
 				module._fetch(urls, function() {
 					var args = tool.map(urls, function(url) {
 						return url ? module.cache[url]._compile() : null;
 					});
 					if (tool.isFunction(cb)) cb.apply(null, args);
+				});
+			},
+			_preload: function(id, cb) {
+				var url = module._createUrls(id)[0];
+				tool._fetch(url, function() {
+					var len = anonymouse.length;
+					if (len) {
+						if (len > 1) {
+							tool._save(url);
+						} else {
+							module._save(url, anonymouse[0]);
+						}
+						anonymouse = [];
+					}
+					cb();
 				});
 			},
 			_fetch: function(urls, cb) {
@@ -533,10 +566,7 @@
 							var len = anonymouse.length;
 							if (len) {
 								if (len > 1) {
-									tool.forEach(anonymouse, function(meta) {
-										meta.id = tool.pathToid(url, meta.id);
-										module._save(meta.id, meta);
-									});
+									tool._save(url);
 								} else {
 									module._save(url, anonymouse[0]);
 								}
@@ -598,36 +628,46 @@
 		//browser api
 		global.define = module.define;
 
+		NAMESPACE['_main'] = {
+			basepath: tool.dirname(BASEPATH),
+			config: CONFIG
+		};
+
 		global.lithe = extend({
 			use: module.use,
+			cache: module.cache,
+			NAMESPACE: NAMESPACE,
+			_start: function(mainjs, callback) {
+				module.use(CONFIG, function(cg) {
+					tool.addNameSpace(cg);
+					tool.buildNameSpace(cg, function() {
+						var _main = NAMESPACE['_main'];
+						_main.alias = cg.alias;
+						_main.timestamp = cg.timestamp;
+						if (cg.basepath) _main.basepath = cg.basepath;
+						if (DEBUG && tool.isFunction(cg.debugswitch)) mainjs = cg.debugswitch(mainjs) || mainjs;
+						module.use(mainjs, callback);
+					});
+				});
+			},
 			start: function(mainjs, callback) {
 				//use by prev config loaded
-				NAMESPACE['_main'] = {
-					basepath: tool.dirname(BASEPATH),
-					config: CONFIG
-				};
 				if (CONFIG) {
-					module.use(CONFIG, function(cg) {
-						tool.addNameSpace(cg);
-						tool.buildNameSpace(cg, function() {
-							var _main = NAMESPACE['_main'];
-				            _main.alias = cg.alias;
-				            _main.timestamp = cg.timestamp;
-							if (cg.basepath) _main.basepath = cg.basepath;
-							if (cg.debug && tool.isFunction(cg.debugswitch)) mainjs = cg.debugswitch(mainjs) || mainjs;
-							module.use(mainjs, callback);
+					if (DEBUG) {
+						lithe._start(mainjs, callback);
+					} else {
+						module._preload(mainjs, function() {
+							lithe._start(mainjs, callback);
 						});
-					});
+					}
 				} else {
 					module.use(mainjs, callback);
 				}
 			}
 		});
 
-		global.lithe.cache = module.cache;
-		global.lithe.NAMESPACE = NAMESPACE;
-
 		if (mainjs) global.lithe.start(mainjs);
+
 	} else {
 		//node api 
 		exports.tool = require('./lib/lithe-tool.js');
