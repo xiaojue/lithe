@@ -49,6 +49,12 @@
 				return source;
 			}
 		};
+
+		NAMESPACE['_main'] = {
+			basepath: tool.dirname(BASEPATH),
+			config: CONFIG
+		};
+
 		var tool = extend({
 			isString: function(v) {
 				return toString.call(v) === '[object String]';
@@ -449,12 +455,11 @@
 				return tool.createUrl([url])[0];
 			},
 			_save: function(url) {
-				if (anonymouse.length) {
-					tool.forEach(anonymouse, function(meta) {
-						meta.id = tool.pathToid(url, meta.id);
-						module._save(meta.id, meta);
-					});
-				}
+				tool.forEach(anonymouse, function(meta) {
+					if (!meta.id) throw new Error('more than ones anonymouse define in one file!');
+					meta.id = tool.pathToid(url, meta.id);
+					module._save(meta.id, meta);
+				});
 			}
 		});
 
@@ -489,7 +494,11 @@
 				}
 			},
 			define: function(id, factory) {
-				if (!tool.isString(id) || ! tool.isFunction(factory)) {
+				if (tool.isFunction(id)) {
+					factory = id;
+					id = undef;
+				}
+				if (!tool.isFunction(factory)) {
 					throw 'define failed';
 				}
 				var deps = tool.getDependencies(factory.toString());
@@ -497,7 +506,7 @@
 					deps: deps,
 					factory: factory
 				};
-				if (tool.isAbsolute(id)) meta.id = id;
+				if (id && tool.isAbsolute(id)) meta.id = id;
 				if (!meta.id && doc.attachEvent) {
 					var script = tool.getCurrentScript();
 					if (script) {
@@ -625,39 +634,34 @@
 			}
 		});
 
+		function _start(mainjs,callback) {
+			module.use(CONFIG, function(cg) {
+				tool.addNameSpace(cg);
+				tool.buildNameSpace(cg, function() {
+					var _main = NAMESPACE['_main'];
+					_main.alias = cg.alias;
+					_main.timestamp = cg.timestamp;
+					if (cg.basepath) _main.basepath = cg.basepath;
+					if (DEBUG && tool.isFunction(cg.debugswitch)) mainjs = cg.debugswitch(mainjs) || mainjs;
+					module.use(mainjs, callback);
+				});
+			});
+		}
+
 		//browser api
 		global.define = module.define;
-
-		NAMESPACE['_main'] = {
-			basepath: tool.dirname(BASEPATH),
-			config: CONFIG
-		};
-
 		global.lithe = extend({
 			use: module.use,
 			cache: module.cache,
 			NAMESPACE: NAMESPACE,
-			_start: function(mainjs, callback) {
-				module.use(CONFIG, function(cg) {
-					tool.addNameSpace(cg);
-					tool.buildNameSpace(cg, function() {
-						var _main = NAMESPACE['_main'];
-						_main.alias = cg.alias;
-						_main.timestamp = cg.timestamp;
-						if (cg.basepath) _main.basepath = cg.basepath;
-						if (DEBUG && tool.isFunction(cg.debugswitch)) mainjs = cg.debugswitch(mainjs) || mainjs;
-						module.use(mainjs, callback);
-					});
-				});
-			},
 			start: function(mainjs, callback) {
 				//use by prev config loaded
 				if (CONFIG) {
 					if (DEBUG) {
-						lithe._start(mainjs, callback);
+						_start(mainjs, callback);
 					} else {
 						module._preload(mainjs, function() {
-							lithe._start(mainjs, callback);
+							_start(mainjs, callback);
 						});
 					}
 				} else {
