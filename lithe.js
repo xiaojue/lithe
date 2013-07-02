@@ -1,8 +1,8 @@
 /**
- * @author xiaojue[designsor@gmail.com]
- * @fileoverview lithe main file
- * @version 0.1.2
- */
+* @author xiaojue[designsor@gmail.com]
+* @fileoverview lithe main file
+* @version 0.1.2
+*/
 (function(global, undef) {
 
 	var isBrowser = !! (typeof window !== undef && global.navigator && global.document);
@@ -50,10 +50,6 @@
 			}
 		};
 
-		NAMESPACE['_main'] = {
-			basepath: tool.dirname(BASEPATH),
-			config: CONFIG
-		};
 
 		var tool = extend({
 			isString: function(v) {
@@ -463,6 +459,11 @@
 			}
 		});
 
+		NAMESPACE['_main'] = {
+			basepath: tool.dirname(BASEPATH),
+			config: CONFIG
+		};
+
 		function module(id) {
 			this.id = id;
 			this.status = 0;
@@ -634,7 +635,7 @@
 			}
 		});
 
-		function _start(mainjs,callback) {
+		function _start(mainjs, callback) {
 			module.use(CONFIG, function(cg) {
 				tool.addNameSpace(cg);
 				tool.buildNameSpace(cg, function() {
@@ -673,9 +674,8 @@
 		if (mainjs) global.lithe.start(mainjs);
 
 	} else {
-		//node api 
+		//node api
 		exports.tool = require('./lib/lithe-tool.js');
 		exports.hfs = require('./lib/lithe-hfs.js');
 	}
 })(this);
-
