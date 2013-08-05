@@ -493,6 +493,7 @@
 					mod.factory = meta.factory;
 					mod.status = module.status.save;
 				}
+				//console.log(mod.id,'_saved');
 			},
 			define: function(id, factory) {
 				if (tool.isFunction(id)) {
@@ -511,7 +512,8 @@
 				if (!meta.id && doc.attachEvent) {
 					var script = tool.getCurrentScript();
 					if (script) {
-						meta.id = tool.pathToid(script.src);
+						//meta.id = tool.pathToid(script.src);
+						meta.id = script.src;
 					} else {
 						throw new Error('failed to derive:" ' + factory);
 					}
@@ -583,6 +585,7 @@
 								anonymouse = [];
 							}
 							mod = module._get(url);
+							//console.log(mod.id,'_success');
 							if (mod.status >= STATUS.save) {
 								var deps = tool.getPureDependencies(mod);
 								if (deps.length) {
