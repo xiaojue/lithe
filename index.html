@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Lithe by xiaojue</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Lithe</h1>
+          <h2>A browser-side script loader,compatible with the de facto standards(NodeJS/CommonJS).</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/xiaojue/lithe/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/xiaojue/lithe/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/xiaojue/lithe" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>
+<a name="lithe" class="anchor" href="#lithe"><span class="octicon octicon-link"></span></a>Lithe</h1>
+
+<p>A browser-side script loader,compatible with the de facto standards(NodeJS/CommonJS).
+It's very simple and small,only 3.7kb gzipped.</p>
+
+<hr><h2>
+<a name="public-api-for-browser" class="anchor" href="#public-api-for-browser"><span class="octicon octicon-link"></span></a>public api for browser</h2>
+
+<h3>
+<a name="define" class="anchor" href="#define"><span class="octicon octicon-link"></span></a>define</h3>
+
+<div class="highlight"><pre><span class="c1">//path/to/file.js</span>
+<span class="nx">define</span><span class="p">(</span><span class="s1">'path/to/file'</span><span class="p">,</span><span class="kd">function</span><span class="p">(</span><span class="nx">require</span><span class="p">,</span><span class="nx">exports</span><span class="p">,</span><span class="nx">module</span><span class="p">){</span>
+  <span class="kd">var</span> <span class="nx">file</span> <span class="o">=</span> <span class="s1">'path/to/file.js'</span><span class="p">;</span>
+  <span class="nx">exports</span><span class="p">.</span><span class="nx">filename</span> <span class="o">=</span> <span class="s1">'file.js'</span><span class="p">;</span>
+  <span class="nx">exports</span><span class="p">.</span><span class="nx">filedir</span> <span class="o">=</span> <span class="s1">'path/to/'</span><span class="p">;</span>
+  <span class="cm">/**</span>
+<span class="cm">   * module.exports = {</span>
+<span class="cm">   *    filename:'file.js',</span>
+<span class="cm">   *    filedir:'path/to'</span>
+<span class="cm">   * };</span>
+<span class="cm">   */</span>
+<span class="p">});</span>
+
+<span class="c1">//if your project will not concat in one file to deploy,your can write:</span>
+
+<span class="nx">define</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">require</span><span class="p">){</span>
+
+<span class="p">});</span>
+
+<span class="c1">//the module id will be the file src path automatic. </span>
+</pre></div>
+
+<h3>
+<a name="require" class="anchor" href="#require"><span class="octicon octicon-link"></span></a>require</h3>
+
+<div class="highlight"><pre><span class="c1">//path/to/app.js</span>
+<span class="nx">define</span><span class="p">(</span><span class="s1">'path/to/app'</span><span class="p">,</span><span class="kd">function</span><span class="p">(</span><span class="nx">require</span><span class="p">,</span><span class="nx">exports</span><span class="p">,</span><span class="nx">module</span><span class="p">){</span>
+  <span class="kd">var</span> <span class="nx">file</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'path/to/file'</span><span class="p">);</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">file</span><span class="p">.</span><span class="nx">filename</span><span class="p">);</span> <span class="c1">//file.js</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">file</span><span class="p">.</span><span class="nx">filedir</span><span class="p">)</span> <span class="c1">//path/to</span>
+  <span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="s1">'i am app.js'</span><span class="p">;</span>
+<span class="p">});</span>
+</pre></div>
+
+<h3>
+<a name="litheuse" class="anchor" href="#litheuse"><span class="octicon octicon-link"></span></a>lithe.use</h3>
+
+<div class="highlight"><pre><span class="c1">//anywhere</span>
+<span class="nx">lithe</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="s1">'path/to/app'</span><span class="p">,</span><span class="kd">function</span><span class="p">(</span><span class="nx">app</span><span class="p">){</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">app</span><span class="p">);</span> <span class="c1">// i am app.js</span>
+<span class="p">});</span>
+<span class="c1">//or</span>
+<span class="nx">lithe</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="s1">'a.js'</span><span class="p">,</span><span class="s1">'b.js'</span><span class="p">,</span><span class="kd">function</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span>
+  <span class="c1">//a and b has required;</span>
+<span class="p">});</span>
+</pre></div>
+
+<h3>
+<a name="lithestart" class="anchor" href="#lithestart"><span class="octicon octicon-link"></span></a>lithe.start</h3>
+
+<div class="highlight"><pre><span class="c1">//if your project have not set data-main then you must be used the start function to make start.</span>
+<span class="nx">lithe</span><span class="p">.</span><span class="nx">start</span><span class="p">(</span><span class="s1">'conf/file'</span><span class="p">);</span>
+</pre></div>
+
+<h3>
+<a name="config" class="anchor" href="#config"><span class="octicon octicon-link"></span></a>config</h3>
+
+<div class="highlight"><pre><span class="nx">define</span><span class="p">(</span><span class="s1">'config'</span><span class="p">,</span><span class="kd">function</span><span class="p">(</span><span class="nx">require</span><span class="p">,</span><span class="nx">exports</span><span class="p">,</span><span class="nx">module</span><span class="p">){</span>
+   <span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="c1">//if your have a lot of project has many configs,you can configuration the namespace at here.</span>
+      <span class="nx">namespace</span><span class="o">:</span><span class="p">{</span>
+          <span class="nx">otherproject</span><span class="o">:</span><span class="p">{</span>
+            <span class="nx">basepath</span><span class="o">:</span><span class="s2">"http://otherproject.com/base/"</span><span class="p">,</span>
+            <span class="nx">config</span><span class="o">:</span><span class="s2">"config.js"</span>
+          <span class="p">}</span>
+          <span class="c1">//In your code you can write like this: require('otherproject:somemod');</span>
+      <span class="p">},</span>
+      <span class="c1">//it will replace the real BASEPATH</span>
+      <span class="nx">base</span><span class="o">:</span><span class="s1">'http://localhost/debug/path'</span><span class="p">,</span> 
+      <span class="c1">//for debug or update timestamp ? All javascript modules will be used</span>
+      <span class="nx">timestamp</span><span class="o">:</span><span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">valueOf</span><span class="p">(),</span> 
+      <span class="c1">//logogram</span>
+      <span class="nx">alias</span><span class="o">:</span><span class="p">{</span>
+        <span class="s1">'app'</span><span class="o">:</span><span class="s1">'path/to/app'</span><span class="p">,</span>
+        <span class="s1">'file'</span><span class="o">:</span><span class="s1">'path/to/file'</span><span class="p">,</span>
+        <span class="c1">//Relative directory proxy</span>
+        <span class="s1">'UI'</span><span class="o">:</span><span class="s1">'../'</span>
+      <span class="p">},</span>
+      <span class="c1">//if in the debug mode,the mainjs will be switch in there.</span>
+      <span class="nx">debugswitch</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">mainjs</span><span class="p">){</span>
+            <span class="k">return</span> <span class="s1">'some/new/path/mainjs'</span><span class="p">;</span>
+      <span class="p">}</span>
+   <span class="p">};</span>
+<span class="p">});</span>
+
+<span class="nx">define</span><span class="p">(</span><span class="s1">'someOtherJs'</span><span class="p">,</span><span class="kd">function</span><span class="p">(){</span>
+  <span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'app'</span><span class="p">),</span>
+  <span class="nx">file</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'file'</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">othermod</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'otherproject:somemod'</span><span class="p">);</span>
+  <span class="c1">//now the path/to/app and path/to/file has required</span>
+<span class="p">});</span>
+</pre></div>
+
+<h2>
+<a name="public-api-for-node" class="anchor" href="#public-api-for-node"><span class="octicon octicon-link"></span></a>public api for node</h2>
+
+<div class="highlight"><pre><span class="c1">//npm install lithe</span>
+<span class="kd">var</span> <span class="nx">lithe</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'lithe'</span><span class="p">),</span>
+<span class="nx">tool</span> <span class="o">=</span> <span class="nx">lithe</span><span class="p">.</span><span class="nx">tool</span><span class="p">,</span>
+<span class="nx">hfs</span> <span class="o">=</span> <span class="nx">lithe</span><span class="p">.</span><span class="nx">hfs</span><span class="p">,</span>
+<span class="nx">options</span> <span class="o">=</span> <span class="nx">tool</span><span class="p">.</span><span class="nx">options</span><span class="p">;</span>
+
+<span class="nx">options</span><span class="p">.</span><span class="nx">basepath</span> <span class="o">=</span> <span class="s1">'your project base dir'</span><span class="p">;</span>
+<span class="nx">options</span><span class="p">.</span><span class="nx">uglifyPath</span> <span class="o">=</span> <span class="s1">'your uglifyjs dir'</span><span class="p">;</span>
+<span class="nx">options</span><span class="p">.</span><span class="nx">alias</span> <span class="o">=</span> <span class="p">{};</span> <span class="c1">//your short alias config</span>
+
+</pre></div>
+
+<h3>
+<a name="toolfindjsallrequiresfilepath" class="anchor" href="#toolfindjsallrequiresfilepath"><span class="octicon octicon-link"></span></a>tool.findJsAllrequires([filepath])</h3>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">requires</span> <span class="o">=</span> <span class="nx">tool</span><span class="p">.</span><span class="nx">findJsAllrequires</span><span class="p">(</span><span class="s1">'../app.js'</span><span class="p">);</span>
+<span class="c1">//app.js's requires are findout and alias will be replaced  </span>
+</pre></div>
+
+<h3>
+<a name="toolconcatfilefilestarget" class="anchor" href="#toolconcatfilefilestarget"><span class="octicon octicon-link"></span></a>tool.concatFile([files],[target])</h3>
+
+<div class="highlight"><pre><span class="nx">tool</span><span class="p">.</span><span class="nx">concatFile</span><span class="p">([</span><span class="s1">'/path/to/file1.js'</span><span class="p">,</span><span class="s1">'/path/to/file2.js'</span><span class="p">],</span><span class="s1">'/path/to/file1&amp;file2.js'</span><span class="p">);</span>
+<span class="c1">//file1 and file2 will be merger</span>
+</pre></div>
+
+<h3>
+<a name="tooluglifyjsfilepathtarget" class="anchor" href="#tooluglifyjsfilepathtarget"><span class="octicon octicon-link"></span></a>tool.uglifyJs([filepath],[target])</h3>
+
+<div class="highlight"><pre><span class="nx">tool</span><span class="p">.</span><span class="nx">uglifyJs</span><span class="p">(</span><span class="s1">'/path/to/file1&amp;file2.js'</span><span class="p">,</span><span class="s1">'path/to/file1&amp;file2-min.js'</span><span class="p">);</span>
+<span class="c1">//Equivalent uglifyjs --reserved-names require -o path/to/file1&amp;file2-min.js /path/to/file1&amp;file2.js</span>
+</pre></div>
+
+<h3>
+<a name="hfscpdirsyncsourcedirtargetdir" class="anchor" href="#hfscpdirsyncsourcedirtargetdir"><span class="octicon octicon-link"></span></a>hfs.cpdirSync([sourceDir],[targetDir])</h3>
+
+<div class="highlight"><pre><span class="nx">hfs</span><span class="p">.</span><span class="nx">cpdirSync</span><span class="p">(</span><span class="s1">'/path/to/dir1'</span><span class="p">,</span><span class="s1">'/path/to/dir2'</span><span class="p">);</span>
+<span class="c1">//copy the folder by sync,if targetDir not exist it will be created.</span>
+<span class="c1">//.git and .svn will be continue.</span>
+</pre></div>
+
+<h3>
+<a name="hfsdelsyncpath" class="anchor" href="#hfsdelsyncpath"><span class="octicon octicon-link"></span></a>hfs.delSync([path])</h3>
+
+<div class="highlight"><pre><span class="nx">hfs</span><span class="p">.</span><span class="nx">delSync</span><span class="p">(</span><span class="s1">'/path/to/dir'</span><span class="p">);</span>
+<span class="nx">hfs</span><span class="p">.</span><span class="nx">delSync</span><span class="p">(</span><span class="s1">'/path/to/file'</span><span class="p">);</span>
+<span class="c1">//del the folder or file sync</span>
+<span class="c1">//.git and .svn will be continue.</span>
+</pre></div>
+
+<h3>
+<a name="hfsmkdirsynctarget" class="anchor" href="#hfsmkdirsynctarget"><span class="octicon octicon-link"></span></a>hfs.mkdirSync([target])</h3>
+
+<div class="highlight"><pre><span class="nx">hfs</span><span class="p">.</span><span class="nx">mkdirSync</span><span class="p">(</span><span class="s1">'/path/dir'</span><span class="p">)</span>
+<span class="c1">//if the '/path' folder not exist,it will be created.</span>
+</pre></div>
+
+<h3>
+<a name="hfswalkpathcallbackoptions" class="anchor" href="#hfswalkpathcallbackoptions"><span class="octicon octicon-link"></span></a>hfs.walk([path],[callback],[options])</h3>
+
+<div class="highlight"><pre><span class="nx">hfs</span><span class="p">.</span><span class="nx">walk</span><span class="p">(</span><span class="s1">'/path/'</span><span class="p">,</span><span class="kd">function</span><span class="p">(</span><span class="nx">files</span><span class="p">){</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">files</span><span class="p">);</span> <span class="s1">'return path folder all js files'</span><span class="p">;</span>    
+<span class="p">},{</span>
+    <span class="nx">filter</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">file</span><span class="p">){</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">path</span><span class="p">.</span><span class="nx">extname</span><span class="p">(</span><span class="nx">el</span><span class="p">).</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">'.js'</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+<span class="c1">//it's worked sync</span>
+</pre></div>
+
+<h3>
+<a name="hfswritefilesyncfilepathdataencoding--utf8" class="anchor" href="#hfswritefilesyncfilepathdataencoding--utf8"><span class="octicon octicon-link"></span></a>hfs.writeFileSync([filepath],[data],[encoding = utf8])</h3>
+
+<div class="highlight"><pre><span class="nx">hfs</span><span class="p">.</span><span class="nx">writeFileSync</span><span class="p">(</span><span class="s1">'/path/file'</span><span class="p">,</span><span class="s2">"abcd"</span><span class="p">);</span>
+<span class="c1">//if path folder not exist,it will be created.</span>
+</pre></div>
+
+<h2>
+<a name="how-to-deploy-in-the-web-browser" class="anchor" href="#how-to-deploy-in-the-web-browser"><span class="octicon octicon-link"></span></a>How to deploy in the web browser？</h2>
+
+<div class="highlight"><pre><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"lithe.js"</span>
+        <span class="na">data-config=</span><span class="s">"config.js"</span>
+        <span class="na">data-path=</span><span class="s">"http://domain.com/"</span>
+        <span class="na">data-debug=</span><span class="s">"true"</span>
+        <span class="na">data-main=</span><span class="s">"app.js"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/script&gt;</span>
+</pre></div>
+
+<h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>BSD license</p>
+        </section>
+
+        <footer>
+          Lithe is maintained by <a href="https://github.com/xiaojue">xiaojue</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
