@@ -10,6 +10,8 @@ define('spec/spec',function(require,exports,module){
     var i = require('i');
     console.log('spec/spec');
 
+    require('dir/dir');
+
     describe("lithe suite",function(){
         it('test all modules ready and exports is right',function(){
             expect(a.a).toBe(1); 

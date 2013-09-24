@@ -46,6 +46,9 @@ function getscript(url, cb, charset) {
 			if (isFunction(cb)) cb();
 		}
 	};
+    node.async = 'async';
+    node.src = url;
+    insertscript(node);
 }
 
 function createNode(tag, charset) {

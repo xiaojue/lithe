@@ -83,19 +83,29 @@ function unique(arr) {
 	forEach(arr, function(item) {
 		o[item] = 1;
 	});
-	return tool.keys(o);
+	return keys(o);
 }
 
 function attr(node, ns) {
-    return node.getAttribute(ns);
+	return node.getAttribute(ns);
 }
 
 //处理依赖部分
-
-function getDependencies(code){
-    var deps = [];
-    code.replace(commentRegExp,'').replace(jsRequireRegExp,function(match,dep){
-        deps.push(dep); 
-    });
-    return unique(deps);
+function getDependencies(code) {
+	var deps = [];
+	code.replace(commentRegExp, '').replace(jsRequireRegExp, function(match, dep) {
+		deps.push(dep);
+	});
+	return unique(deps);
 }
+
+function runModuleContext(fn, mod) {
+	var ret;
+	try {
+		ret = fn(mod.require, mod.exports, mod);
+	} catch(e) {
+		throw new Error(mod.id + ':' + e);
+	}
+	if (ret !== undef) mod.exports = ret;
+}
+

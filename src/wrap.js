@@ -6,7 +6,7 @@
 		include "path.js"
 		include "fetch.js"
 		include "module.js"
-		global.lithe = module;
+		global.lithe = lithe;
 		global.define = lithe.define;
 		if (mainjs) global.lithe.use(mainjs);
 	} else {

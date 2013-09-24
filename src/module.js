@@ -1,4 +1,5 @@
 var anonymouse = [],
+config = {},
 STATUS = {
 	'created': 0,
 	'save': 1,
@@ -10,12 +11,12 @@ stack = [];
 
 //help
 function isReadyDependencies(mod) {
-	if (!mod || mod.status !== module.status.save) return false;
+	if (!mod || mod.status !== STATUS.save) return false;
 	var deps = mod.dependencies;
 	if (deps.length) {
 		if (isOverlap(deps, stack)) return true;
 		for (var i = 0; i < deps.length; i++) {
-			if (isReadyDependencies(module.cache[deps[i]])) return true;
+			if (isReadyDependencies(lithe.cache[deps[i]])) return true;
 		}
 	}
 	stack.pop();
@@ -30,8 +31,77 @@ function isOverlap(a, b) {
 function getPureDependencies(mod) {
 	return filter(mod.dependencies, function(dep) {
 		stack.push(mod.id);
-		return ! isReadyDependencies(module.cache[dep]);
+		return ! isReadyDependencies(lithe.cache[dep]);
 	});
+}
+
+function createUrls(urls) {
+	isString(urls) && (urls = [urls]);
+	return map(urls, function(url) {
+		return resolve(url);
+	});
+}
+
+function fetchMods(urls, cb) {
+	urls = createUrls(urls);
+	var loadUris = filter(urls, function(url) {
+		return url && (!lithe.cache[url] || lithe.cache[url].status < STATUS.ready);
+	}),
+	len = loadUris.length;
+	if (len === 0) {
+		cb();
+		return;
+	}
+	var queue = len;
+	function restart(mod) { (mod || {}).status < STATUS.ready && (mod.status = STATUS.ready); --queue;
+		(queue === 0) && cb();
+	}
+	forEach(loadUris, function(url) {
+		var mod = lithe.get(url);
+		function success() {
+			forEach(anonymouse, function(meta) {
+				mod._save(meta, url);
+			});
+			anonymouse = [];
+			if (mod.status >= STATUS.save) {
+				var deps = getPureDependencies(mod);
+				deps.length ? fetchMods(deps, function() {
+					restart(mod);
+				}) : restart(mod);
+			} else {
+				restart();
+			}
+		}
+		mod.status < STATUS.save ? fetch(url, success) : success();
+	});
+}
+
+function realUse(urls, cb) {
+	fetchMods(urls, function() {
+		urls = createUrls(urls);
+		var args = map(urls, function(url) {
+			return url ? lithe.cache[url]._compile() : null;
+		});
+		if (isFunction(cb)) cb.apply(null, args);
+	});
+}
+
+function setConfig(cg) {
+	config = cg;
+	config.directorys = [];
+	var alias = config.alias,
+	i, alia, dir;
+	if (alias) {
+		for (i in alias) {
+			alia = alias[i];
+			if (isDir(alia)) {
+				dir = {};
+				dir[i] = alia;
+				config.directorys.push(dir);
+			}
+		}
+	}
+	config.init = true;
 }
 
 function module(url) {
@@ -43,68 +113,6 @@ function module(url) {
 	this.factory = noop;
 }
 
-extend(module,new events());
-
-extend(module, {
-	basepath: BASEPATH,
-	config: CONFIG,
-	cache: {},
-	get: function(url) {
-		return module.cache[url] || (module.cache[url] = new module(url));
-	},
-	define: function(id, factory) {
-		var deps = getDependencies(factory.toString());
-		var meta = {
-			id: id,
-			deps: deps,
-			factory: factory
-		};
-        this.trigger('initMeta',[meta]);
-		anonymouse.push(meta);
-	},
-	require: function(urls, cb) {
-		module._fetch(urls, function() {
-			var args = map(urls, function(url) {
-				return url ? module.cache[url]._compile() : null;
-			});
-			if (isFunction(cb)) cb.apply(null, args);
-		});
-	},
-	_fetch: function(urls, cb) {
-		var loadUris = filter(urls, function(url) {
-			url = resolve(url);
-			return url && (!module.cache[url] || module.cache[url].status < STATUS.ready);
-		}),
-		len = loadUris.length;
-		if (len === 0) {
-			cb();
-			return;
-		}
-		var queue = len;
-		function restart(mod) { (mod || {}).status < STATUS.ready && (mod.status = STATUS.ready); --queue;
-			(queue === 0) && cb();
-		}
-		forEach(loadUris, function(url) {
-			var mod = module.get(url);
-			function success() {
-				forEach(anonymouse, function(meta) {
-					mod._save(meta, url);
-				});
-				anonymouse = [];
-				if (mod.status >= STATUS.save) {
-					var deps = getPureDependencies(mod);
-					deps.length ? module._fetch(deps, function() {
-						restart(mod);
-					}) : restart(mod);
-				} else {
-					restart();
-				}
-			}
-			mod.status < STATUS.save ? fetch(url, success) : success();
-		});
-	}
-});
-
 extend(module.prototype, {
 	_compile: function() {
 		var mod = this;
@@ -113,13 +121,13 @@ extend(module.prototype, {
 		mod.status = STATUS.compiling;
 		function require(id) {
 			id = resolve(id);
-			var child = module.cache[id];
+			var child = lithe.cache[id];
 			if (!child) return null;
 			if (child.status === STATUS.compiling) return child.exports;
 			child.parent = mod;
 			return child._compile();
 		}
-		require.cache = module.cache;
+		require.cache = lithe.cache;
 		mod.require = require;
 		mod.exports = {};
 		var fun = mod.factory;
@@ -134,6 +142,30 @@ extend(module.prototype, {
 			this.factory = meta.factory;
 			this.status = STATUS.save;
 		}
+	}
+});
+
+var lithe = extend({
+	basepath: BASEPATH,
+	config: CONFIG,
+	cache: {},
+	get: function(url) {
+		return lithe.cache[url] || (lithe.cache[url] = new module(url));
+	},
+	define: function(id, factory) {
+		var deps = getDependencies(factory.toString());
+		var meta = {
+			id: id,
+			deps: deps,
+			factory: factory
+		};
+		anonymouse.push(meta);
+	},
+	use: function(urls, cb) {
+		config.init ? realUse(urls, cb) : realUse(CONFIG, function(cg) {
+			setConfig(cg);
+			realUse(urls, cb);
+		});
 	}
 });
 
