@@ -7,9 +7,13 @@
 
 	var isBrowser = !! (typeof window !== undef && global.navigator && global.document);
 	if (isBrowser) {
-		var NAMESPACE = {};
-		var doc = global.document,
+		var NAMESPACE = {},
+		doc = global.document,
 		loc = global.location,
+		getTag = function(tagname, ele) {
+			ele = ele || doc;
+			return ele.getElementsByTagName(tagname);
+		},
 		noop = function() {},
 		Arr = Array.prototype,
 		Obj = Object,
@@ -17,9 +21,9 @@
 		TIMESTAMP,
 		CHARSET = 'utf-8',
 		toString = Obj.prototype.toString,
-		header = doc.head || doc.getElementsByTagName('head')[0] || doc.documentElement,
+		header = doc.head || getTag('head')[0] || doc.documentElement,
 		UA = navigator.userAgent,
-		scripts = doc.getElementsByTagName('script'),
+		scripts = getTag('script'),
 		currentLoadedScript = scripts[scripts.length - 1],
 		attr = function(node, ns) {
 			return node.getAttribute(ns);
@@ -28,7 +32,7 @@
 		CONFIG = attr(currentLoadedScript, 'data-config'),
 		DEBUG = attr(currentLoadedScript, 'data-debug') === 'true',
 		mainjs = attr(currentLoadedScript, 'data-main'),
-		baseElement = header.getElementsByTagName('base')[0],
+		baseElement = getTag('base', header)[0],
 		commentRegExp = /(\/\*([\s\S]*?)\*\/|([^:]|^)\/\/(.*)$)/mg,
 		jsRequireRegExp = /[^.]\s*require\s*\(\s*["']([^'"\s]+)["']\s*\)/g,
 		fetching = {},
@@ -431,7 +435,7 @@
 					return interactiveScript;
 				}
 
-				var scripts = header.getElementsByTagName("script");
+				var scripts = getTag("script", header);
 
 				for (var i = scripts.length - 1; i >= 0; i--) {
 					var script = scripts[i];
@@ -508,7 +512,6 @@
 					factory: factory
 				};
 				if (id && tool.isAbsolute(id)) meta.id = id;
-				/*
 				if (!meta.id && doc.attachEvent) {
 					var script = tool.getCurrentScript();
 					if (script) {
@@ -518,7 +521,6 @@
 						throw new Error('failed to derive:" ' + factory);
 					}
 				}
-        */
 				if (meta.id) {
 					module._save(meta.id, meta);
 				} else {
@@ -535,7 +537,6 @@
 				var urls = module._createUrls(ids);
 				module._fetch(urls, function() {
 					var args = tool.map(urls, function(url) {
-						url = url.replace(/\?.*$/g, '');
 						return url ? module.cache[url]._compile() : null;
 					});
 					if (tool.isFunction(cb)) cb.apply(null, args);
@@ -561,8 +562,7 @@
 				loadUris = tool.filter(urls, function(url) {
 					return url && (!module.cache[url] || module.cache[url].status < STATUS.ready);
 				}),
-				restart = function(mod) {
-                    (mod || {}).status < STATUS.ready && (mod.status = STATUS.ready); --queue;
+				restart = function(mod) { (mod || {}).status < STATUS.ready && (mod.status = STATUS.ready); --queue;
 					(queue === 0) && cb();
 				},
 				len = loadUris.length;
@@ -677,9 +677,7 @@
 			}
 		});
 
-		if (mainjs) {
-			global.lithe.start(mainjs);
-		}
+		if (mainjs) global.lithe.start(mainjs);
 
 	} else {
 		//node api
