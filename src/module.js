@@ -7,32 +7,41 @@ STATUS = {
 	'compiling': 3,
 	'compiled': 4
 },
-stack = [];
+circularStack = [];
 
 //help
-function isReadyDependencies(mod) {
+function getPureDependencies(mod) {
+	var id = mod.id;
+	var deps = filter(mod.dependencies, function(dep) {
+		circularStack.push(id);
+		var isCircular = isCircularWaiting(lithe.cache[resolve(dep)]);
+		if (isCircular) {
+			//the circular is ready
+			circularStack.push(id);
+		}
+		circularStack.pop();
+		return ! isCircular;
+	});
+	return createUrls(deps);
+}
+
+function isCircularWaiting(mod) {
 	if (!mod || mod.status !== STATUS.save) return false;
+	circularStack.push(mod.id);
 	var deps = mod.dependencies;
 	if (deps.length) {
-		if (isOverlap(deps, stack)) return true;
+		if (isOverlap(deps, circularStack)) return true;
 		for (var i = 0; i < deps.length; i++) {
-			if (isReadyDependencies(lithe.cache[deps[i]])) return true;
+			if (isCircularWaiting(lithe.cache[deps[i]])) return true;
 		}
 	}
-	stack.pop();
+	circularStack.pop();
 	return false;
 }
 
-function isOverlap(a, b) {
-	var c = a.concat(b);
-	return c.length > unique(c).length;
-}
-
-function getPureDependencies(mod) {
-	return filter(mod.dependencies, function(dep) {
-		stack.push(mod.id);
-		return ! isReadyDependencies(lithe.cache[dep]);
-	});
+function isOverlap(arrA, arrB) {
+	var arrC = arrA.concat(arrB);
+	return arrC.length > unique(arrC).length;
 }
 
 function createUrls(urls) {
@@ -59,10 +68,7 @@ function fetchMods(urls, cb) {
 	forEach(loadUris, function(url) {
 		var mod = lithe.get(url);
 		function success() {
-			forEach(anonymouse, function(meta) {
-				mod._save(meta, url);
-			});
-			anonymouse = [];
+			saveAnonymouse();
 			if (mod.status >= STATUS.save) {
 				var deps = getPureDependencies(mod);
 				deps.length ? fetchMods(deps, function() {
@@ -76,13 +82,25 @@ function fetchMods(urls, cb) {
 	});
 }
 
+function saveAnonymouse() {
+	forEach(anonymouse, function(meta) {
+		var anonymousemod = lithe.get(meta.id);
+		anonymousemod._save(meta);
+        lithe.events.trigger('success',[anonymousemod]);
+	});
+	anonymouse = [];
+}
+
 function realUse(urls, cb) {
 	fetchMods(urls, function() {
 		urls = createUrls(urls);
 		var args = map(urls, function(url) {
-			return url ? lithe.cache[url]._compile() : null;
+			return url ? lithe.get(url)._compile() : null;
 		});
-		if (isFunction(cb)) cb.apply(null, args);
+		if (isFunction(cb)){
+            lithe.events.trigger('use',[cb,args]);
+            cb.apply(null, args);
+        }
 	});
 }
 
@@ -102,6 +120,7 @@ function setConfig(cg) {
 		}
 	}
 	config.init = true;
+	if (config.basepath) lithe.basepath = config.basepath;
 }
 
 function module(url) {
@@ -135,9 +154,9 @@ extend(module.prototype, {
 		mod.status = STATUS.compiled;
 		return mod.exports;
 	},
-	_save: function(meta, url) {
+	_save: function(meta) {
 		if (this.status < STATUS.save) {
-			this.id = resolve(meta.id, url);
+			this.id = meta.id;
 			this.dependencies = meta.deps;
 			this.factory = meta.factory;
 			this.status = STATUS.save;
@@ -147,25 +166,29 @@ extend(module.prototype, {
 
 var lithe = extend({
 	basepath: BASEPATH,
-	config: CONFIG,
+    events:new events(),
 	cache: {},
 	get: function(url) {
+		url = normalize(url, true);
 		return lithe.cache[url] || (lithe.cache[url] = new module(url));
 	},
 	define: function(id, factory) {
 		var deps = getDependencies(factory.toString());
 		var meta = {
-			id: id,
+			id: resolve(id),
 			deps: deps,
 			factory: factory
 		};
+        lithe.events.trigger('define',[meta]);
 		anonymouse.push(meta);
 	},
-	use: function(urls, cb) {
-		config.init ? realUse(urls, cb) : realUse(CONFIG, function(cg) {
-			setConfig(cg);
-			realUse(urls, cb);
-		});
+	use: function(urls, cb) { (!CONFIG || config.init) ? realUse(urls, cb) : function() {
+			saveAnonymouse();
+			realUse(CONFIG, function(cg) {
+				setConfig(cg);
+				realUse(urls, cb);
+			});
+		} ();
 	}
 });
 

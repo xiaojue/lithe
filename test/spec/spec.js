@@ -2,7 +2,7 @@ define('spec/spec',function(require,exports,module){
     var a = require('mods/a');
     var b = require('mods/b');
     var c = require('mods/c');
-    var d = require('mods/d');
+    var d = require('mods/d.js?a=1');
     var e = require('mods/e');
     var f = require('mods/f');
     var g = require('g');

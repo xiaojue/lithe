@@ -1,5 +1,5 @@
 function isAbsolute(url) {
-	return id.indexOf('://') > 0 || id.indexOf('//') === 0;
+	return url.indexOf('://') > 0 || url.indexOf('//') === 0;
 }
 
 function isDir(url) {
@@ -42,7 +42,7 @@ function realpath(path) {
 	return ret.join('/');
 }
 
-function normalize(url) {
+function normalize(url, t) {
 	url = realpath(url);
 	var lastChar = url.charAt(url.length - 1);
 	if (lastChar === '/') {
@@ -57,6 +57,7 @@ function normalize(url) {
 	if (url.indexOf(':80/') > 0) {
 		url = url.replace(':80/', '/');
 	}
+	if (t) url = url.replace(/\?.+$/, '');
 	return url;
 }
 
@@ -96,6 +97,7 @@ function replaceId(id) {
 
 function resolve(id, path) {
 	path = dirname(path || lithe.basepath);
+	if (isAbsolute(id)) return id;
 	if (config.init) id = replaceId(id);
 	var url = '';
 	if (id.indexOf('./') === 0 || id.indexOf('../') === 0) {

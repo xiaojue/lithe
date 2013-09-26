@@ -23,7 +23,7 @@
 
 		var filter = Arr.filter ? function(arr, fn) {
 			return arr.filter(fn);
-		}: function() {
+		}: function(arr,fn) {
 			var ret = [];
 			forEach(arr, function(item, i, arr) {
 				if (fn(item, i, arr)) ret.push(item);
@@ -119,31 +119,30 @@
 		}
 
 
-	    function events() {
-	    	this.map = {};
-	    }
+		function events() {
+			this.map = {};
+		}
 
-	    extend(events.prototype, {
-	    	trigger: function(name, args) {
-	    		var cbs = this.map[name];
-	    		if (cbs) {
-	    			forEach(cbs, function(fn) {
-	    				fn.apply(this, args);
-	    			});
-	    		}
-	    	},
-	    	on: function(name, cb) {
-	    		if (this.map[name]) {
-	    			this.map[name].push(cb);
-	    		} else {
-	    			this.map[name] = [cb];
-	    		}
-	    	}
-	    });
-
+		extend(events.prototype, {
+			trigger: function(name, args) {
+				var cbs = this.map[name];
+				if (cbs) {
+					forEach(cbs, function(fn) {
+						fn.apply(this, args);
+					});
+				}
+			},
+			on: function(name, cb) {
+				if (this.map[name]) {
+					this.map[name].push(cb);
+				} else {
+					this.map[name] = [cb];
+				}
+			}
+		});
 
 		function isAbsolute(url) {
-			return id.indexOf('://') > 0 || id.indexOf('//') === 0;
+			return url.indexOf('://') > 0 || url.indexOf('//') === 0;
 		}
 
 		function isDir(url) {
@@ -186,7 +185,7 @@
 			return ret.join('/');
 		}
 
-		function normalize(url) {
+		function normalize(url, t) {
 			url = realpath(url);
 			var lastChar = url.charAt(url.length - 1);
 			if (lastChar === '/') {
@@ -201,6 +200,7 @@
 			if (url.indexOf(':80/') > 0) {
 				url = url.replace(':80/', '/');
 			}
+			if (t) url = url.replace(/\?.+$/, '');
 			return url;
 		}
 
@@ -240,6 +240,7 @@
 
 		function resolve(id, path) {
 			path = dirname(path || lithe.basepath);
+			if (isAbsolute(id)) return id;
 			if (config.init) id = replaceId(id);
 			var url = '';
 			if (id.indexOf('./') === 0 || id.indexOf('../') === 0) {
@@ -330,32 +331,41 @@
 			'compiling': 3,
 			'compiled': 4
 		},
-		stack = [];
+		circularStack = [];
 
 		//help
-		function isReadyDependencies(mod) {
+		function getPureDependencies(mod) {
+			var id = mod.id;
+			var deps = filter(mod.dependencies, function(dep) {
+				circularStack.push(id);
+				var isCircular = isCircularWaiting(lithe.cache[resolve(dep)]);
+				if (isCircular) {
+					//the circular is ready
+					circularStack.push(id);
+				}
+				circularStack.pop();
+				return ! isCircular;
+			});
+			return createUrls(deps);
+		}
+
+		function isCircularWaiting(mod) {
 			if (!mod || mod.status !== STATUS.save) return false;
+			circularStack.push(mod.id);
 			var deps = mod.dependencies;
 			if (deps.length) {
-				if (isOverlap(deps, stack)) return true;
+				if (isOverlap(deps, circularStack)) return true;
 				for (var i = 0; i < deps.length; i++) {
-					if (isReadyDependencies(lithe.cache[deps[i]])) return true;
+					if (isCircularWaiting(lithe.cache[deps[i]])) return true;
 				}
 			}
-			stack.pop();
+			circularStack.pop();
 			return false;
 		}
 
-		function isOverlap(a, b) {
-			var c = a.concat(b);
-			return c.length > unique(c).length;
-		}
-
-		function getPureDependencies(mod) {
-			return filter(mod.dependencies, function(dep) {
-				stack.push(mod.id);
-				return ! isReadyDependencies(lithe.cache[dep]);
-			});
+		function isOverlap(arrA, arrB) {
+			var arrC = arrA.concat(arrB);
+			return arrC.length > unique(arrC).length;
 		}
 
 		function createUrls(urls) {
@@ -382,10 +392,7 @@
 			forEach(loadUris, function(url) {
 				var mod = lithe.get(url);
 				function success() {
-					forEach(anonymouse, function(meta) {
-						mod._save(meta, url);
-					});
-					anonymouse = [];
+					saveAnonymouse();
 					if (mod.status >= STATUS.save) {
 						var deps = getPureDependencies(mod);
 						deps.length ? fetchMods(deps, function() {
@@ -399,13 +406,25 @@
 			});
 		}
 
+		function saveAnonymouse() {
+			forEach(anonymouse, function(meta) {
+				var anonymousemod = lithe.get(meta.id);
+				anonymousemod._save(meta);
+		        lithe.events.trigger('success',[anonymousemod]);
+			});
+			anonymouse = [];
+		}
+
 		function realUse(urls, cb) {
 			fetchMods(urls, function() {
 				urls = createUrls(urls);
 				var args = map(urls, function(url) {
-					return url ? lithe.cache[url]._compile() : null;
+					return url ? lithe.get(url)._compile() : null;
 				});
-				if (isFunction(cb)) cb.apply(null, args);
+				if (isFunction(cb)){
+		            lithe.events.trigger('use',[cb,args]);
+		            cb.apply(null, args);
+		        }
 			});
 		}
 
@@ -425,6 +444,7 @@
 				}
 			}
 			config.init = true;
+			if (config.basepath) lithe.basepath = config.basepath;
 		}
 
 		function module(url) {
@@ -458,9 +478,9 @@
 				mod.status = STATUS.compiled;
 				return mod.exports;
 			},
-			_save: function(meta, url) {
+			_save: function(meta) {
 				if (this.status < STATUS.save) {
-					this.id = resolve(meta.id, url);
+					this.id = meta.id;
 					this.dependencies = meta.deps;
 					this.factory = meta.factory;
 					this.status = STATUS.save;
@@ -470,34 +490,44 @@
 
 		var lithe = extend({
 			basepath: BASEPATH,
-			config: CONFIG,
+		    events:new events(),
 			cache: {},
 			get: function(url) {
+				url = normalize(url, true);
 				return lithe.cache[url] || (lithe.cache[url] = new module(url));
 			},
 			define: function(id, factory) {
 				var deps = getDependencies(factory.toString());
 				var meta = {
-					id: id,
+					id: resolve(id),
 					deps: deps,
 					factory: factory
 				};
+		        lithe.events.trigger('define',[meta]);
 				anonymouse.push(meta);
 			},
-			use: function(urls, cb) {
-				config.init ? realUse(urls, cb) : realUse(CONFIG, function(cg) {
-					setConfig(cg);
-					realUse(urls, cb);
-				});
+			use: function(urls, cb) { (!CONFIG || config.init) ? realUse(urls, cb) : function() {
+					saveAnonymouse();
+					realUse(CONFIG, function(cg) {
+						setConfig(cg);
+						realUse(urls, cb);
+					});
+				} ();
 			}
 		});
 
 
 		global.lithe = lithe;
 		global.define = lithe.define;
-		if (mainjs) global.lithe.use(mainjs);
+		if (mainjs) {
+			setTimeout(function() {
+				global.lithe.use(mainjs);
+			},
+			0);
+		}
 	} else {
 		exports.tool = require('./lib/lithe-tool.js');
 		exports.hfs = require('./lib/lithe-hfs.js');
 	}
 })(this);
+

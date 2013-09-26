@@ -19,4 +19,3 @@ extend(events.prototype, {
 		}
 	}
 });
-

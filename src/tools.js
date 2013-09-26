@@ -14,7 +14,7 @@ var forEach = Arr.forEach ? function(arr, fn) {
 
 var filter = Arr.filter ? function(arr, fn) {
 	return arr.filter(fn);
-}: function() {
+}: function(arr,fn) {
 	var ret = [];
 	forEach(arr, function(item, i, arr) {
 		if (fn(item, i, arr)) ret.push(item);
