@@ -410,7 +410,7 @@
 			forEach(anonymouse, function(meta) {
 				var anonymousemod = lithe.get(meta.id);
 				anonymousemod._save(meta);
-		        lithe.events.trigger('success',[anonymousemod]);
+				lithe.events.trigger('success', [anonymousemod]);
 			});
 			anonymouse = [];
 		}
@@ -421,10 +421,10 @@
 				var args = map(urls, function(url) {
 					return url ? lithe.get(url)._compile() : null;
 				});
-				if (isFunction(cb)){
-		            lithe.events.trigger('use',[cb,args]);
-		            cb.apply(null, args);
-		        }
+				if (isFunction(cb)) {
+					lithe.events.trigger('use', [cb, args]);
+					cb.apply(null, args);
+				}
 			});
 		}
 
@@ -490,7 +490,7 @@
 
 		var lithe = extend({
 			basepath: BASEPATH,
-		    events:new events(),
+			events: new events(),
 			cache: {},
 			get: function(url) {
 				url = normalize(url, true);
@@ -503,7 +503,7 @@
 					deps: deps,
 					factory: factory
 				};
-		        lithe.events.trigger('define',[meta]);
+				lithe.events.trigger('define', [meta]);
 				anonymouse.push(meta);
 			},
 			use: function(urls, cb) { (!CONFIG || config.init) ? realUse(urls, cb) : function() {
