@@ -53,40 +53,19 @@ lithe.use('a.js','b.js',function(a,b){
 });
 ```
 
-### lithe.start
-
-```js
-//if your project have not set data-main then you must be used the start function to make start.
-lithe.start('conf/file');
-```
-
 ### config
 
 ```js
 define('config',function(require,exports,module){
    module.exports = {
-      //if your have a lot of project has many configs,you can configuration the namespace at here.
-      namespace:{
-          otherproject:{
-            basepath:"http://otherproject.com/base/",
-            config:"config.js"
-          }
-          //In your code you can write like this: require('otherproject:somemod');
-      },
       //it will replace the real BASEPATH
-      base:'http://localhost/debug/path', 
-      //for debug or update timestamp ? All javascript modules will be used
-      timestamp:new Date().valueOf(), 
+      basepath:'http://localhost/debug/path', 
       //logogram
       alias:{
         'app':'path/to/app',
         'file':'path/to/file',
         //Relative directory proxy
         'UI':'../'
-      },
-      //if in the debug mode,the mainjs will be switch in there.
-      debugswitch:function(mainjs){
-            return 'some/new/path/mainjs';
       }
    };
 });
@@ -94,8 +73,6 @@ define('config',function(require,exports,module){
 define('someOtherJs',function(){
   var app = require('app'),
   file = require('file');
-  var othermod = require('otherproject:somemod');
-  //now the path/to/app and path/to/file has required
 });
 ```
 
