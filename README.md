@@ -1,7 +1,11 @@
 # Lithe
 
 A browser-side script loader,compatible with the de facto standards(NodeJS/CommonJS).
-It's very simple and small,only 3.7kb gzipped.
+It's very simple and small,only 2.7kb gzipped.
+
+If you use Gruntjs to build your project , you can use [grunt-lithe][1]
+
+  [1]: http://www.github.com/xiaojue/grunt-lithe
 
 ---
 
@@ -23,13 +27,6 @@ define('path/to/file',function(require,exports,module){
    */
 });
 
-//if your project will not concat in one file to deploy,your can write:
-
-define(function(require){
-    
-});
-
-//the module id will be the file src path automatic. 
 ```
 
 ### require
