@@ -2,7 +2,7 @@
  lithe 
  @author xiaojue [designsor@gmail.com] 
  @fileoverview a javascript common loader 
- @vserion 0.1.9 
+ @vserion 0.2.0 
  */
 (function(global, undef) {
 	var isBrowser = !! (typeof window !== undef && global.navigator && global.document);
@@ -356,7 +356,7 @@
 			if (deps.length) {
 				if (isOverlap(deps, circularStack)) return true;
 				for (var i = 0; i < deps.length; i++) {
-					if (isCircularWaiting(lithe.cache[deps[i]])) return true;
+					if (isCircularWaiting(lithe.cache[resolve(deps[i])])) return true;
 				}
 			}
 			circularStack.pop();

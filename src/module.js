@@ -32,7 +32,7 @@ function isCircularWaiting(mod) {
 	if (deps.length) {
 		if (isOverlap(deps, circularStack)) return true;
 		for (var i = 0; i < deps.length; i++) {
-			if (isCircularWaiting(lithe.cache[deps[i]])) return true;
+			if (isCircularWaiting(lithe.cache[resolve(deps[i])])) return true;
 		}
 	}
 	circularStack.pop();
