@@ -11,8 +11,7 @@
 		if (mainjs) {
 			setTimeout(function() {
 				global.lithe.use(mainjs);
-			},
-			0);
+			});
 		}
 	} else {
 		exports.tool = require('./lib/lithe-tool.js');

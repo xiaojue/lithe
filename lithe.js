@@ -2,7 +2,7 @@
  lithe 
  @author xiaojue [designsor@gmail.com] 
  @fileoverview a javascript common loader 
- @vserion 0.2.0 
+ @vserion 0.2.1 
  */
 (function(global, undef) {
 	var isBrowser = !! (typeof window !== undef && global.navigator && global.document);
@@ -300,14 +300,14 @@
 			node.onload = node.onerror = node.onreadystatechange = function() {
 				if (/loaded|complete|undefined/.test(node.readyState)) {
 					node.onload = node.onerror = node.onreadystatechange = null;
-					if (node.parentNode && !DEBUG) node.parentNode.removeChild(node);
+					if (node.parentNode && ! DEBUG) node.parentNode.removeChild(node);
 					node = undef;
 					if (isFunction(cb)) cb();
 				}
 			};
-		    node.async = 'async';
-		    node.src = url;
-		    insertscript(node);
+			node.async = 'async';
+			node.src = url;
+			insertscript(node);
 		}
 
 		function createNode(tag, charset) {
@@ -383,6 +383,7 @@
 			len = loadUris.length;
 			if (len === 0) {
 				cb();
+				lithe.events.trigger('end');
 				return;
 			}
 			var queue = len;
@@ -410,7 +411,6 @@
 			forEach(anonymouse, function(meta) {
 				var anonymousemod = lithe.get(meta.id);
 				anonymousemod._save(meta);
-				lithe.events.trigger('success', [anonymousemod]);
 			});
 			anonymouse = [];
 		}
@@ -422,7 +422,6 @@
 					return url ? lithe.get(url)._compile() : null;
 				});
 				if (isFunction(cb)) {
-					lithe.events.trigger('use', [cb, args]);
 					cb.apply(null, args);
 				}
 			});
@@ -463,7 +462,7 @@
 				if (mod.status < STATUS.save) return null;
 				mod.status = STATUS.compiling;
 				function require(id) {
-					id = resolve(id);
+					id = normalize(resolve(id), true);
 					var child = lithe.cache[id];
 					if (!child) return null;
 					if (child.status === STATUS.compiling) return child.exports;
@@ -476,11 +475,13 @@
 				var fun = mod.factory;
 				if (isFunction(fun)) runModuleContext(fun, mod);
 				mod.status = STATUS.compiled;
+				lithe.events.trigger('compiled', [mod]);
 				return mod.exports;
 			},
 			_save: function(meta) {
 				if (this.status < STATUS.save) {
 					this.id = meta.id;
+					this.name = meta.name;
 					this.dependencies = meta.deps;
 					this.factory = meta.factory;
 					this.status = STATUS.save;
@@ -500,10 +501,10 @@
 				var deps = getDependencies(factory.toString());
 				var meta = {
 					id: resolve(id),
+					name: id,
 					deps: deps,
 					factory: factory
 				};
-				lithe.events.trigger('define', [meta]);
 				anonymouse.push(meta);
 			},
 			use: function(urls, cb) { (!CONFIG || config.init) ? realUse(urls, cb) : function() {
@@ -522,8 +523,7 @@
 		if (mainjs) {
 			setTimeout(function() {
 				global.lithe.use(mainjs);
-			},
-			0);
+			});
 		}
 	} else {
 		exports.tool = require('./lib/lithe-tool.js');

@@ -59,6 +59,7 @@ function fetchMods(urls, cb) {
 	len = loadUris.length;
 	if (len === 0) {
 		cb();
+		lithe.events.trigger('end');
 		return;
 	}
 	var queue = len;
@@ -86,7 +87,6 @@ function saveAnonymouse() {
 	forEach(anonymouse, function(meta) {
 		var anonymousemod = lithe.get(meta.id);
 		anonymousemod._save(meta);
-		lithe.events.trigger('success', [anonymousemod]);
 	});
 	anonymouse = [];
 }
@@ -98,7 +98,6 @@ function realUse(urls, cb) {
 			return url ? lithe.get(url)._compile() : null;
 		});
 		if (isFunction(cb)) {
-			lithe.events.trigger('use', [cb, args]);
 			cb.apply(null, args);
 		}
 	});
@@ -139,7 +138,7 @@ extend(module.prototype, {
 		if (mod.status < STATUS.save) return null;
 		mod.status = STATUS.compiling;
 		function require(id) {
-			id = resolve(id);
+			id = normalize(resolve(id), true);
 			var child = lithe.cache[id];
 			if (!child) return null;
 			if (child.status === STATUS.compiling) return child.exports;
@@ -152,11 +151,13 @@ extend(module.prototype, {
 		var fun = mod.factory;
 		if (isFunction(fun)) runModuleContext(fun, mod);
 		mod.status = STATUS.compiled;
+		lithe.events.trigger('compiled', [mod]);
 		return mod.exports;
 	},
 	_save: function(meta) {
 		if (this.status < STATUS.save) {
 			this.id = meta.id;
+			this.name = meta.name;
 			this.dependencies = meta.deps;
 			this.factory = meta.factory;
 			this.status = STATUS.save;
@@ -176,10 +177,10 @@ var lithe = extend({
 		var deps = getDependencies(factory.toString());
 		var meta = {
 			id: resolve(id),
+			name: id,
 			deps: deps,
 			factory: factory
 		};
-		lithe.events.trigger('define', [meta]);
 		anonymouse.push(meta);
 	},
 	use: function(urls, cb) { (!CONFIG || config.init) ? realUse(urls, cb) : function() {

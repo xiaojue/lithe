@@ -41,14 +41,14 @@ function getscript(url, cb, charset) {
 	node.onload = node.onerror = node.onreadystatechange = function() {
 		if (/loaded|complete|undefined/.test(node.readyState)) {
 			node.onload = node.onerror = node.onreadystatechange = null;
-			if (node.parentNode && !DEBUG) node.parentNode.removeChild(node);
+			if (node.parentNode && ! DEBUG) node.parentNode.removeChild(node);
 			node = undef;
 			if (isFunction(cb)) cb();
 		}
 	};
-    node.async = 'async';
-    node.src = url;
-    insertscript(node);
+	node.async = 'async';
+	node.src = url;
+	insertscript(node);
 }
 
 function createNode(tag, charset) {
