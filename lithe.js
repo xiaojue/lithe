@@ -444,6 +444,7 @@
 			}
 			config.init = true;
 			if (config.basepath) lithe.basepath = config.basepath;
+		    lithe.config = config;
 		}
 
 		function module(url) {
