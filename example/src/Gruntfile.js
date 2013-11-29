@@ -1,5 +1,5 @@
 var path = require('path');
-var config = require('config.js');
+var config = require('./config.js');
 var banner = '/* <%=pkg.name%> | <%=pkg.description%> | vserion <%=pkg.version%>*/\r\n';
 module.exports = function(grunt) {
 	grunt.initConfig({
