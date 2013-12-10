@@ -12,7 +12,7 @@ English Documentation [EN][1]
 
 ---
 
-## public api for browser
+## 浏览器端API
 
 ### define
 
@@ -35,7 +35,7 @@ define('path/to/file',function(require,exports,module){
 ### require
 
 ```js
-//path/to/app.js
+//path/to/app.js 定义一个模块
 define('path/to/app',function(require,exports,module){
   var file = require('path/to/file');
   console.log(file.filename); //file.js
@@ -46,13 +46,13 @@ define('path/to/app',function(require,exports,module){
 ### lithe.use
 
 ```js
-//anywhere
+//可以用于任何位置
 lithe.use('path/to/app',function(app){
     console.log(app); // i am app.js
 });
-//or
+//或者这样使用
 lithe.use('a.js','b.js',function(a,b){
-  //a and b has required;
+  //a和b为exports;
 });
 ```
 
@@ -61,13 +61,13 @@ lithe.use('a.js','b.js',function(a,b){
 ```js
 define('config',function(require,exports,module){
    module.exports = {
-      //it will replace the real BASEPATH
+      //basepath会替换掉默认根目录为你指定的目录
       basepath:'http://localhost/debug/path', 
-      //logogram
+      //短命名
       alias:{
         'app':'path/to/app',
         'file':'path/to/file',
-        //Relative directory proxy
+        //定义整个目录短名
         'UI':'../'
       }
    };
@@ -79,7 +79,7 @@ define('someOtherJs',function(){
 });
 ```
 
-## public api for node
+## NodeJS端API
 
 ```js
 //npm install lithe
@@ -88,9 +88,9 @@ tool = lithe.tool,
 hfs = lithe.hfs,
 options = tool.options;
 
-options.basepath = 'your project base dir';
-options.uglifyPath = 'your uglifyjs dir';
-options.alias = {}; //your short alias config
+options.basepath = '你项目本地根目录';
+options.uglifyPath = '你得uglify bin 文件地址';
+options.alias = {}; //这里要传入你得alias，前后端统一，才可以正确build目录
 
 ```
 
@@ -98,28 +98,27 @@ options.alias = {}; //your short alias config
 
 ```js
 var requires = tool.findJsAllrequires('../app.js');
-//app.js's requires are findout and alias will be replaced  
+//返回app.js文件所有的依赖，有短命名的一样会返回，不包含app.js
 ```
 ### tool.concatFile([files],[target])
 
 ```js
 tool.concatFile(['/path/to/file1.js','/path/to/file2.js'],'/path/to/file1&file2.js');
-//file1 and file2 will be merger
+//file1和file2会被合并。
 ```
 
 ### tool.uglifyJs([filepath],[target])
 
 ```js
 tool.uglifyJs('/path/to/file1&file2.js','path/to/file1&file2-min.js');
-//Equivalent uglifyjs --reserved-names require -o path/to/file1&file2-min.js /path/to/file1&file2.js
+//相当于执行了 uglifyjs --reserved-names require -o path/to/file1&file2-min.js /path/to/file1&file2.js 命令 压缩文件，设置require为关键字
 ```
 
 ### hfs.cpdirSync([sourceDir],[targetDir])
 
 ```js
 hfs.cpdirSync('/path/to/dir1','/path/to/dir2');
-//copy the folder by sync,if targetDir not exist it will be created.
-//.git and .svn will be continue.
+//同步复制目录，如果多级不存在的目录也会被创建，不会复制.git 和.svn 文件
 ```
 
 ### hfs.delSync([path])
@@ -127,24 +126,24 @@ hfs.cpdirSync('/path/to/dir1','/path/to/dir2');
 ```js
 hfs.delSync('/path/to/dir');
 hfs.delSync('/path/to/file');
-//del the folder or file sync
-//.git and .svn will be continue.
+//删除目录或者文件，.git 和.svn 文件会被跳过.
 ```
 
 ### hfs.mkdirSync([target])
 
 ```js
 hfs.mkdirSync('/path/dir')
-//if the '/path' folder not exist,it will be created.
+//创建目录，如果多级不存在，会一起创建。
 ```
 
 ### hfs.walk([path],[callback],[options])
 
 ```js
-hfs.walk('/path/',function(files){
-    console.log(files); 'return path folder all js files';    
+hfs.walk('/path/',function(files,dirs){
+    console.log(files); //'返回所有文件数组';    
 },{
     filter:function(file){
+    	  //过滤参数
 	  if (path.extname(el).indexOf('.js') > - 1) return true;
     }
 });
@@ -155,7 +154,7 @@ hfs.walk('/path/',function(files){
 
 ```js
 hfs.writeFileSync('/path/file',"abcd");
-//if path folder not exist,it will be created.
+//写入文件，如果多级目录不存在会一起被创建。
 ```
 
 ## How to deploy in the web browser？
@@ -168,6 +167,6 @@ hfs.writeFileSync('/path/file',"abcd");
         data-main="app.js">
 </script>
 ```
-## License
+## 许可协议
 
 BSD license
