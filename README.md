@@ -8,7 +8,7 @@ If you use Gruntjs to build your project , you can use [grunt-lithe][1]
 
   [1]: http://www.github.com/xiaojue/grunt-lithe
 
-You can use [bower][1] and [lithe-cli][2] manage your modules.
+You can use [bower][1] and [lithe-cli][2] manage modules Easier.
 
   [1]: https://github.com/bower/bower
   [2]: https://github.com/xiaojue/lithe-cli
