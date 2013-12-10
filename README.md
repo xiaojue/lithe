@@ -9,7 +9,7 @@ If you use Gruntjs to build your project , you can use [grunt-lithe][1]
 
 Chinese Documentation [中文文档][1]
 
-  [1]: http://www.github.com/xiaojue/lithe/document/ZH
+  [1]: https://github.com/xiaojue/lithe/blob/master/document/ZH.md
 
 ---
 
