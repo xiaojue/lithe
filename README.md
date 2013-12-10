@@ -10,10 +10,10 @@ You can use [bower][2] and [lithe-cli][3] manage modules Easier.
 
 Chinese Documentation [中文文档][4]
 
-  [1]: http://www.github.com/xiaojue/grunt-lithe
+  [1]: http://www.github.com/litheModule/grunt-lithe
   [2]: https://github.com/bower/bower
-  [3]: https://github.com/xiaojue/lithe-cli
-  [4]: https://github.com/xiaojue/lithe/blob/master/document/ZH.md
+  [3]: https://github.com/litheModule/lithe-cli
+  [4]: https://github.com/litheModule/lithe/blob/master/document/ZH.md
 
 ---
 
