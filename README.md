@@ -1,4 +1,5 @@
 # Lithe
+[![Build Status](https://travis-ci.org/xiaojue/lithe.png?branch=master)](https://travis-ci.org/xiaojue/lithe) [![依赖模块状态](https://david-dm.org/xiaojue/lithe.png)](http://david-dm.org/xiaojue/lithe)
 
 A browser-side script loader,compatible with the de facto standards(NodeJS/CommonJS).
 It's very simple and small,only 2.7kb gzipped.
@@ -10,6 +11,20 @@ If you use Gruntjs to build your project , you can use [grunt-lithe][1]
 Chinese Documentation [中文文档][1]
 
   [1]: https://github.com/xiaojue/lithe/blob/master/document/ZH.md
+
+---
+
+## Installation
+
+```bash
+$ npm install lithe
+```
+or
+```bash
+$ bower install lithe
+$ cd lithe/
+$ npm install -d
+```
 
 ---
 
