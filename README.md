@@ -7,6 +7,10 @@ If you use Gruntjs to build your project , you can use [grunt-lithe][1]
 
   [1]: http://www.github.com/xiaojue/grunt-lithe
 
+Chinese Documentation [中文文档][1]
+
+  [1]: http://www.github.com/xiaojue/lithe/document/ZH
+
 ---
 
 ## public api for browser
