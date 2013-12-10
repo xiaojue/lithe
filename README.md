@@ -6,16 +6,14 @@ It's very simple and small,only 2.7kb gzipped.
 
 If you use Gruntjs to build your project , you can use [grunt-lithe][1]
 
+You can use [bower][2] and [lithe-cli][3] manage modules Easier.
+
+Chinese Documentation [中文文档][4]
+
   [1]: http://www.github.com/xiaojue/grunt-lithe
-
-You can use [bower][1] and [lithe-cli][2] manage modules Easier.
-
-  [1]: https://github.com/bower/bower
-  [2]: https://github.com/xiaojue/lithe-cli
-
-Chinese Documentation [中文文档][1]
-
-  [1]: https://github.com/xiaojue/lithe/blob/master/document/ZH.md
+  [2]: https://github.com/bower/bower
+  [3]: https://github.com/xiaojue/lithe-cli
+  [4]: https://github.com/xiaojue/lithe/blob/master/document/ZH.md
 
 ---
 
