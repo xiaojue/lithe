@@ -1,7 +1,7 @@
 {
   "name": "lithe",
   "main": "lithe.js",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "homepage": "https://github.com/xiaojue/lithe",
   "authors": [
     "xiaojue <designsor@gmail.com>"
