@@ -39,7 +39,7 @@
            </div>
 
            <h3>模块仓库</h3>
-           <p>loading...</p>
+           <div id="modules">loading...</div>
 
            <h3>相关文档</h3>
            <ol>
@@ -50,10 +50,33 @@
                <li><a href="http://bower.io/" target="_blank">bower 文档</a></li> 
                <li><a href="https://github.com/litheModule/examples" target="_blank">实战例子</a></li> 
            </ol>
-           <footer style="text-align:center;">
-            <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_5763763'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s17.cnzz.com/stat.php%3Fid%3D5763763%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));</script>
+           <footer>
+            <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_5763763'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s17.cnzz.com/stat.php%3Fid%3D5763763%26online%3D1%26show%3Dline' type='text/javascript'%3E%3C/script%3E"));</script>
            </footer>
          </div>
         <script src="bower_components/lithe/lithe.min.js" data-path="http://lithemodule.org/"></script>
+        <script>
+            lithe.use('/bower_components/jquery/jquery',function($){
+                function gitconvert(git){
+                    var http = git.replace(/^git@/,'http://');
+                    http = http.replace('github.com:','github.com/');
+                    return http.slice(0,http.lastIndexOf('.'));
+                }
+                $.ajax({
+                    url:'http://bower.lithemodule.org/list',
+                    type:'get',
+                    dataType:'json',
+                    success:function(arr){
+                        var html = '<ul>';
+                        for(var i=0;i<arr.length;i++){
+                            var pkg = arr[i];
+                            html += '<li><a href="'+gitconvert(pkg.url)+'" target="_blank">'+pkg.name+'</a></li>'; 
+                        }
+                        html += '</ul>';
+                        $('#modules').html(html);
+                    }
+                });
+            }); 
+        </script>
     </body>
 </html>
