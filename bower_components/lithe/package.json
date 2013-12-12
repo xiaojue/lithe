@@ -1,0 +1,33 @@
+{
+  "name": "lithe",
+  "version": "0.2.3",
+  "author": {
+    "name": "xiaojue",
+    "email": "designsor@gmail.com",
+    "url": "http://tuer.me/user/profile/designsor"
+  },
+  "description": "a javascript common loader",
+  "keywords": [
+    "javascript loader",
+    "commonjs loader"
+  ],
+  "main": "./lithe.js",
+  "dependencies": {
+    "grunt":"~0.4.0",
+    "grunt-contrib-uglify":"~0.2.7",
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-includes":"0.4.0",
+    "grunt-contrib-concat":"~0.3.0",
+    "uglify-js": "2.4.7",
+    "optimist":"0.6.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/litheModule/lithe.git"
+  },
+  "license": "BSD",
+  "readme": "# Lithe\n\nA browser-side script loader,compatible with the de facto standards(NodeJS/CommonJS).\nIt's very simple and small,only 2.6kb gzipped.\n\n---\n\n## public api for browser\n\n### define\n\n```js\n//path/to/file.js\ndefine('path/to/file',function(require,exports,module){\n  var file = 'path/to/file.js';\n  exports.filename = 'file.js';\n  exports.filedir = 'path/to/';\n  /**\n   * module.exports = {\n   *    filename:'file.js',\n   *    filedir:'path/to'\n   * };\n   */\n});\n```\n\n### require\n\n```js\n//path/to/app.js\ndefine('path/to/app',function(require,exports,module){\n  var file = require('path/to/file');\n  console.log(file.filename); //file.js\n  console.log(file.filedir) //path/to\n  module.exports = 'i am app.js';\n});\n```\n### lithe.use\n\n```js\n//anywhere\nlithe.use('path/to/app',function(app){\n    console.log(app); // i am app.js\n});\n//or\nlithe.use('a.js','b.js',function(a,b){\n  //a and b has required;\n});\n```\n\n### config\n\n```js\ndefine('config',function(require,exports,module){\n   module.exports = {\n      base:'http://localhost/debug/path', \n      //it will replace the real BASEPATH\n      timestamp:new Date().valueOf(), \n      //for debug or update timestamp ? All javascript modules will be used\n      alias:{\n        'app':'path/to/app',\n        'file':'path/to/file'\n      }\n      //logogram\n   };\n});\n\ndefine('someOtherJs',function(){\n  var app = require('app'),\n  file = require('file');\n  //now the path/to/app and path/to/file has required\n});\n```\n\n## public api for node\n\n```js\n//npm install lithe\n//npm install -d\nvar tool = require('lithe').tool\n```\n\n### tool.findJsAllrequires([filepath],[alias]) \n\n```js\nvar requires = tool.findJsAllrequires('../app.js',{'$':'path/to/jquery'});\n//app.js's requires are findout and alias will be replaced  \n```\n### tool.concatFile([files],[target])\n\n```js\ntool.concatFile(['/path/to/file1.js','/path/to/file2.js'],'/path/to/file1&file2.js');\n//file1 and file2 will be merger\n```\n\n### tool.uglifyJs([filepath],[target])\n\n```js\ntool.uglifyJs('/path/to/file1&file2.js','path/to/file1&file2-min.js');\n//Equivalent uglifyjs --reserved-names require -o path/to/file1&file2-min.js /path/to/file1&file2.js\n```\n## How to deploy in the web browser？\n\n```html\n<script src=\"/lithe.js\" \n        data-config=\"/config.js\"\n        data-path=\"http://domain.com/\"\n        data-main=\"app.js\">\n</script>\n```\n## License\n\nBSD license\n",
+  "readmeFilename": "README.md",
+  "_id": "lithe@0.0.4",
+  "_from": "lithe"
+}

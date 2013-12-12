@@ -1,0 +1,29 @@
+{
+  "name": "lithe",
+  "main": "lithe.js",
+  "homepage": "https://github.com/litheModule/lithe",
+  "authors": [
+    "xiaojue <designsor@gmail.com>"
+  ],
+  "description": "a javascript common loader",
+  "keywords": [
+    "javascript loader",
+    "commonjs loader"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ],
+  "_release": "849206bee0",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "849206bee0d0c6ab1795fad1c5beccfd40e41180"
+  },
+  "_source": "git@github.com:litheModule/lithe.git",
+  "_target": "*",
+  "_originalSource": "lithe",
+  "_direct": true
+}

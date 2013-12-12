@@ -1,0 +1,23 @@
+{
+  "name": "jquery",
+  "homepage": "https://github.com/litheModule/lithe.jquery",
+  "authors": [
+    "xiaojue <designsor@gmail.com>"
+  ],
+  "description": "jquery for lithe",
+  "main": "jquery.js",
+  "keywords": [
+    "jquery-1.10.2"
+  ],
+  "license": "MIT",
+  "_release": "a34329d5a0",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "a34329d5a02300847b4cc6e8e0894ead48624012"
+  },
+  "_source": "git@github.com:litheModule/lithe.jquery.git",
+  "_target": "*",
+  "_originalSource": "jquery",
+  "_direct": true
+}

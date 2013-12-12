@@ -1,0 +1,20 @@
+{
+  "name": "lithe",
+  "main": "lithe.js",
+  "version": "0.2.4",
+  "homepage": "https://github.com/litheModule/lithe",
+  "authors": [
+    "xiaojue <designsor@gmail.com>"
+  ],
+  "description": "a javascript common loader",
+  "keywords": [
+    "javascript loader",
+    "commonjs loader"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ]
+}

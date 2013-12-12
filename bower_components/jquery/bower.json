@@ -1,0 +1,14 @@
+{
+  "name": "jquery",
+  "version": "1.10.2",
+  "homepage": "https://github.com/litheModule/lithe.jquery",
+  "authors": [
+    "xiaojue <designsor@gmail.com>"
+  ],
+  "description": "jquery for lithe",
+  "main": "jquery.js",
+  "keywords": [
+    "jquery-1.10.2"
+  ],
+  "license": "MIT"
+}

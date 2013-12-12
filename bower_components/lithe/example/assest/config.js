@@ -1,0 +1,2 @@
+/* lithe-example |  | vserion 0.0.1*/
+(function(e,t){var r,n,i=!(typeof window===t||!e.navigator||!e.document);i&&(r=/debug/.test(location.search),n=location.href.slice(0,location.href.lastIndexOf("/")));var l={basepath:r?n+"/src/":n+"/assest/",alias:{markdown:"mods/markdown"}};e.define&&i?define("config",function(){return l}):module.exports=l})(this);
