@@ -1,0 +1,14 @@
+{
+  "name": "bootstrap3",
+  "version": "3.0.2",
+  "homepage": "https://github.com/litheModule/lithe.bootstrap3",
+  "authors": [
+    "xiaojue <designsor@gmail.com>"
+  ],
+  "description": "bootstrap3 for lithe",
+  "main": "bootstrap.js",
+  "keywords": [
+    "bootstrap3"
+  ],
+  "license": "MIT"
+}

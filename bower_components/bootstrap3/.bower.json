@@ -1,0 +1,23 @@
+{
+  "name": "bootstrap3",
+  "homepage": "https://github.com/litheModule/lithe.bootstrap3",
+  "authors": [
+    "xiaojue <designsor@gmail.com>"
+  ],
+  "description": "bootstrap3 for lithe",
+  "main": "bootstrap.js",
+  "keywords": [
+    "bootstrap3"
+  ],
+  "license": "MIT",
+  "_release": "0cc81bc491",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "0cc81bc4910ab41ae51eda1a0413667ab9a89d80"
+  },
+  "_source": "git@github.com:litheModule/lithe.bootstrap3.git",
+  "_target": "*",
+  "_originalSource": "bootstrap3",
+  "_direct": true
+}
