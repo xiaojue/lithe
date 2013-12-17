@@ -2,7 +2,7 @@
  lithe 
  @author xiaojue [designsor@gmail.com] 
  @fileoverview a javascript common loader 
- @vserion 0.2.1 
+ @vserion 0.2.3 
  */
 (function(global, undef) {
 	var isBrowser = !! (typeof window !== undef && global.navigator && global.document);
@@ -509,6 +509,7 @@
 				anonymouse.push(meta);
 			},
 			use: function(urls, cb) { (!CONFIG || config.init) ? realUse(urls, cb) : function() {
+		            CONFIG = createUrls(CONFIG);
 					saveAnonymouse();
 					realUse(CONFIG, function(cg) {
 						setConfig(cg);
