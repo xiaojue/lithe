@@ -1,3 +1,3 @@
-define('mods/a/g',function(require,exports,module){
+define("mods/a/g",function(require,exports,module){
     exports.g = 'g';
 });
