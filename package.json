@@ -12,6 +12,9 @@
     "commonjs loader"
   ],
   "main": "./lithe.js",
+  "bin":{
+    "lithe":"bin/lithe"  
+   },
   "dependencies": {
     "grunt":"~0.4.0",
     "grunt-contrib-uglify":"~0.2.7",
