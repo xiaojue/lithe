@@ -1,4 +1,4 @@
-deifne("mods/d",function(require,exports,module){
+define("mods/d",function(require,exports,module){
     var g = require('g');
     exports.d = g;
 });

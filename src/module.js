@@ -9,6 +9,8 @@ STATUS = {
 },
 circularStack = [];
 
+if(CONFIG) CONFIG = createUrls(CONFIG);
+
 //help
 function getPureDependencies(mod) {
 	var id = mod.id;
@@ -185,7 +187,6 @@ var lithe = extend({
 		anonymouse.push(meta);
 	},
 	use: function(urls, cb) { (!CONFIG || config.init) ? realUse(urls, cb) : function() {
-            CONFIG = createUrls(CONFIG);
 			saveAnonymouse();
 			realUse(CONFIG, function(cg) {
 				setConfig(cg);
