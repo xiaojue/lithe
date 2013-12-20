@@ -19,7 +19,8 @@
     "grunt-includes":"0.4.0",
     "grunt-contrib-concat":"~0.3.0",
     "uglify-js": "2.4.7",
-    "optimist":"0.6.0"
+    "optimist":"0.6.0",
+    "commander":"*"
   },
   "repository": {
     "type": "git",
