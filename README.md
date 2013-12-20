@@ -1,6 +1,6 @@
 # Lithe
 [![Build Status](https://travis-ci.org/litheModule/lithe.png?branch=master)](https://travis-ci.org/litheModule/lithe) [![依赖模块状态](https://david-dm.org/litheModule/lithe.png)](http://david-dm.org/litheModule/lithe)
-[![浏览数](https://sourcegraph.com/api/repos/github.com/litheModule/lithe/counters/views-24h.png)](https://sourcegraph.com/github.com/bower/bower)
+[![浏览数](https://sourcegraph.com/api/repos/github.com/litheModule/lithe/counters/views.png?no-count)](https://sourcegraph.com/github.com/bower/bower)
 
 
 A browser-side script loader,compatible with the de facto standards(NodeJS/CommonJS).
