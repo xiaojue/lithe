@@ -24,7 +24,7 @@ Chinese Documentation [中文文档][4]
 ```bash
 $ npm install lithe
 ```
-or
+or 
 ```bash
 $ bower install lithe
 $ cd lithe/
