@@ -76,22 +76,19 @@
         <script src="bower_components/lithe/lithe.min.js" data-path="http://lithemodule.org/"></script>
         <script>
             lithe.use('/bower_components/jquery/jquery',function($){
-                function gitconvert(git){
-                    var http = git.replace(/^git@/,'http://');
-                    http = http.replace('github.com:','github.com/');
-                    return http.slice(0,http.lastIndexOf('.'));
-                }
                 $.ajax({
-                    url:'http://bower.lithemodule.org/list',
+                    url:'http://list.lithemodule.org',
                     type:'get',
                     dataType:'json',
                     success:function(arr){
-                        var html = '<ul>';
+                        var html = '<dl>';
                         for(var i=0;i<arr.length;i++){
                             var pkg = arr[i];
-                            html += '<li><a href="'+gitconvert(pkg.url)+'" target="_blank">'+pkg.name+'</a></li>'; 
+                            html += '<dt><a href="'+pkg.website+'" target="_blank">'+pkg.name+'</a></dt>'; 
+                            html += '<dd>'+pkg.description+'</dd>'; 
+                            html += '<dd>updated:'+pkg.updated+' created:'+pkg.created+' owner:'+pkg.owner+' forks:'+pkg.forks+' stars:'+pkg.stars+'</dd>'; 
                         }
-                        html += '</ul>';
+                        html += '</dl>';
                         $('#modules').html(html);
                     }
                 });
