@@ -10,7 +10,7 @@ If you use Gruntjs to build your project , you can use [grunt-lithe][1]
 
 You can use [bower][2] manage modules Easier.
 
-Chinese Documentation [中文文档][4]
+Chinese Documentation [中文文档][3]
 
   [1]: http://www.github.com/litheModule/grunt-lithe
   [2]: https://github.com/bower/bower
