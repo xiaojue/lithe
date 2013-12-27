@@ -49,7 +49,10 @@ $ lithe
     -h, --help           output usage information
     -V, --version        output the version number
     -c, --config <path>  set the config file,it will be return alias and basepath
+    
 ```
+
+---
 
 ## public api for browser
 
