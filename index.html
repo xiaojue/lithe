@@ -131,7 +131,7 @@
                             var pkg = arr[i];
                             html += '<dt><a href="'+pkg.website+'" target="_blank">'+filterXSS(pkg.name)+'</a></dt>'; 
                             html += '<dd class="description">'+filterXSS(pkg.description)+'</dd>'; 
-                            html += '<dd class="other"><span>updated:'+new Date(pkg.updated).Format("yyyy-MM-dd HH:mm")+'</span><span>created:'+new Date(pkg.created).Format("yyyy-MM-dd HH:mm:ss")+'</span><span>owner:'+filterXSS(pkg.owner)+'</span><span>forks:'+pkg.forks+'</span><span>stars:'+pkg.stars+'<span></dd>'; 
+                            html += '<dd class="other"><span>updated:'+new Date(pkg.updated).Format("yyyy-MM-dd hh:mm")+'</span><span>created:'+new Date(pkg.created).Format("yyyy-MM-dd hh:mm")+'</span><span>owner:'+filterXSS(pkg.owner)+'</span><span>forks:'+pkg.forks+'</span><span>stars:'+pkg.stars+'<span></dd>'; 
                             html += '</dl>';
                         }
                         $('#modules').html(html);
