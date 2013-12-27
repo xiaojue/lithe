@@ -120,7 +120,7 @@
                     return fmt;
                 }
                 function filterXSS(html){
-                    var div = $('div').text(html); 
+                    var div = $('<div>').text(html); 
                     return div.html();
                 }
                 $.ajax({
