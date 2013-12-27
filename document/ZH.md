@@ -12,6 +12,41 @@ English Documentation [EN][1]
 
 ---
 
+## 安装
+
+```bash
+$ npm install lithe -g
+$ git clone https://github.com/litheModule/lithe
+$ cd lithe
+$ npm install -d
+```
+---
+
+## 命令行工具
+
+---
+
+```bash
+$ lithe 
+
+  Usage: lithe [options] [command]
+
+  Commands:
+
+    build <source> <target> build source to target
+    compress <source> <target> compress source to target
+    getpackage <source> <target> get source requires to target package
+
+  Options:
+
+    -h, --help           output usage information
+    -V, --version        output the version number
+    -c, --config <path>  set the config file,it will be return alias and basepath
+    
+```
+
+---
+
 ## 浏览器端API
 
 ### define

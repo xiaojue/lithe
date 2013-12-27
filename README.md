@@ -8,27 +8,48 @@ It's very simple and small,only 2.7kb gzipped.
 
 If you use Gruntjs to build your project , you can use [grunt-lithe][1]
 
-You can use [bower][2] and [lithe-cli][3] manage modules Easier.
+You can use [bower][2] manage modules Easier.
 
-Chinese Documentation [中文文档][4]
+Chinese Documentation [中文文档][3]
 
   [1]: http://www.github.com/litheModule/grunt-lithe
   [2]: https://github.com/bower/bower
-  [3]: https://github.com/litheModule/lithe-cli
-  [4]: https://github.com/litheModule/lithe/blob/master/document/ZH.md
+  [3]: https://github.com/litheModule/lithe/blob/master/document/ZH.md
 
 ---
 
 ## Installation
 
 ```bash
-$ npm install lithe
-```
-or 
-```bash
-$ bower install lithe
-$ cd lithe/
+$ npm install lithe -g
+$ git clone https://github.com/litheModule/lithe
+$ cd lithe
 $ npm install -d
+```
+
+---
+
+## command tools
+
+---
+
+```bash
+$ lithe 
+
+  Usage: lithe [options] [command]
+
+  Commands:
+
+    build <source> <target> build source to target
+    compress <source> <target> compress source to target
+    getpackage <source> <target> get source requires to target package
+
+  Options:
+
+    -h, --help           output usage information
+    -V, --version        output the version number
+    -c, --config <path>  set the config file,it will be return alias and basepath
+    
 ```
 
 ---
