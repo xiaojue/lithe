@@ -2,7 +2,7 @@
  lithe 
  @author xiaojue [designsor@gmail.com] 
  @fileoverview a javascript common loader 
- @vserion 0.2.5 
+ @vserion 0.2.7 
  */
 (function(global, undef) {
 	var isBrowser = !! (typeof window !== undef && global.navigator && global.document);
@@ -333,7 +333,6 @@
 		},
 		circularStack = [];
 
-		if(CONFIG) CONFIG = createUrls(CONFIG);
 
 		//help
 		function getPureDependencies(mod) {
@@ -520,6 +519,7 @@
 			}
 		});
 
+		if(CONFIG) CONFIG = createUrls(CONFIG);
 
 		global.lithe = lithe;
 		global.define = lithe.define;

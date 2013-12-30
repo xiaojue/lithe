@@ -9,7 +9,6 @@ STATUS = {
 },
 circularStack = [];
 
-if(CONFIG) CONFIG = createUrls(CONFIG);
 
 //help
 function getPureDependencies(mod) {
@@ -196,3 +195,4 @@ var lithe = extend({
 	}
 });
 
+if(CONFIG) CONFIG = createUrls(CONFIG);
