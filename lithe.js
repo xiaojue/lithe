@@ -198,7 +198,7 @@
 			if (lastChar === '#') {
 				url = url.slice(0, - 1);
 			}
-			else if (url.indexOf('?') === - 1 && ! (/\.(?:js)$/).test(url)) {
+			else if (url.indexOf('?') === - 1 && ! (/\.(?:js|css)$/).test(url)) {
 				url += '.js';
 			}
 			if (url.indexOf(':80/') > 0) {
@@ -436,7 +436,7 @@
 				if (isFunction(cb)) {
 					cb.apply(null, args);
 				}
-				lithe.events.trigger('end');
+				LEVENTS.trigger('end');
 			});
 		}
 
@@ -505,7 +505,7 @@
 
 		var lithe = extend({
 			basepath: BASEPATH,
-			events: new events(),
+			events: LEVENTS,
 			cache: {},
 			get: function(url) {
 				url = normalize(url, true);

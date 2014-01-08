@@ -102,7 +102,7 @@ function realUse(urls, cb) {
 		if (isFunction(cb)) {
 			cb.apply(null, args);
 		}
-		lithe.events.trigger('end');
+		LEVENTS.trigger('end');
 	});
 }
 
@@ -171,7 +171,7 @@ extend(module.prototype, {
 
 var lithe = extend({
 	basepath: BASEPATH,
-	events: new events(),
+	events: LEVENTS,
 	cache: {},
 	get: function(url) {
 		url = normalize(url, true);

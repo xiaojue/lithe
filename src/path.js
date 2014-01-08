@@ -51,7 +51,7 @@ function normalize(url, t) {
 	if (lastChar === '#') {
 		url = url.slice(0, - 1);
 	}
-	else if (url.indexOf('?') === - 1 && ! (/\.(?:js)$/).test(url)) {
+	else if (url.indexOf('?') === - 1 && ! (/\.(?:js|css)$/).test(url)) {
 		url += '.js';
 	}
 	if (url.indexOf(':80/') > 0) {
