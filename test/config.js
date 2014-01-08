@@ -1,5 +1,5 @@
 define('config',function(require,exports,module){
-    require('plugn/lithe-uml');
+    require('plugn/lithe-cache');
     module.exports = {
         alias:{
             'dir':'mods/dir/',

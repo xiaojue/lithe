@@ -125,7 +125,8 @@
 
 		extend(events.prototype, {
 			trigger: function(name, args) {
-				var cbs = this.map[name];
+				var self = this,
+				cbs = this.map[name];
 				if (cbs) {
 					forEach(cbs, function(fn) {
 						fn.apply(this, args);
@@ -140,6 +141,9 @@
 				}
 			}
 		});
+
+		var LEVENTS = new events();
+
 
 		function isAbsolute(url) {
 			return url.indexOf('://') > 0 || url.indexOf('//') === 0;
@@ -271,29 +275,35 @@
 		fetched = {};
 
 		function fetch(url, cb) {
-			if (fetched[url]) {
-				cb();
-				return;
-			}
-			if (fetching[url]) {
-				callbacks[url].push(cb);
-				return;
-			}
-			fetching[url] = true;
-			callbacks[url] = [cb];
-			getscript(url, function() {
-				fetched[url] = true;
-				delete fetching[url];
-				var fns = callbacks[url];
-				if (fns) {
-					delete callbacks[url];
-					forEach(fns, function(fn) {
-						fn();
-					});
-				}
-			},
-			CHARSET);
+			LEVENTS.trigger('fetch', [url, cb]);
 		}
+
+		LEVENTS.on('fetch', function(url, cb) {
+			if (! (/\.css$/).test(url)) {
+				if (fetched[url]) {
+					cb();
+					return;
+				}
+				if (fetching[url]) {
+					callbacks[url].push(cb);
+					return;
+				}
+				fetching[url] = true;
+				callbacks[url] = [cb];
+				getscript(url, function() {
+					fetched[url] = true;
+					delete fetching[url];
+					var fns = callbacks[url];
+					if (fns) {
+						delete callbacks[url];
+						forEach(fns, function(fn) {
+							fn();
+						});
+					}
+				},
+				CHARSET);
+			}
+		});
 
 		function getscript(url, cb, charset) {
 			var node = createNode('script', charset);
@@ -332,7 +342,6 @@
 			'compiled': 4
 		},
 		circularStack = [];
-
 
 		//help
 		function getPureDependencies(mod) {
@@ -378,13 +387,13 @@
 
 		function fetchMods(urls, cb) {
 			urls = createUrls(urls);
+			LEVENTS.trigger('start', [urls]);
 			var loadUris = filter(urls, function(url) {
 				return url && (!lithe.cache[url] || lithe.cache[url].status < STATUS.ready);
 			}),
 			len = loadUris.length;
 			if (len === 0) {
 				cb();
-				lithe.events.trigger('end');
 				return;
 			}
 			var queue = len;
@@ -393,13 +402,15 @@
 			}
 			forEach(loadUris, function(url) {
 				var mod = lithe.get(url);
-				function success() {
-					saveAnonymouse();
+				function success(style) {
+					LEVENTS.trigger('fetchsuccess', [mod, style]);
 					if (mod.status >= STATUS.save) {
 						var deps = getPureDependencies(mod);
 						deps.length ? fetchMods(deps, function() {
 							restart(mod);
 						}) : restart(mod);
+					} else if (style) {
+						restart(mod);
 					} else {
 						restart();
 					}
@@ -425,6 +436,7 @@
 				if (isFunction(cb)) {
 					cb.apply(null, args);
 				}
+				lithe.events.trigger('end');
 			});
 		}
 
@@ -445,7 +457,7 @@
 			}
 			config.init = true;
 			if (config.basepath) lithe.basepath = config.basepath;
-		    lithe.config = config;
+			lithe.config = config;
 		}
 
 		function module(url) {
@@ -508,9 +520,9 @@
 					factory: factory
 				};
 				anonymouse.push(meta);
+				saveAnonymouse();
 			},
 			use: function(urls, cb) { (!CONFIG || config.init) ? realUse(urls, cb) : function() {
-					saveAnonymouse();
 					realUse(CONFIG, function(cg) {
 						setConfig(cg);
 						realUse(urls, cb);
@@ -519,7 +531,8 @@
 			}
 		});
 
-		if(CONFIG) CONFIG = createUrls(CONFIG);
+		if (CONFIG) CONFIG = createUrls(CONFIG);
+
 
 		global.lithe = lithe;
 		global.define = lithe.define;

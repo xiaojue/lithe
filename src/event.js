@@ -4,7 +4,8 @@ function events() {
 
 extend(events.prototype, {
 	trigger: function(name, args) {
-		var cbs = this.map[name];
+		var self = this,
+		cbs = this.map[name];
 		if (cbs) {
 			forEach(cbs, function(fn) {
 				fn.apply(this, args);
@@ -19,3 +20,6 @@ extend(events.prototype, {
 		}
 	}
 });
+
+var LEVENTS = new events();
+

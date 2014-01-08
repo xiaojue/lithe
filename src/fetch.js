@@ -12,29 +12,35 @@ callbacks = {},
 fetched = {};
 
 function fetch(url, cb) {
-	if (fetched[url]) {
-		cb();
-		return;
-	}
-	if (fetching[url]) {
-		callbacks[url].push(cb);
-		return;
-	}
-	fetching[url] = true;
-	callbacks[url] = [cb];
-	getscript(url, function() {
-		fetched[url] = true;
-		delete fetching[url];
-		var fns = callbacks[url];
-		if (fns) {
-			delete callbacks[url];
-			forEach(fns, function(fn) {
-				fn();
-			});
-		}
-	},
-	CHARSET);
+	LEVENTS.trigger('fetch', [url, cb]);
 }
+
+LEVENTS.on('fetch', function(url, cb) {
+	if (! (/\.css$/).test(url)) {
+		if (fetched[url]) {
+			cb();
+			return;
+		}
+		if (fetching[url]) {
+			callbacks[url].push(cb);
+			return;
+		}
+		fetching[url] = true;
+		callbacks[url] = [cb];
+		getscript(url, function() {
+			fetched[url] = true;
+			delete fetching[url];
+			var fns = callbacks[url];
+			if (fns) {
+				delete callbacks[url];
+				forEach(fns, function(fn) {
+					fn();
+				});
+			}
+		},
+		CHARSET);
+	}
+});
 
 function getscript(url, cb, charset) {
 	var node = createNode('script', charset);

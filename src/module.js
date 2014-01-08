@@ -9,7 +9,6 @@ STATUS = {
 },
 circularStack = [];
 
-
 //help
 function getPureDependencies(mod) {
 	var id = mod.id;
@@ -54,13 +53,13 @@ function createUrls(urls) {
 
 function fetchMods(urls, cb) {
 	urls = createUrls(urls);
+	LEVENTS.trigger('start', [urls]);
 	var loadUris = filter(urls, function(url) {
 		return url && (!lithe.cache[url] || lithe.cache[url].status < STATUS.ready);
 	}),
 	len = loadUris.length;
 	if (len === 0) {
 		cb();
-		lithe.events.trigger('end');
 		return;
 	}
 	var queue = len;
@@ -69,13 +68,15 @@ function fetchMods(urls, cb) {
 	}
 	forEach(loadUris, function(url) {
 		var mod = lithe.get(url);
-		function success() {
-			saveAnonymouse();
+		function success(style) {
+			LEVENTS.trigger('fetchsuccess', [mod, style]);
 			if (mod.status >= STATUS.save) {
 				var deps = getPureDependencies(mod);
 				deps.length ? fetchMods(deps, function() {
 					restart(mod);
 				}) : restart(mod);
+			} else if (style) {
+				restart(mod);
 			} else {
 				restart();
 			}
@@ -101,6 +102,7 @@ function realUse(urls, cb) {
 		if (isFunction(cb)) {
 			cb.apply(null, args);
 		}
+		lithe.events.trigger('end');
 	});
 }
 
@@ -121,7 +123,7 @@ function setConfig(cg) {
 	}
 	config.init = true;
 	if (config.basepath) lithe.basepath = config.basepath;
-    lithe.config = config;
+	lithe.config = config;
 }
 
 function module(url) {
@@ -184,9 +186,9 @@ var lithe = extend({
 			factory: factory
 		};
 		anonymouse.push(meta);
+		saveAnonymouse();
 	},
 	use: function(urls, cb) { (!CONFIG || config.init) ? realUse(urls, cb) : function() {
-			saveAnonymouse();
 			realUse(CONFIG, function(cg) {
 				setConfig(cg);
 				realUse(urls, cb);
@@ -195,4 +197,5 @@ var lithe = extend({
 	}
 });
 
-if(CONFIG) CONFIG = createUrls(CONFIG);
+if (CONFIG) CONFIG = createUrls(CONFIG);
+

@@ -1,5 +1,6 @@
 define('plugn/lithe-uml', function(require, exports, module) {
 
+    /*
 	var maps = [];
 
     function replaceName(name,config){
@@ -22,6 +23,6 @@ define('plugn/lithe-uml', function(require, exports, module) {
 		var origin = 'http://yuml.me/diagram/scruffy;/class/' + maps.join();
 		console.log(maps.join());
 	});
-
+    */
 });
 
