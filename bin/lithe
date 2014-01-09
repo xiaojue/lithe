@@ -18,12 +18,36 @@ program.command('compress <source> <target>').description('compress source to ta
 program.command('getpackage <source> <target>').description('get source requires to target package').action(getpackage);
 program.parse(process.argv);
 
+function isDir(url){
+	return ! filename(url);
+}
+
+function filename(url) {
+	return url.slice(url.lastIndexOf('/') + 1).replace(/\?.*$/, '');
+}
+
 function beforeProcess(source, target, cb) {
 	source = path.resolve(pwd, source);
 	target = path.resolve(pwd, target);
 	var config = require(path.resolve(pwd, program.config));
 	litheOption.basepath = config.basepath;
 	litheOption.alias = config.alias;
+	if (config.alias) {
+		config.directorys = [];
+		var alias = config.alias,
+		i, alia, dir;
+		if (alias) {
+			for (i in alias) {
+				alia = alias[i];
+				if (isDir(alia)) {
+					dir = {};
+					dir[i] = alia;
+					config.directorys.push(dir);
+				}
+			}
+		}
+	    litheOption.directorys = config.directorys;
+	}
 	if (fs.existsSync(source)) {
 		var sourceStat = fs.statSync(source);
 		if (sourceStat.isFile()) {
@@ -59,7 +83,7 @@ function compress(source, target) {
 
 function getpackage(source, target) {
 	beforeProcess(source, target, function(source, target) {
-        tool.getpackage(source,path.basename(target));
+		tool.getpackage(source, path.basename(target));
 	});
 }
 

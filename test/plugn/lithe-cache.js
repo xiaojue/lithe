@@ -10,7 +10,7 @@ define('plugn/lithe-cache', function(require, exports, module) {
 		this.key = key || 'litheCache';
 		this.cache = JSON.parse(localStorage.getItem(this.key)) || {};
 		this.msgqueue = {};
-        this.init();
+		this.init();
 		return this;
 	};
 
@@ -24,7 +24,7 @@ define('plugn/lithe-cache', function(require, exports, module) {
 				cache = {};
 				cache._version = version;
 			}
-            this.initCssBridge();
+			this.initCssBridge();
 			this.bindEvent();
 		},
 		bindEvent: function() {
@@ -128,4 +128,3 @@ define('plugn/lithe-cache', function(require, exports, module) {
 	};
 
 });
-
