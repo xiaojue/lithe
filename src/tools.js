@@ -100,12 +100,7 @@ function getDependencies(code) {
 }
 
 function runModuleContext(fn, mod) {
-	var ret;
-	try {
-		ret = fn(mod.require, mod.exports, mod);
-	} catch(e) {
-		throw new Error(mod.id + ':' + e);
-	}
+	var ret = fn(mod.require, mod.exports, mod);
 	if (ret !== undef) mod.exports = ret;
 }
 

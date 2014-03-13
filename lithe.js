@@ -2,7 +2,7 @@
  lithe 
  @author xiaojue [designsor@gmail.com] 
  @fileoverview a javascript common loader 
- @vserion 0.3.0 
+ @vserion 0.3.1 
  */
 (function(global, undef) {
 	var isBrowser = !! (typeof window !== undef && global.navigator && global.document);
@@ -109,12 +109,7 @@
 		}
 
 		function runModuleContext(fn, mod) {
-			var ret;
-			try {
-				ret = fn(mod.require, mod.exports, mod);
-			} catch(e) {
-				throw new Error(mod.id + ':' + e);
-			}
+			var ret = fn(mod.require, mod.exports, mod);
 			if (ret !== undef) mod.exports = ret;
 		}
 
