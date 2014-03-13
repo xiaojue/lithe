@@ -2,7 +2,7 @@
  lithe 
  @author xiaojue [designsor@gmail.com] 
  @fileoverview a javascript common loader 
- @vserion 0.2.7 
+ @vserion 0.3.0 
  */
 (function(global, undef) {
 	var isBrowser = !! (typeof window !== undef && global.navigator && global.document);
@@ -145,6 +145,17 @@
 		var LEVENTS = new events();
 
 
+		function getTimeStamp(url) {
+			var query = url.slice(url.lastIndexOf('?') + 1).split('&');
+			for (var i = 0; i < query.length; i++) {
+				var item = query[i].split('='),
+				key = item[0],
+				val = item[1];
+				if (key == 'timestamp') return val;
+			}
+			return null;
+		}
+
 		function isAbsolute(url) {
 			return url.indexOf('://') > 0 || url.indexOf('//') === 0;
 		}
@@ -268,6 +279,8 @@
 		BASEPATH = attr(currentJs, 'data-path') || currentJs.src || attr(currentJs, 'src'),
 		CONFIG = attr(currentJs, 'data-config'),
 		DEBUG = attr(currentJs, 'data-debug') === 'true',
+		GLOBALTIMESTAMP = getTimeStamp(currentJs.src),
+		CONFIGSTMAP = null,
 		mainjs = attr(currentJs, 'data-main'),
 
 		fetching = {},
@@ -316,6 +329,8 @@
 				}
 			};
 			node.async = 'async';
+			var timestamp = CONFIGSTMAP ? CONFIGSTMAP : GLOBALTIMESTAMP;
+			url = timestamp ? url + '?timestamp=' + timestamp : url;
 			node.src = url;
 			insertscript(node);
 		}
@@ -458,6 +473,7 @@
 			config.init = true;
 			if (config.basepath) lithe.basepath = config.basepath;
 			lithe.config = config;
+			CONFIGSTMAP = config.timestamp;
 		}
 
 		function module(url) {

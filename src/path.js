@@ -1,3 +1,14 @@
+function getTimeStamp(url) {
+	var query = url.slice(url.lastIndexOf('?') + 1).split('&');
+	for (var i = 0; i < query.length; i++) {
+		var item = query[i].split('='),
+		key = item[0],
+		val = item[1];
+		if (key == 'timestamp') return val;
+	}
+	return null;
+}
+
 function isAbsolute(url) {
 	return url.indexOf('://') > 0 || url.indexOf('//') === 0;
 }
