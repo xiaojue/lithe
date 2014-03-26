@@ -53,6 +53,7 @@ define('plugn/lithe-cache', function(require, exports, module) {
 							if (self.isCss(url)) {
 								lithe.events.trigger('fetchsuccess', [lithe.get(url), cache[url]]);
 							} else {
+								console.log(cache[url]);
 								eval('define(url,' + cache[url] + ')');
 							}
 						}
