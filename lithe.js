@@ -548,6 +548,7 @@
 		lithe.start = function(){
 			if(!started && mainjs){
 				lithe.use(mainjs);
+				started = true;
 			}
 		};
 		setTimeout(lithe.start);
