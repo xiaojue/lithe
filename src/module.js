@@ -124,6 +124,7 @@ function setConfig(cg) {
 	config.init = true;
 	if (config.basepath) lithe.basepath = config.basepath;
 	lithe.config = config;
+	CONFIGSTMAP = config.timestamp;
 }
 
 function module(url) {

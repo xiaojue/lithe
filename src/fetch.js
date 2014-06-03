@@ -5,6 +5,8 @@ currentJs = scripts[scripts.length - 1],
 BASEPATH = attr(currentJs, 'data-path') || currentJs.src || attr(currentJs, 'src'),
 CONFIG = attr(currentJs, 'data-config'),
 DEBUG = attr(currentJs, 'data-debug') === 'true',
+GLOBALTIMESTAMP = getTimeStamp(currentJs.src),
+CONFIGSTMAP = null,
 mainjs = attr(currentJs, 'data-main'),
 
 fetching = {},
@@ -53,6 +55,8 @@ function getscript(url, cb, charset) {
 		}
 	};
 	node.async = 'async';
+	var timestamp = CONFIGSTMAP ? CONFIGSTMAP : GLOBALTIMESTAMP;
+	url = timestamp ? url + '?timestamp=' + timestamp : url;
 	node.src = url;
 	insertscript(node);
 }
