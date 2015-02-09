@@ -1,3 +1,4 @@
+
 var anonymouse = [],
 config = {},
 STATUS = {
@@ -10,7 +11,7 @@ STATUS = {
 circularStack = [];
 
 //help
-function getPureDependencies(mod) {
+var getPureDependencies = function(mod) {
 	var id = mod.id;
 	var deps = filter(mod.dependencies, function(dep) {
 		circularStack.push(id);
@@ -23,35 +24,43 @@ function getPureDependencies(mod) {
 		return ! isCircular;
 	});
 	return createUrls(deps);
-}
+};
 
-function isCircularWaiting(mod) {
-	if (!mod || mod.status !== STATUS.save) return false;
+var isCircularWaiting = function(mod) {
+	if (!mod || mod.status !== STATUS.save){
+		return false;
+	}
 	circularStack.push(mod.id);
 	var deps = mod.dependencies;
 	if (deps.length) {
-		if (isOverlap(deps, circularStack)) return true;
+		if (isOverlap(deps, circularStack)){
+			return true;
+		}
 		for (var i = 0; i < deps.length; i++) {
-			if (isCircularWaiting(lithe.cache[resolve(deps[i])])) return true;
+			if (isCircularWaiting(lithe.cache[resolve(deps[i])])){
+				return true;
+			}
 		}
 	}
 	circularStack.pop();
 	return false;
-}
+};
 
-function isOverlap(arrA, arrB) {
+var isOverlap = function(arrA, arrB) {
 	var arrC = arrA.concat(arrB);
 	return arrC.length > unique(arrC).length;
-}
+};
 
-function createUrls(urls) {
-	isString(urls) && (urls = [urls]);
+var createUrls = function(urls) {
+	if(isString(urls)){
+		urls = [urls];
+	}
 	return map(urls, function(url) {
 		return resolve(url);
 	});
-}
+};
 
-function fetchMods(urls, cb) {
+var fetchMods = function(urls, cb) {
 	urls = createUrls(urls);
 	LEVENTS.trigger('start', [urls]);
 	var loadUris = filter(urls, function(url) {
@@ -63,37 +72,53 @@ function fetchMods(urls, cb) {
 		return;
 	}
 	var queue = len;
-	function restart(mod) { (mod || {}).status < STATUS.ready && (mod.status = STATUS.ready); --queue;
-		(queue === 0) && cb();
-	}
+
+	var restart = function(mod) {
+		if((mod || {}).status < STATUS.ready){
+			mod.status = STATUS.ready;
+		}
+		--queue;
+		if(queue === 0){
+			cb();
+		}
+	};
+
 	forEach(loadUris, function(url) {
 		var mod = lithe.get(url);
 		function success(style) {
 			LEVENTS.trigger('fetchsuccess', [mod, style]);
 			if (mod.status >= STATUS.save) {
 				var deps = getPureDependencies(mod);
-				deps.length ? fetchMods(deps, function() {
+				if(deps.length){
+					fetchMods(deps, function() {
+						restart(mod);
+					});
+				}else{
 					restart(mod);
-				}) : restart(mod);
+				}
 			} else if (style) {
 				restart(mod);
 			} else {
 				restart();
 			}
 		}
-		mod.status < STATUS.save ? fetch(url, success) : success();
+		if(mod.status < STATUS.save){
+			fetch(url, success);
+		}else{
+			success();
+		}
 	});
-}
+};
 
-function saveAnonymouse() {
+var saveAnonymouse = function() {
 	forEach(anonymouse, function(meta) {
 		var anonymousemod = lithe.get(meta.id);
 		anonymousemod._save(meta);
 	});
 	anonymouse = [];
-}
+};
 
-function realUse(urls, cb) {
+var realUse = function(urls, cb) {
 	fetchMods(urls, function() {
 		urls = createUrls(urls);
 		var args = map(urls, function(url) {
@@ -104,9 +129,9 @@ function realUse(urls, cb) {
 		}
 		LEVENTS.trigger('end');
 	});
-}
+};
 
-function setConfig(cg) {
+var setConfig = function(cg) {
 	config = cg;
 	config.directorys = [];
 	var alias = config.alias,
@@ -122,31 +147,41 @@ function setConfig(cg) {
 		}
 	}
 	config.init = true;
-	if (config.basepath) lithe.basepath = config.basepath;
+	if (config.basepath){
+		lithe.basepath = config.basepath;
+	}
 	lithe.config = config;
 	CONFIGSTMAP = config.timestamp;
-}
+};
 
-function module(url) {
+var Module = function(url) {
 	this.id = url;
 	this.status = 0;
 	this.dependencies = [];
 	this.exports = null;
 	this.parent = [];
 	this.factory = noop;
-}
+};
 
-extend(module.prototype, {
+extend(Module.prototype, {
 	_compile: function() {
 		var mod = this;
-		if (mod.status === STATUS.compiled) return mod.exports;
-		if (mod.status < STATUS.save) return null;
+		if (mod.status === STATUS.compiled){
+			return mod.exports;
+		}
+		if (mod.status < STATUS.save){
+			return null;
+		}
 		mod.status = STATUS.compiling;
 		function require(id) {
 			id = normalize(resolve(id), true);
 			var child = lithe.cache[id];
-			if (!child) return null;
-			if (child.status === STATUS.compiling) return child.exports;
+			if (!child){
+				return null;
+			}
+			if (child.status === STATUS.compiling){
+				return child.exports;
+			}
 			child.parent = mod;
 			return child._compile();
 		}
@@ -154,7 +189,9 @@ extend(module.prototype, {
 		mod.require = require;
 		mod.exports = {};
 		var fun = mod.factory;
-		if (isFunction(fun)) runModuleContext(fun, mod);
+		if (isFunction(fun)){
+			runModuleContext(fun, mod);
+		}
 		mod.status = STATUS.compiled;
 		lithe.events.trigger('compiled', [mod]);
 		return mod.exports;
@@ -176,7 +213,12 @@ var lithe = extend({
 	cache: {},
 	get: function(url) {
 		url = normalize(url, true);
-		return lithe.cache[url] || (lithe.cache[url] = new module(url));
+		if(lithe.cache[url]){
+			return lithe.cache[url];
+		}else{
+			lithe.cache[url] = new Module(url);
+			return lithe.cache[url];
+		}
 	},
 	define: function(id, factory) {
 		var deps = getDependencies(factory.toString());
@@ -189,14 +231,19 @@ var lithe = extend({
 		anonymouse.push(meta);
 		saveAnonymouse();
 	},
-	use: function(urls, cb) { (!CONFIG || config.init) ? realUse(urls, cb) : function() {
+	use: function(urls, cb) {
+		if(!CONFIG || config.init){
+			realUse(urls, cb);
+		}else{
 			realUse(CONFIG, function(cg) {
 				setConfig(cg);
 				realUse(urls, cb);
 			});
-		} ();
+		}
 	}
 });
 
-if (CONFIG) CONFIG = createUrls(CONFIG);
+if (CONFIG){
+	CONFIG = createUrls(CONFIG);
+}
 

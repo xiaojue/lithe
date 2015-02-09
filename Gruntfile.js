@@ -42,6 +42,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-includes');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-mocha');
 
 	grunt.registerTask('default', [
         'includes',

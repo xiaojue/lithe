@@ -4,8 +4,14 @@ lithe
 @fileoverview a javascript common loader
 @vserion 0.3.4
 **/
+
 (function(global, undef) {
-	var isBrowser = !! (typeof window !== undef && global.navigator && global.document);
+	var isBrowser = !!(
+		typeof window !== undef &&
+		global.navigator &&
+		global.document
+	);
+
 	if (isBrowser) {
 		//tools function
 		var doc = global.document,
@@ -18,7 +24,9 @@ lithe
 		var forEach = Arr.forEach ? function(arr, fn) {
 			arr.forEach(fn);
 		}: function(arr, fn) {
-			for (var i = 0; i < arr.length; i++) fn(arr[i], i, arr);
+			for (var i = 0; i < arr.length; i++){
+				fn(arr[i], i, arr);
+			}
 		};
 
 		var filter = Arr.filter ? function(arr, fn) {
@@ -26,7 +34,9 @@ lithe
 		}: function(arr,fn) {
 			var ret = [];
 			forEach(arr, function(item, i, arr) {
-				if (fn(item, i, arr)) ret.push(item);
+				if (fn(item, i, arr)){
+					ret.push(item);
+				}
 			});
 			return ret;
 		};
@@ -44,7 +54,9 @@ lithe
 		var keys = Obj.keys ? Obj.keys: function(o) {
 			var ret = [];
 			for (var p in o) {
-				if (o.hasOwnProperty(p)) ret.push(p);
+				if (o.hasOwnProperty(p)){
+					ret.push(p);
+				}
 			}
 			return ret;
 		};
@@ -53,72 +65,80 @@ lithe
 			return arr.indexOf(selector);
 		}: function(arr, selector) {
 			for (var i = 0; i < arr.length; i++) {
-				if (arr[i] === selector) return i;
+				if (arr[i] === selector){
+					return i;
+				}
 			}
 			return - 1;
 		};
-		function getByTagName(tag, ele) {
+
+		var getByTagName = function(tag, ele) {
 			ele = ele || doc;
 			return ele ? ele.getElementsByTagName(tag) : ele;
-		}
+		};
 
-		function noop() {}
+		var noop = function(){};
 
-		function getAttr(ele, ns) {
+		var getAttr = function(ele, ns) {
 			return ele.getAttribute(ns);
-		}
+		};
 
-		function extend(source, options) {
+		var extend = function(source, options) {
 			for (var i in options) {
-				if (options.hasOwnProperty(i)) source[i] = options[i];
+				if (options.hasOwnProperty(i)){
+					source[i] = options[i];
+				}
 			}
 			return source;
-		}
+		};
 
-		function isString(v) {
+		var isString = function(v) {
 			return toString.call(v) === '[object String]';
-		}
+		};
 
-		function isFunction(v) {
+		var isFunction = function isFunction(v) {
 			return toString.call(v) === '[object Function]';
-		}
+		};
 
-		function isObject(v) {
+		var isObject = function isObject(v) {
 			return v === Obj(v);
-		}
+		};
 
-		function unique(arr) {
+		var unique = function unique(arr) {
 			var o = {};
 			forEach(arr, function(item) {
 				o[item] = 1;
 			});
 			return keys(o);
-		}
+		};
 
-		function attr(node, ns) {
+		var attr = function attr(node, ns) {
 			return node.getAttribute(ns);
-		}
+		};
 
 		//处理依赖部分
-		function getDependencies(code) {
+		var getDependencies = function(code) {
 			var deps = [];
 			code.replace(commentRegExp, '').replace(jsRequireRegExp, function(match, dep) {
 				deps.push(dep);
 			});
 			return unique(deps);
-		}
+		};
 
-		function runModuleContext(fn, mod) {
+		var runModuleContext = function(fn, mod) {
 			var ret = fn(mod.require, mod.exports, mod);
-			if (ret !== undef) mod.exports = ret;
-		}
+			if (ret !== undef){
+				mod.exports = ret;
+			}
+		};
 
 
-		function events() {
+
+		var Events = function() {
 			this.map = {};
-		}
+		};
 
-		extend(events.prototype, {
+		extend(Events.prototype, {
 			trigger: function(name, args) {
 				var self = this,
 				cbs = this.map[name];
@@ -137,38 +157,41 @@ lithe
 			}
 		});
 
-		var LEVENTS = new events();
+		var LEVENTS = new Events();
 
 
-		function getTimeStamp(url) {
+
+		var getTimeStamp = function(url) {
 			var query = url.slice(url.lastIndexOf('?') + 1).split('&');
 			for (var i = 0; i < query.length; i++) {
 				var item = query[i].split('='),
 				key = item[0],
 				val = item[1];
-				if (key == 'timestamp') return val;
+				if (key === 'timestamp'){
+					return val;
+				}
 			}
 			return null;
-		}
+		};
 
-		function isAbsolute(url) {
+		var isAbsolute = function(url) {
 			return url.indexOf('://') > 0 || url.indexOf('//') === 0;
-		}
+		};
 
-		function isDir(url) {
+		var isDir = function(url) {
 			return ! filename(url);
-		}
+		};
 
-		function dirname(url) {
+		var dirname = function(url) {
 			var s = url.match(/[^?]*(?=\/.*$)/);
 			return (s ? s[0] : '.') + '/';
-		}
+		};
 
-		function filename(url) {
+		var filename = function(url) {
 			return url.slice(url.lastIndexOf('/') + 1).replace(/\?.*$/, '');
-		}
+		};
 
-		function realpath(path) {
+		var realpath = function(path){
 			var multiple_slash_re = /([^:\/])\/\/+/g;
 			multiple_slash_re.lastIndex = 0;
 			if (multiple_slash_re.test(path)) {
@@ -193,9 +216,9 @@ lithe
 				}
 			}
 			return ret.join('/');
-		}
+		};
 
-		function normalize(url, t) {
+		var normalize = function(url, t) {
 			url = realpath(url);
 			var lastChar = url.charAt(url.length - 1);
 			if (lastChar === '/') {
@@ -210,11 +233,13 @@ lithe
 			if (url.indexOf(':80/') > 0) {
 				url = url.replace(':80/', '/');
 			}
-			if (t) url = url.replace(/\?.+$/, '');
+			if (t){
+				url = url.replace(/\?.+$/, '');
+			}
 			return url;
-		}
+		};
 
-		function replaceDir(id) {
+		var replaceDir = function(id) {
 			//只替换一次,且如果路径包含2个dir，也只替换一次,并且只匹配第一个，之后的不匹配
 			// UI:../ -> UI/test = ../test
 			// UI:../ -> UI/UI/test = ../UI/test
@@ -224,7 +249,9 @@ lithe
 			directorys = config.directorys,
 			k, path, reg, dir, j;
 			for (k = 0; k < directorys.length; k++) {
-				if (locks[id]) break;
+				if (locks[id]){
+					break;
+				}
 				dir = directorys[k];
 				for (j in dir) {
 					path = dir[j];
@@ -237,21 +264,25 @@ lithe
 				}
 			}
 			return id;
-		}
+		};
 
-		function replaceId(id) {
+		var replaceId = function(id) {
 			var alias = config.alias;
 			if (alias) {
 				var newid = alias[id];
 				return newid ? newid: replaceDir(id);
 			}
 			return id;
-		}
+		};
 
-		function resolve(id, path) {
+		var resolve = function(id, path) {
 			path = dirname(path || lithe.basepath);
-			if (isAbsolute(id)) return id;
-			if (config.init) id = replaceId(id);
+			if (isAbsolute(id)){
+				return id;
+			}
+			if (config.init){
+				id = replaceId(id);
+			}
 			var url = '';
 			if (id.indexOf('./') === 0 || id.indexOf('../') === 0) {
 				if (id.indexOf('./') === 0) {
@@ -264,7 +295,8 @@ lithe
 				url = path + '/' + id;
 			}
 			return normalize(url);
-		}
+		};
+
 
 
 		var header = doc.head || getByTagName('head')[0] || doc.documentElement,
@@ -282,9 +314,9 @@ lithe
 		callbacks = {},
 		fetched = {};
 
-		function fetch(url, cb) {
+		var fetch = function(url, cb) {
 			LEVENTS.trigger('fetch', [url, cb]);
-		}
+		};
 
 		LEVENTS.on('fetch', function(url, cb) {
 			if (! (/\.css$/).test(url)) {
@@ -313,14 +345,18 @@ lithe
 			}
 		});
 
-		function getscript(url, cb, charset) {
+		var getscript = function(url, cb, charset) {
 			var node = createNode('script', charset);
 			node.onload = node.onerror = node.onreadystatechange = function() {
 				if (/loaded|complete|undefined/.test(node.readyState)) {
 					node.onload = node.onerror = node.onreadystatechange = null;
-					if (node.parentNode && ! DEBUG) node.parentNode.removeChild(node);
+					if (node.parentNode && ! DEBUG){
+						node.parentNode.removeChild(node);
+					}
 					node = undef;
-					if (isFunction(cb)) cb();
+					if (isFunction(cb)){
+						cb();
+					}
 				}
 			};
 			node.async = 'async';
@@ -328,18 +364,25 @@ lithe
 			url = timestamp ? url + '?timestamp=' + timestamp : url;
 			node.src = url;
 			insertscript(node);
-		}
+		};
 
-		function createNode(tag, charset) {
+		var createNode = function(tag, charset) {
 			var node = doc.createElement(tag);
-			if (charset) node.charset = charset;
+			if (charset){
+				node.charset = charset;
+			}
 			return node;
-		}
+		};
 
-		function insertscript(node) {
+		var insertscript = function(node) {
 			var baseElement = getByTagName('base', header)[0];
-			baseElement ? header.insertBefore(node, baseElement) : header.appendChild(node);
-		}
+			if(baseElement){
+				header.insertBefore(node, baseElement);
+			}else{
+				header.appendChild(node);
+			}
+		};
+
 
 
 		var anonymouse = [],
@@ -354,7 +397,7 @@ lithe
 		circularStack = [];
 
 		//help
-		function getPureDependencies(mod) {
+		var getPureDependencies = function(mod) {
 			var id = mod.id;
 			var deps = filter(mod.dependencies, function(dep) {
 				circularStack.push(id);
@@ -367,35 +410,43 @@ lithe
 				return ! isCircular;
 			});
 			return createUrls(deps);
-		}
+		};
 
-		function isCircularWaiting(mod) {
-			if (!mod || mod.status !== STATUS.save) return false;
+		var isCircularWaiting = function(mod) {
+			if (!mod || mod.status !== STATUS.save){
+				return false;
+			}
 			circularStack.push(mod.id);
 			var deps = mod.dependencies;
 			if (deps.length) {
-				if (isOverlap(deps, circularStack)) return true;
+				if (isOverlap(deps, circularStack)){
+					return true;
+				}
 				for (var i = 0; i < deps.length; i++) {
-					if (isCircularWaiting(lithe.cache[resolve(deps[i])])) return true;
+					if (isCircularWaiting(lithe.cache[resolve(deps[i])])){
+						return true;
+					}
 				}
 			}
 			circularStack.pop();
 			return false;
-		}
+		};
 
-		function isOverlap(arrA, arrB) {
+		var isOverlap = function(arrA, arrB) {
 			var arrC = arrA.concat(arrB);
 			return arrC.length > unique(arrC).length;
-		}
+		};
 
-		function createUrls(urls) {
-			isString(urls) && (urls = [urls]);
+		var createUrls = function(urls) {
+			if(isString(urls)){
+				urls = [urls];
+			}
 			return map(urls, function(url) {
 				return resolve(url);
 			});
-		}
+		};
 
-		function fetchMods(urls, cb) {
+		var fetchMods = function(urls, cb) {
 			urls = createUrls(urls);
 			LEVENTS.trigger('start', [urls]);
 			var loadUris = filter(urls, function(url) {
@@ -407,37 +458,53 @@ lithe
 				return;
 			}
 			var queue = len;
-			function restart(mod) { (mod || {}).status < STATUS.ready && (mod.status = STATUS.ready); --queue;
-				(queue === 0) && cb();
-			}
+
+			var restart = function(mod) {
+				if((mod || {}).status < STATUS.ready){
+					mod.status = STATUS.ready;
+				}
+				--queue;
+				if(queue === 0){
+					cb();
+				}
+			};
+
 			forEach(loadUris, function(url) {
 				var mod = lithe.get(url);
 				function success(style) {
 					LEVENTS.trigger('fetchsuccess', [mod, style]);
 					if (mod.status >= STATUS.save) {
 						var deps = getPureDependencies(mod);
-						deps.length ? fetchMods(deps, function() {
+						if(deps.length){
+							fetchMods(deps, function() {
+								restart(mod);
+							});
+						}else{
 							restart(mod);
-						}) : restart(mod);
+						}
 					} else if (style) {
 						restart(mod);
 					} else {
 						restart();
 					}
 				}
-				mod.status < STATUS.save ? fetch(url, success) : success();
+				if(mod.status < STATUS.save){
+					fetch(url, success);
+				}else{
+					success();
+				}
 			});
-		}
+		};
 
-		function saveAnonymouse() {
+		var saveAnonymouse = function() {
 			forEach(anonymouse, function(meta) {
 				var anonymousemod = lithe.get(meta.id);
 				anonymousemod._save(meta);
 			});
 			anonymouse = [];
-		}
+		};
 
-		function realUse(urls, cb) {
+		var realUse = function(urls, cb) {
 			fetchMods(urls, function() {
 				urls = createUrls(urls);
 				var args = map(urls, function(url) {
@@ -448,9 +515,9 @@ lithe
 				}
 				LEVENTS.trigger('end');
 			});
-		}
+		};
 
-		function setConfig(cg) {
+		var setConfig = function(cg) {
 			config = cg;
 			config.directorys = [];
 			var alias = config.alias,
@@ -466,31 +533,41 @@ lithe
 				}
 			}
 			config.init = true;
-			if (config.basepath) lithe.basepath = config.basepath;
+			if (config.basepath){
+				lithe.basepath = config.basepath;
+			}
 			lithe.config = config;
 			CONFIGSTMAP = config.timestamp;
-		}
+		};
 
-		function module(url) {
+		var Module = function(url) {
 			this.id = url;
 			this.status = 0;
 			this.dependencies = [];
 			this.exports = null;
 			this.parent = [];
 			this.factory = noop;
-		}
+		};
 
-		extend(module.prototype, {
+		extend(Module.prototype, {
 			_compile: function() {
 				var mod = this;
-				if (mod.status === STATUS.compiled) return mod.exports;
-				if (mod.status < STATUS.save) return null;
+				if (mod.status === STATUS.compiled){
+					return mod.exports;
+				}
+				if (mod.status < STATUS.save){
+					return null;
+				}
 				mod.status = STATUS.compiling;
 				function require(id) {
 					id = normalize(resolve(id), true);
 					var child = lithe.cache[id];
-					if (!child) return null;
-					if (child.status === STATUS.compiling) return child.exports;
+					if (!child){
+						return null;
+					}
+					if (child.status === STATUS.compiling){
+						return child.exports;
+					}
 					child.parent = mod;
 					return child._compile();
 				}
@@ -498,7 +575,9 @@ lithe
 				mod.require = require;
 				mod.exports = {};
 				var fun = mod.factory;
-				if (isFunction(fun)) runModuleContext(fun, mod);
+				if (isFunction(fun)){
+					runModuleContext(fun, mod);
+				}
 				mod.status = STATUS.compiled;
 				lithe.events.trigger('compiled', [mod]);
 				return mod.exports;
@@ -520,7 +599,12 @@ lithe
 			cache: {},
 			get: function(url) {
 				url = normalize(url, true);
-				return lithe.cache[url] || (lithe.cache[url] = new module(url));
+				if(lithe.cache[url]){
+					return lithe.cache[url];
+				}else{
+					lithe.cache[url] = new Module(url);
+					return lithe.cache[url];
+				}
 			},
 			define: function(id, factory) {
 				var deps = getDependencies(factory.toString());
@@ -533,16 +617,21 @@ lithe
 				anonymouse.push(meta);
 				saveAnonymouse();
 			},
-			use: function(urls, cb) { (!CONFIG || config.init) ? realUse(urls, cb) : function() {
+			use: function(urls, cb) {
+				if(!CONFIG || config.init){
+					realUse(urls, cb);
+				}else{
 					realUse(CONFIG, function(cg) {
 						setConfig(cg);
 						realUse(urls, cb);
 					});
-				} ();
+				}
 			}
 		});
 
-		if (CONFIG) CONFIG = createUrls(CONFIG);
+		if (CONFIG){
+			CONFIG = createUrls(CONFIG);
+		}
 
 
 		global.lithe = lithe;

@@ -1,8 +1,9 @@
-function events() {
-	this.map = {};
-}
 
-extend(events.prototype, {
+var Events = function() {
+	this.map = {};
+};
+
+extend(Events.prototype, {
 	trigger: function(name, args) {
 		var self = this,
 		cbs = this.map[name];
@@ -21,5 +22,5 @@ extend(events.prototype, {
 	}
 });
 
-var LEVENTS = new events();
+var LEVENTS = new Events();
 

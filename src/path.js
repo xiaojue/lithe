@@ -1,32 +1,35 @@
-function getTimeStamp(url) {
+
+var getTimeStamp = function(url) {
 	var query = url.slice(url.lastIndexOf('?') + 1).split('&');
 	for (var i = 0; i < query.length; i++) {
 		var item = query[i].split('='),
 		key = item[0],
 		val = item[1];
-		if (key == 'timestamp') return val;
+		if (key === 'timestamp'){
+			return val;
+		}
 	}
 	return null;
-}
+};
 
-function isAbsolute(url) {
+var isAbsolute = function(url) {
 	return url.indexOf('://') > 0 || url.indexOf('//') === 0;
-}
+};
 
-function isDir(url) {
+var isDir = function(url) {
 	return ! filename(url);
-}
+};
 
-function dirname(url) {
+var dirname = function(url) {
 	var s = url.match(/[^?]*(?=\/.*$)/);
 	return (s ? s[0] : '.') + '/';
-}
+};
 
-function filename(url) {
+var filename = function(url) {
 	return url.slice(url.lastIndexOf('/') + 1).replace(/\?.*$/, '');
-}
+};
 
-function realpath(path) {
+var realpath = function(path){
 	var multiple_slash_re = /([^:\/])\/\/+/g;
 	multiple_slash_re.lastIndex = 0;
 	if (multiple_slash_re.test(path)) {
@@ -51,9 +54,9 @@ function realpath(path) {
 		}
 	}
 	return ret.join('/');
-}
+};
 
-function normalize(url, t) {
+var normalize = function(url, t) {
 	url = realpath(url);
 	var lastChar = url.charAt(url.length - 1);
 	if (lastChar === '/') {
@@ -68,11 +71,13 @@ function normalize(url, t) {
 	if (url.indexOf(':80/') > 0) {
 		url = url.replace(':80/', '/');
 	}
-	if (t) url = url.replace(/\?.+$/, '');
+	if (t){
+		url = url.replace(/\?.+$/, '');
+	}
 	return url;
-}
+};
 
-function replaceDir(id) {
+var replaceDir = function(id) {
 	//只替换一次,且如果路径包含2个dir，也只替换一次,并且只匹配第一个，之后的不匹配
 	// UI:../ -> UI/test = ../test
 	// UI:../ -> UI/UI/test = ../UI/test
@@ -82,7 +87,9 @@ function replaceDir(id) {
 	directorys = config.directorys,
 	k, path, reg, dir, j;
 	for (k = 0; k < directorys.length; k++) {
-		if (locks[id]) break;
+		if (locks[id]){
+			break;
+		}
 		dir = directorys[k];
 		for (j in dir) {
 			path = dir[j];
@@ -95,21 +102,25 @@ function replaceDir(id) {
 		}
 	}
 	return id;
-}
+};
 
-function replaceId(id) {
+var replaceId = function(id) {
 	var alias = config.alias;
 	if (alias) {
 		var newid = alias[id];
 		return newid ? newid: replaceDir(id);
 	}
 	return id;
-}
+};
 
-function resolve(id, path) {
+var resolve = function(id, path) {
 	path = dirname(path || lithe.basepath);
-	if (isAbsolute(id)) return id;
-	if (config.init) id = replaceId(id);
+	if (isAbsolute(id)){
+		return id;
+	}
+	if (config.init){
+		id = replaceId(id);
+	}
 	var url = '';
 	if (id.indexOf('./') === 0 || id.indexOf('../') === 0) {
 		if (id.indexOf('./') === 0) {
@@ -122,5 +133,5 @@ function resolve(id, path) {
 		url = path + '/' + id;
 	}
 	return normalize(url);
-}
+};
 

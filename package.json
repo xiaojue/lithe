@@ -12,21 +12,23 @@
     "commonjs loader"
   ],
   "main": "./lithe.js",
-  "bin":{
-    "lithe":"bin/lithe"  
-   },
+  "bin": {
+    "lithe": "bin/lithe"
+  },
   "dependencies": {
     "uglify-js": "2.4.7",
-    "optimist":"0.6.0",
-    "commander":"*"
+    "optimist": "0.6.0",
+    "commander": "*"
   },
-  "devDependencies":{
-    "grunt":"~0.4.0",
-    "grunt-contrib-uglify":"~0.2.7",
+  "devDependencies": {
+    "chai": "^1.10.0",
+    "grunt": "~0.4.0",
+    "grunt-contrib-concat": "~0.3.0",
     "grunt-contrib-copy": "~0.4.1",
-    "grunt-includes":"0.4.0",
-    "grunt-contrib-concat":"~0.3.0",
-    "grunt-contrib-jshint": "^0.10.0"
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-contrib-uglify": "~0.2.7",
+    "grunt-includes": "0.4.0",
+    "grunt-mocha": "^0.4.11"
   },
   "repository": {
     "type": "git",

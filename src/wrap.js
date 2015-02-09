@@ -1,5 +1,11 @@
+
 (function(global, undef) {
-	var isBrowser = !! (typeof window !== undef && global.navigator && global.document);
+	var isBrowser = !!(
+		typeof window !== undef &&
+		global.navigator &&
+		global.document
+	);
+
 	if (isBrowser) {
 		include "tools.js"
 		include "event.js"
