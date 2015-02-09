@@ -10,6 +10,15 @@ var banner = [
 module.exports = function(grunt) {
 	grunt.initConfig({
 		pkg:grunt.file.readJSON('package.json'),
+        jshint: {
+            all: [
+                'Gruntfile.js',
+                'lithe.js'
+            ],
+            options: {
+                jshintrc: '.jshintrc'
+            }
+        },
 		includes:{
 			options:{
 				banner:banner
@@ -31,11 +40,13 @@ module.exports = function(grunt) {
 	});
 
 	grunt.loadNpmTasks('grunt-includes');
-	grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-jshint');
 
 	grunt.registerTask('default', [
         'includes',
-        'uglify'
+        'uglify',
+        'jshint'
     ]);
 
 };
