@@ -4,7 +4,8 @@ var banner = [
     '@author <%=pkg.author.name%> [<%=pkg.author.email%>]',
     '@fileoverview <%=pkg.description%>',
     '@vserion <%=pkg.version%>',
-    '**/'
+    '**/',
+    ''
 ].join('\r\n');
 
 module.exports = function(grunt) {
@@ -12,8 +13,7 @@ module.exports = function(grunt) {
 		pkg:grunt.file.readJSON('package.json'),
         jshint: {
             all: [
-                'Gruntfile.js',
-                'lithe.js'
+                'Gruntfile.js'
             ],
             options: {
                 jshintrc: '.jshintrc'

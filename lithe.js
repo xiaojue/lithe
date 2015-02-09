@@ -3,7 +3,8 @@ lithe
 @author xiaojue [designsor@gmail.com]
 @fileoverview a javascript common loader
 @vserion 0.3.4
-**/(function(global, undef) {
+**/
+(function(global, undef) {
 	var isBrowser = !! (typeof window !== undef && global.navigator && global.document);
 	if (isBrowser) {
 		//tools function
