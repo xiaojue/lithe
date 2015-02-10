@@ -19,21 +19,21 @@ describe('#use()', function(){
         });
     });
 
-    it('可以相对路径方式引入文件', function(done){
+    it('可用相对路径方式引入文件', function(done){
         lithe.use('test/mods/string.js', function(module){
             expect(module).to.equal('test/mods/string');
             done();
         });
     });
 
-    it('可以相对路径方式引入文件，参数没有影响', function(done){
+    it('路径参数没有影响', function(done){
         lithe.use('test/mods/query.js?key=value#key', function(module){
             expect(module).to.equal('test/mods/query');
             done();
         });
     });
 
-    it('可以相对路径方式引入文件，注意路径不能直接用hash，否则返回为 null', function(done){
+    it('注意路径不能直接用hash，否则返回为 null', function(done){
         var obj = {};
         var check = function(val){
             obj[val] = true;
@@ -48,6 +48,13 @@ describe('#use()', function(){
         lithe.use('test/mods/hash', function(module){
             expect(module).to.equal('test/mods/hash');
             check('nohash');
+        });
+    });
+
+    it('可以引入远程文件', function(done){
+        lithe.use('https://raw.githubusercontent.com/Esoul/lithe/master/test/mods/string.js', function(module){
+            expect(module).to.equal('test/mods/string');
+            done();
         });
     });
 
