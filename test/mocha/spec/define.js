@@ -26,6 +26,15 @@ define('empty', function(require, exports, module){
 
 });
 
+define('return', function(require, exports, module){
+	return 'return';
+});
+
+define('exports', function(require, exports, module){
+	exports.name = 'name';
+	exports.value = 'value';
+});
+
 describe('#define()', function(){
 
 	define('test', function(require, exports, module){
@@ -36,6 +45,8 @@ describe('#define()', function(){
 		var nil = require('null');
 		var undef = require('undef');
 		var empty = require('empty');
+		var ret = require('return');
+		var exp = require('exports');
 
 		it('模块可以被直接设置为一个空字符串', function(){
 			expect(str).to.be.a('string');
@@ -66,6 +77,16 @@ describe('#define()', function(){
 		it('可以不设置模块的输出，此时模块为一个空对象', function(){
 			expect(empty).to.be.a('object');
 			expect(Object.keys(empty).length).to.equal(0);
+		});
+
+		it('模块可以使用 return 替代 module.exports 来输出', function(){
+			expect(ret).to.equal('return');
+		});
+		
+		it('模块可以使用 exports 对象来输出一个集合', function(){
+			expect(exp).to.be.a('object');
+			expect(exp.name).to.equal('name');
+			expect(exp.value).to.equal('value');
 		});
 	});
 
