@@ -52,6 +52,7 @@ describe('#use()', function(){
     });
 
     it('现在不能引入绝对路径的远程文件，会返回 null', function(done){
+        this.timeout(5000);
         lithe.use('http://cdn.rawgit.com/Esoul/lithe/master/test/mods/remote.js', function(module){
             expect(module).to.equal(null);
             done();

@@ -23,12 +23,14 @@ var expect = chai.expect;
 <script>
 document.writeln([
 	'<' + 'script',
+	'id="lithe"',
 	'src="../../lithe.js"',
 	'data-debug="true"',
 	'data-path="' +
 		window.location.origin + '/' +
 		window.location.pathname.replace('config.html', '') + 'js/"',
 	'data-config="config.js"',
+	'data-main="mods/main"',
 	'></' + 'script>'
 ].join(' '));
 </script>
