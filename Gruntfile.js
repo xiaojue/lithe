@@ -59,7 +59,8 @@ module.exports = function(grunt) {
 	grunt.registerTask('default', [
 		'includes',
 		'uglify',
-		'jshint'
+		'jshint',
+		'mocha'
 	]);
 
 };
