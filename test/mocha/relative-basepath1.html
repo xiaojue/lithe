@@ -20,22 +20,8 @@ mocha.setup('bdd');
 // Setup chai
 var expect = chai.expect;
 </script>
-<script>
-document.writeln([
-	'<' + 'script',
-	'id="lithe"',
-	'src="../../lithe.js"',
-	'data-debug="true"',
-	'data-path="' +
-		window.location.origin +
-		window.location.pathname.replace(/[^\/]+.html/, '') + 'js/"',
-	'data-config="config.js"',
-	'data-main="mods/main"',
-	'></' + 'script>'
-].join(' '));
-</script>
-<script src="spec/config.js"></script>
-
+<script id="lithe" src="../../lithe.js" data-debug="true" data-path="test/mocha/js/" data-config="config.js"></script>
+<script src="spec/relative-basepath1.js"></script>
 <!-- run mocha -->
 <script>
 // If tests run in a real browser

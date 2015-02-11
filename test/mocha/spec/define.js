@@ -1,6 +1,6 @@
 describe('#define()', function(){
 
-    it('window 和 lithe 都存在 define 方法', function(){
+    it('lithe 存在 define 方法，将其暴露到 window 上', function(){
         expect(window.define).to.be.a('function');
         expect(lithe.define).to.be.a('function');
     });
