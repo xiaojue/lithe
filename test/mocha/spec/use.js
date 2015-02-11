@@ -33,7 +33,7 @@ describe('#use()', function(){
         });
     });
 
-    it('注意路径不能直接用hash，否则返回为 null', function(done){
+    it('现在路径不能识别 hash，会返回 null', function(done){
         var obj = {};
         var check = function(val){
             obj[val] = true;
@@ -51,9 +51,9 @@ describe('#use()', function(){
         });
     });
 
-    it('可以引入远程文件', function(done){
-        lithe.use('https://raw.githubusercontent.com/Esoul/lithe/master/test/mods/string.js', function(module){
-            expect(module).to.equal('test/mods/string');
+    it('现在不能引入绝对路径的远程文件，会返回 null', function(done){
+        lithe.use('http://cdn.rawgit.com/Esoul/lithe/master/test/mods/remote.js', function(module){
+            expect(module).to.equal(null);
             done();
         });
     });
