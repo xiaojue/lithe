@@ -1,11 +1,11 @@
 
 var header = doc.head || getByTagName('head')[0] || doc.documentElement,
-CHARSET = 'utf-8',
 scripts = getByTagName('script'),
 currentJs = scripts[scripts.length - 1],
 currentPath = currentJs.src || attr(currentJs, 'src'),
 BASEPATH = attr(currentJs, 'data-path') || currentPath,
 CONFIG = attr(currentJs, 'data-config'),
+CHARSET = attr(currentJs,'charset') || 'utf8',
 DEBUG = attr(currentJs, 'data-debug') === 'true',
 GLOBALTIMESTAMP = getTimeStamp(currentJs.src),
 CONFIGSTMAP = null,
