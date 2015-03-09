@@ -1,11 +1,15 @@
 {
   "name": "lithe",
   "version": "0.3.4",
-  "author": {
+  "author": [{
     "name": "xiaojue",
     "email": "designsor@gmail.com",
     "url": "http://tuer.me/user/profile/designsor"
-  },
+  },{
+    "name":"Esoul",  
+    "email":"pillar0514@163.com",
+    "url":"https://github.com/Esoul"
+  }],
   "description": "a javascript common loader",
   "keywords": [
     "javascript loader",
