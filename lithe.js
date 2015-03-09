@@ -1,6 +1,6 @@
 /**
 lithe
-@author xiaojue [designsor@gmail.com]
+@author  []
 @fileoverview a javascript common loader
 @vserion 0.3.4
 **/
@@ -135,26 +135,26 @@ lithe
 
 
 		var Events = function() {
-			this.map = {};
+		  this.map = {};
 		};
 
 		extend(Events.prototype, {
-			trigger: function(name, args) {
-				var self = this,
-				cbs = this.map[name];
-				if (cbs) {
-					forEach(cbs, function(fn) {
-						fn.apply(this, args);
-					});
-				}
-			},
-			on: function(name, cb) {
-				if (this.map[name]) {
-					this.map[name].push(cb);
-				} else {
-					this.map[name] = [cb];
-				}
-			}
+		  trigger: function(name, args) {
+		    var self = this,
+		    cbs = this.map[name];
+		    if (cbs) {
+		      forEach(cbs, function(fn) {
+		        fn.apply(this, args);
+		      });
+		    }
+		  },
+		  on: function(name, cb) {
+		    if (this.map[name]) {
+		      this.map[name].push(cb);
+		    } else {
+		      this.map[name] = [cb];
+		    }
+		  }
 		});
 
 		var LEVENTS = new Events();
@@ -162,139 +162,138 @@ lithe
 
 
 		var getTimeStamp = function(url) {
-			var query = url.slice(url.lastIndexOf('?') + 1).split('&');
-			for (var i = 0; i < query.length; i++) {
-				var item = query[i].split('='),
-				key = item[0],
-				val = item[1];
-				if (key === 'timestamp'){
-					return val;
-				}
-			}
-			return null;
+		  var query = url.slice(url.lastIndexOf('?') + 1).split('&');
+		  for (var i = 0; i < query.length; i++) {
+		    var item = query[i].split('='),
+		    key = item[0],
+		    val = item[1];
+		    if (key === 'timestamp'){
+		      return val;
+		    }
+		  }
+		  return null;
 		};
 
 		var isAbsolute = function(url) {
-			return url.indexOf('://') > 0 || url.indexOf('//') === 0;
+		  return url.indexOf('://') > 0 || url.indexOf('//') === 0;
 		};
 
 		var isDir = function(url) {
-			return ! filename(url);
+		  return ! filename(url);
 		};
 
 		var dirname = function(url) {
-			var s = url.match(/[^?]*(?=\/.*$)/);
-			return (s ? s[0] : '.') + '/';
+		  var s = url.match(/[^?]*(?=\/.*$)/);
+		  return (s ? s[0] : '.') + '/';
 		};
 
 		var filename = function(url) {
-			return url.slice(url.lastIndexOf('/') + 1).replace(/\?.*$/, '');
+		  return url.slice(url.lastIndexOf('/') + 1).replace(/\?.*$/, '');
 		};
 
 		var realpath = function(path){
-			var multiple_slash_re = /([^:\/])\/\/+/g;
-			multiple_slash_re.lastIndex = 0;
-			if (multiple_slash_re.test(path)) {
-				path = path.replace(multiple_slash_re, '$1\/');
-			}
-			if (path.indexOf('.') === - 1) {
-				return path;
-			}
-			var original = path.split('/'),
-			ret = [],
-			part;
-			for (var i = 0; i < original.length; i++) {
-				part = original[i];
-				if (part === '..') {
-					if (ret.length === 0) {
-						throw new Error('The path is invalid: ' + path);
-					}
-					ret.pop();
-				}
-				else if (part !== '.') {
-					ret.push(part);
-				}
-			}
-			return ret.join('/');
+		  var multiple_slash_re = /([^:\/])\/\/+/g;
+		  multiple_slash_re.lastIndex = 0;
+		  if (multiple_slash_re.test(path)) {
+		    path = path.replace(multiple_slash_re, '$1\/');
+		  }
+		  if (path.indexOf('.') === - 1) {
+		    return path;
+		  }
+		  var original = path.split('/'),
+		  ret = [],
+		  part;
+		  for (var i = 0; i < original.length; i++) {
+		    part = original[i];
+		    if (part === '..') {
+		      if (ret.length === 0) {
+		        throw new Error('The path is invalid: ' + path);
+		      }
+		      ret.pop();
+		    }
+		    else if (part !== '.') {
+		      ret.push(part);
+		    }
+		  }
+		  return ret.join('/');
 		};
 
 		var normalize = function(url, t) {
-			url = realpath(url);
-			var lastChar = url.charAt(url.length - 1);
-			if (lastChar === '/') {
-				return url;
-			}
-			if (lastChar === '#') {
-				url = url.slice(0, - 1);
-			}
-			else if (url.indexOf('?') === - 1 && ! (/\.(?:js|css)$/).test(url)) {
-				url += '.js';
-			}
-			if (url.indexOf(':80/') > 0) {
-				url = url.replace(':80/', '/');
-			}
-			if (t){
-				url = url.replace(/\?.+$/, '');
-			}
-			return url;
+		  url = realpath(url);
+		  var lastChar = url.charAt(url.length - 1);
+		  if (lastChar === '/') {
+		    return url;
+		  }
+		  if (lastChar === '#') {
+		    url = url.slice(0, - 1);
+		  }
+		  else if (url.indexOf('?') === - 1 && ! (/\.(?:js|css)$/).test(url)) {
+		    url += '.js';
+		  }
+		  if (url.indexOf(':80/') > 0) {
+		    url = url.replace(':80/', '/');
+		  }
+		  if (t){
+		    url = url.replace(/\?.+$/, '');
+		  }
+		  return url;
 		};
 
 		var replaceDir = function(id) {
-			//只替换一次,且如果路径包含2个dir，也只替换一次,并且只匹配第一个，之后的不匹配
-			// UI:../ -> UI/test = ../test
-			// UI:../ -> UI/UI/test = ../UI/test
-			// UI:../ -> ../a/UI/test = ../a/UI/test [不会替换]
-			// UI:../ -> a/UI/test = a/UI/test [不会替换]
-			var locks = {},
-			directorys = config.directorys,
-			k, path, reg, dir, j;
-			for (k = 0; k < directorys.length; k++) {
-				if (locks[id]){
-					break;
-				}
-				dir = directorys[k];
-				for (j in dir) {
-					path = dir[j];
-					reg = new RegExp("^" + j + "\/");
-					if (reg.test(id) && ! locks[id]) {
-						id = id.replace(reg, path);
-						locks[id] = true;
-						break;
-					}
-				}
-			}
-			return id;
+		  //只替换一次,且如果路径包含2个dir，也只替换一次,并且只匹配第一个，之后的不匹配
+		  // UI:../ -> UI/test = ../test
+		  // UI:../ -> UI/UI/test = ../UI/test
+		  // UI:../ -> ../a/UI/test = ../a/UI/test [不会替换]
+		  // UI:../ -> a/UI/test = a/UI/test [不会替换]
+		  var locks = {},
+		  k, path, reg, dir, j;
+		  for (k = 0; k < directorys.length; k++) {
+		    if (locks[id]){
+		      break;
+		    }
+		    dir = directorys[k];
+		    for (j in dir) {
+		      path = dir[j];
+		      reg = new RegExp("^" + j + "\/");
+		      if (reg.test(id) && ! locks[id]) {
+		        id = id.replace(reg, path);
+		        locks[id] = true;
+		        break;
+		      }
+		    }
+		  }
+		  return id;
 		};
 
 		var replaceId = function(id) {
-			var alias = config.alias;
-			if (alias) {
-				var newid = alias[id];
-				return newid ? newid: replaceDir(id);
-			}
-			return id;
+		  var alias = config.alias;
+		  if (alias) {
+		    var newid = alias[id];
+		    return newid ? newid: replaceDir(id);
+		  }
+		  return id;
 		};
 
 		var resolve = function(id, path) {
-			path = dirname(path || lithe.basepath);
-			if (isAbsolute(id)){
-				return id;
-			}
-			if (config.init){
-				id = replaceId(id);
-			}
-			var url = '';
-			if (id.indexOf('./') === 0 || id.indexOf('../') === 0) {
-				if (id.indexOf('./') === 0) {
-					id = id.substring(2);
-				}
-				url = path + id;
-			} else if (id.charAt(0) === '/' && id.charAt(1) !== '/') {
-				url = path + id.substring(1);
-			} else {
-				url = path + '/' + id;
-			}
-			return normalize(url);
+		  path = dirname(path || lithe.basepath);
+		  if (isAbsolute(id)){
+		    return id;
+		  }
+		  if (isInitConfig){
+		    id = replaceId(id);
+		  }
+		  var url = '';
+		  if (id.indexOf('./') === 0 || id.indexOf('../') === 0) {
+		    if (id.indexOf('./') === 0) {
+		      id = id.substring(2);
+		    }
+		    url = path + id;
+		  } else if (id.charAt(0) === '/' && id.charAt(1) !== '/') {
+		    url = path + id.substring(1);
+		  } else {
+		    url = path + '/' + id;
+		  }
+		  return normalize(url);
 		};
 
 
@@ -303,7 +302,8 @@ lithe
 		CHARSET = 'utf-8',
 		scripts = getByTagName('script'),
 		currentJs = scripts[scripts.length - 1],
-		BASEPATH = attr(currentJs, 'data-path') || currentJs.src || attr(currentJs, 'src'),
+		currentPath = currentJs.src || attr(currentJs, 'src'),
+		BASEPATH = attr(currentJs, 'data-path') || currentPath,
 		CONFIG = attr(currentJs, 'data-config'),
 		DEBUG = attr(currentJs, 'data-debug') === 'true',
 		GLOBALTIMESTAMP = getTimeStamp(currentJs.src),
@@ -314,73 +314,75 @@ lithe
 		callbacks = {},
 		fetched = {};
 
+		BASEPATH = (BASEPATH === currentPath) ? dirname(currentPath) : resolve(BASEPATH,dirname(currentPath));
+
 		var fetch = function(url, cb) {
-			LEVENTS.trigger('fetch', [url, cb]);
+		  LEVENTS.trigger('fetch', [url, cb]);
 		};
 
 		LEVENTS.on('fetch', function(url, cb) {
-			if (! (/\.css$/).test(url)) {
-				if (fetched[url]) {
-					cb();
-					return;
-				}
-				if (fetching[url]) {
-					callbacks[url].push(cb);
-					return;
-				}
-				fetching[url] = true;
-				callbacks[url] = [cb];
-				getscript(url, function() {
-					fetched[url] = true;
-					delete fetching[url];
-					var fns = callbacks[url];
-					if (fns) {
-						delete callbacks[url];
-						forEach(fns, function(fn) {
-							fn();
-						});
-					}
-				},
-				CHARSET);
-			}
+		  if (! (/\.css$/).test(url)) {
+		    if (fetched[url]) {
+		      cb();
+		      return;
+		    }
+		    if (fetching[url]) {
+		      callbacks[url].push(cb);
+		      return;
+		    }
+		    fetching[url] = true;
+		    callbacks[url] = [cb];
+		    getscript(url, function() {
+		      fetched[url] = true;
+		      delete fetching[url];
+		      var fns = callbacks[url];
+		      if (fns) {
+		        delete callbacks[url];
+		        forEach(fns, function(fn) {
+		          fn();
+		        });
+		      }
+		    },
+		    CHARSET);
+		  }
 		});
 
 		var getscript = function(url, cb, charset) {
-			var node = createNode('script', charset);
-			node.onload = node.onerror = node.onreadystatechange = function() {
-				if (/loaded|complete|undefined/.test(node.readyState)) {
-					node.onload = node.onerror = node.onreadystatechange = null;
-					if (node.parentNode && ! DEBUG){
-						node.parentNode.removeChild(node);
-					}
-					node = undef;
-					if (isFunction(cb)){
-						cb();
-					}
-				}
-			};
-			node.async = 'async';
-			var timestamp = CONFIGSTMAP ? CONFIGSTMAP : GLOBALTIMESTAMP;
-			url = timestamp ? url + '?timestamp=' + timestamp : url;
-			node.src = url;
-			insertscript(node);
+		  var node = createNode('script', charset);
+		  node.onload = node.onerror = node.onreadystatechange = function() {
+		    if (/loaded|complete|undefined/.test(node.readyState)) {
+		      node.onload = node.onerror = node.onreadystatechange = null;
+		      if (node.parentNode && ! DEBUG){
+		        node.parentNode.removeChild(node);
+		      }
+		      node = undef;
+		      if (isFunction(cb)){
+		        cb();
+		      }
+		    }
+		  };
+		  node.async = 'async';
+		  var timestamp = CONFIGSTMAP ? CONFIGSTMAP : GLOBALTIMESTAMP;
+		  url = timestamp ? url + '?timestamp=' + timestamp : url;
+		  node.src = url;
+		  insertscript(node);
 		};
 
 		var createNode = function(tag, charset) {
-			var node = doc.createElement(tag);
-			if (charset){
-				node.charset = charset;
-			}
-			return node;
+		  var node = doc.createElement(tag);
+		  if (charset){
+		    node.charset = charset;
+		  }
+		  return node;
 		};
 
 		var insertscript = function(node) {
-			var baseElement = getByTagName('base', header)[0];
-			if(baseElement){
-				header.insertBefore(node, baseElement);
-			}else{
-				header.appendChild(node);
-			}
+		  var baseElement = getByTagName('base', header)[0];
+		  if(baseElement){
+		    header.insertBefore(node, baseElement);
+		  }else{
+		    header.appendChild(node);
+		  }
 		};
 
 
@@ -388,249 +390,252 @@ lithe
 		var anonymouse = [],
 		config = {},
 		STATUS = {
-			'created': 0,
-			'save': 1,
-			'ready': 2,
-			'compiling': 3,
-			'compiled': 4
+		  'created': 0,
+		  'save': 1,
+		  'ready': 2,
+		  'compiling': 3,
+		  'compiled': 4
 		},
-		circularStack = [];
+		circularStack = [],
+		directorys = [],
+		isInitConfig;
 
 		//help
 		var getPureDependencies = function(mod) {
-			var id = mod.id;
-			var deps = filter(mod.dependencies, function(dep) {
-				circularStack.push(id);
-				var isCircular = isCircularWaiting(lithe.cache[resolve(dep)]);
-				if (isCircular) {
-					//the circular is ready
-					circularStack.push(id);
-				}
-				circularStack.pop();
-				return ! isCircular;
-			});
-			return createUrls(deps);
+		  var id = mod.id;
+		  var deps = filter(mod.dependencies, function(dep) {
+		    circularStack.push(id);
+		    var isCircular = isCircularWaiting(lithe.cache[resolve(dep)]);
+		    if (isCircular) {
+		      //the circular is ready
+		      circularStack.push(id);
+		    }
+		    circularStack.pop();
+		    return ! isCircular;
+		  });
+		  return createUrls(deps);
 		};
 
 		var isCircularWaiting = function(mod) {
-			if (!mod || mod.status !== STATUS.save){
-				return false;
-			}
-			circularStack.push(mod.id);
-			var deps = mod.dependencies;
-			if (deps.length) {
-				if (isOverlap(deps, circularStack)){
-					return true;
-				}
-				for (var i = 0; i < deps.length; i++) {
-					if (isCircularWaiting(lithe.cache[resolve(deps[i])])){
-						return true;
-					}
-				}
-			}
-			circularStack.pop();
-			return false;
+		  if (!mod || mod.status !== STATUS.save){
+		    return false;
+		  }
+		  circularStack.push(mod.id);
+		  var deps = mod.dependencies;
+		  if (deps.length) {
+		    if (isOverlap(deps, circularStack)){
+		      return true;
+		    }
+		    for (var i = 0; i < deps.length; i++) {
+		      if (isCircularWaiting(lithe.cache[resolve(deps[i])])){
+		        return true;
+		      }
+		    }
+		  }
+		  circularStack.pop();
+		  return false;
 		};
 
 		var isOverlap = function(arrA, arrB) {
-			var arrC = arrA.concat(arrB);
-			return arrC.length > unique(arrC).length;
+		  var arrC = arrA.concat(arrB);
+		  return arrC.length > unique(arrC).length;
 		};
 
 		var createUrls = function(urls) {
-			if(isString(urls)){
-				urls = [urls];
-			}
-			return map(urls, function(url) {
-				return resolve(url);
-			});
+		  if(isString(urls)){
+		    urls = [urls];
+		  }
+		  return map(urls, function(url) {
+		    return resolve(url);
+		  });
 		};
 
 		var fetchMods = function(urls, cb) {
-			urls = createUrls(urls);
-			LEVENTS.trigger('start', [urls]);
-			var loadUris = filter(urls, function(url) {
-				return url && (!lithe.cache[url] || lithe.cache[url].status < STATUS.ready);
-			}),
-			len = loadUris.length;
-			if (len === 0) {
-				cb();
-				return;
-			}
-			var queue = len;
+		  urls = createUrls(urls);
+		  LEVENTS.trigger('start', [urls]);
+		  var loadUris = filter(urls, function(url) {
+		    return url && (!lithe.cache[url] || lithe.cache[url].status < STATUS.ready);
+		  }),
+		  len = loadUris.length;
+		  if (len === 0) {
+		    cb();
+		    return;
+		  }
+		  var queue = len;
 
-			var restart = function(mod) {
-				if((mod || {}).status < STATUS.ready){
-					mod.status = STATUS.ready;
-				}
-				--queue;
-				if(queue === 0){
-					cb();
-				}
-			};
+		  var restart = function(mod) {
+		    if((mod || {}).status < STATUS.ready){
+		      mod.status = STATUS.ready;
+		    }
+		    --queue;
+		    if(queue === 0){
+		      cb();
+		    }
+		  };
 
-			forEach(loadUris, function(url) {
-				var mod = lithe.get(url);
-				function success(style) {
-					LEVENTS.trigger('fetchsuccess', [mod, style]);
-					if (mod.status >= STATUS.save) {
-						var deps = getPureDependencies(mod);
-						if(deps.length){
-							fetchMods(deps, function() {
-								restart(mod);
-							});
-						}else{
-							restart(mod);
-						}
-					} else if (style) {
-						restart(mod);
-					} else {
-						restart();
-					}
-				}
-				if(mod.status < STATUS.save){
-					fetch(url, success);
-				}else{
-					success();
-				}
-			});
+		  forEach(loadUris, function(url) {
+		    var mod = lithe.get(url);
+		    function success(style) {
+		      LEVENTS.trigger('fetchsuccess', [mod, style]);
+		      if (mod.status >= STATUS.save) {
+		        var deps = getPureDependencies(mod);
+		        if(deps.length){
+		          fetchMods(deps, function() {
+		            restart(mod);
+		          });
+		        }else{
+		          restart(mod);
+		        }
+		      } else if (style) {
+		        restart(mod);
+		      } else {
+		        restart();
+		      }
+		    }
+		    if(mod.status < STATUS.save){
+		      fetch(url, success);
+		    }else{
+		      success();
+		    }
+		  });
 		};
 
 		var saveAnonymouse = function() {
-			forEach(anonymouse, function(meta) {
-				var anonymousemod = lithe.get(meta.id);
-				anonymousemod._save(meta);
-			});
-			anonymouse = [];
+		  forEach(anonymouse, function(meta) {
+		    var anonymousemod = lithe.get(meta.id);
+		    anonymousemod._save(meta);
+		  });
+		  anonymouse = [];
 		};
 
 		var realUse = function(urls, cb) {
-			fetchMods(urls, function() {
-				urls = createUrls(urls);
-				var args = map(urls, function(url) {
-					return url ? lithe.get(url)._compile() : null;
-				});
-				if (isFunction(cb)) {
-					cb.apply(null, args);
-				}
-				LEVENTS.trigger('end');
-			});
+		  fetchMods(urls, function() {
+		    urls = createUrls(urls);
+		    var args = map(urls, function(url) {
+		      return url ? lithe.get(url)._compile() : null;
+		    });
+		    if (isFunction(cb)) {
+		      cb.apply(null, args);
+		    }
+		    LEVENTS.trigger('end');
+		  });
 		};
 
+
 		var setConfig = function(cg) {
-			config = cg;
-			config.directorys = [];
-			var alias = config.alias,
-			i, alia, dir;
-			if (alias) {
-				for (i in alias) {
-					alia = alias[i];
-					if (isDir(alia)) {
-						dir = {};
-						dir[i] = alia;
-						config.directorys.push(dir);
-					}
-				}
-			}
-			config.init = true;
-			if (config.basepath){
-				lithe.basepath = config.basepath;
-			}
-			lithe.config = config;
-			CONFIGSTMAP = config.timestamp;
+		  config = cg;
+		  directorys = [];
+		  var alias = config.alias,
+		  i, alia, dir;
+		  if (alias) {
+		    for (i in alias) {
+		      alia = alias[i];
+		      if (isDir(alia)) {
+		        dir = {};
+		        dir[i] = alia;
+		        directorys.push(dir);
+		      }
+		    }
+		  }
+		  isInitConfig = true;
+		  if (config.basepath){
+		    lithe.basepath = config.basepath;
+		  }
+		  lithe.config = config;
+		  CONFIGSTMAP = config.timestamp;
 		};
 
 		var Module = function(url) {
-			this.id = url;
-			this.status = 0;
-			this.dependencies = [];
-			this.exports = null;
-			this.parent = [];
-			this.factory = noop;
+		  this.id = url;
+		  this.status = 0;
+		  this.dependencies = [];
+		  this.exports = null;
+		  this.parent = [];
+		  this.factory = noop;
 		};
 
 		extend(Module.prototype, {
-			_compile: function() {
-				var mod = this;
-				if (mod.status === STATUS.compiled){
-					return mod.exports;
-				}
-				if (mod.status < STATUS.save){
-					return null;
-				}
-				mod.status = STATUS.compiling;
-				function require(id) {
-					id = normalize(resolve(id), true);
-					var child = lithe.cache[id];
-					if (!child){
-						return null;
-					}
-					if (child.status === STATUS.compiling){
-						return child.exports;
-					}
-					child.parent = mod;
-					return child._compile();
-				}
-				require.cache = lithe.cache;
-				mod.require = require;
-				mod.exports = {};
-				var fun = mod.factory;
-				if (isFunction(fun)){
-					runModuleContext(fun, mod);
-				}
-				mod.status = STATUS.compiled;
-				lithe.events.trigger('compiled', [mod]);
-				return mod.exports;
-			},
-			_save: function(meta) {
-				if (this.status < STATUS.save) {
-					this.id = meta.id;
-					this.name = meta.name;
-					this.dependencies = meta.deps;
-					this.factory = meta.factory;
-					this.status = STATUS.save;
-				}
-			}
+		  _compile: function() {
+		    var mod = this;
+		    if (mod.status === STATUS.compiled){
+		      return mod.exports;
+		    }
+		    if (mod.status < STATUS.save){
+		      return null;
+		    }
+		    mod.status = STATUS.compiling;
+		    function require(id) {
+		      id = normalize(resolve(id), true);
+		      var child = lithe.cache[id];
+		      if (!child){
+		        return null;
+		      }
+		      if (child.status === STATUS.compiling){
+		        return child.exports;
+		      }
+		      child.parent = mod;
+		      return child._compile();
+		    }
+		    require.cache = lithe.cache;
+		    mod.require = require;
+		    mod.exports = {};
+		    var fun = mod.factory;
+		    if (isFunction(fun)){
+		      runModuleContext(fun, mod);
+		    }
+		    mod.status = STATUS.compiled;
+		    lithe.events.trigger('compiled', [mod]);
+		    return mod.exports;
+		  },
+		  _save: function(meta) {
+		    if (this.status < STATUS.save) {
+		      this.id = meta.id;
+		      this.name = meta.name;
+		      this.dependencies = meta.deps;
+		      this.factory = meta.factory;
+		      this.status = STATUS.save;
+		    }
+		  }
 		});
 
 		var lithe = extend({
-			basepath: BASEPATH,
-			events: LEVENTS,
-			cache: {},
-			get: function(url) {
-				url = normalize(url, true);
-				if(lithe.cache[url]){
-					return lithe.cache[url];
-				}else{
-					lithe.cache[url] = new Module(url);
-					return lithe.cache[url];
-				}
-			},
-			define: function(id, factory) {
-				var deps = getDependencies(factory.toString());
-				var meta = {
-					id: resolve(id),
-					name: id,
-					deps: deps,
-					factory: factory
-				};
-				anonymouse.push(meta);
-				saveAnonymouse();
-			},
-			use: function(urls, cb) {
-				if(!CONFIG || config.init){
-					realUse(urls, cb);
-				}else{
-					realUse(CONFIG, function(cg) {
-						setConfig(cg);
-						realUse(urls, cb);
-					});
-				}
-			}
+		  basepath: BASEPATH,
+		  events: LEVENTS,
+		  cache: {},
+		  get: function(url) {
+		    url = normalize(url, true);
+		    if(lithe.cache[url]){
+		      return lithe.cache[url];
+		    }else{
+		      lithe.cache[url] = new Module(url);
+		      return lithe.cache[url];
+		    }
+		  },
+		  define: function(id, factory) {
+		    var deps = getDependencies(factory.toString());
+		    var meta = {
+		      id: resolve(id),
+		      name: id,
+		      deps: deps,
+		      factory: factory
+		    };
+		    anonymouse.push(meta);
+		    saveAnonymouse();
+		  },
+		  use: function(urls, cb) {
+		    if(!CONFIG || isInitConfig){
+		      realUse(urls, cb);
+		    }else{
+		      realUse(CONFIG, function(cg) {
+		        setConfig(cg);
+		        realUse(urls, cb);
+		      });
+		    }
+		  }
 		});
 
 		if (CONFIG){
-			CONFIG = createUrls(CONFIG);
+		  CONFIG = createUrls(CONFIG);
 		}
 
 
