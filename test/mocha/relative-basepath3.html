@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<title>Example Mocha Test</title>
+<link rel="stylesheet" href="../../node_modules/mocha/mocha.css">
+</head>
+<body>
+<!-- Required for browser reporter -->
+<div id="mocha"></div>
+
+<!-- mocha -->
+<script src="../../node_modules/mocha/mocha.js"></script>
+<!-- Include your assertion lib of choice -->
+<script src="../../node_modules/chai/chai.js"></script>
+<script>
+// This will be overridden by mocha-helper if you run with grunt
+mocha.setup('bdd');
+// Setup chai
+var expect = chai.expect;
+</script>
+<script id="lithe" src="../../lithe.js" data-debug="true" data-path="/test/mocha/js/" data-config="config.js"></script>
+<script src="spec/relative-basepath3.js"></script>
+<!-- run mocha -->
+<script>
+// If tests run in a real browser
+// Can alternatively do a check on window.PHANTOMJS
+if (navigator.userAgent.indexOf('PhantomJS') < 0) {
+	mocha.run();
+}
+</script>
+</body>
+</html>

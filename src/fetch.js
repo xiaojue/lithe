@@ -1,3 +1,4 @@
+
 var header = doc.head || getByTagName('head')[0] || doc.documentElement,
 CHARSET = 'utf-8',
 scripts = getByTagName('script'),
@@ -13,9 +14,9 @@ fetching = {},
 callbacks = {},
 fetched = {};
 
-function fetch(url, cb) {
+var fetch = function(url, cb) {
 	LEVENTS.trigger('fetch', [url, cb]);
-}
+};
 
 LEVENTS.on('fetch', function(url, cb) {
 	if (! (/\.css$/).test(url)) {
@@ -44,14 +45,18 @@ LEVENTS.on('fetch', function(url, cb) {
 	}
 });
 
-function getscript(url, cb, charset) {
+var getscript = function(url, cb, charset) {
 	var node = createNode('script', charset);
 	node.onload = node.onerror = node.onreadystatechange = function() {
 		if (/loaded|complete|undefined/.test(node.readyState)) {
 			node.onload = node.onerror = node.onreadystatechange = null;
-			if (node.parentNode && ! DEBUG) node.parentNode.removeChild(node);
+			if (node.parentNode && ! DEBUG){
+				node.parentNode.removeChild(node);
+			}
 			node = undef;
-			if (isFunction(cb)) cb();
+			if (isFunction(cb)){
+				cb();
+			}
 		}
 	};
 	node.async = 'async';
@@ -59,16 +64,22 @@ function getscript(url, cb, charset) {
 	url = timestamp ? url + '?timestamp=' + timestamp : url;
 	node.src = url;
 	insertscript(node);
-}
+};
 
-function createNode(tag, charset) {
+var createNode = function(tag, charset) {
 	var node = doc.createElement(tag);
-	if (charset) node.charset = charset;
+	if (charset){
+		node.charset = charset;
+	}
 	return node;
-}
+};
 
-function insertscript(node) {
+var insertscript = function(node) {
 	var baseElement = getByTagName('base', header)[0];
-	baseElement ? header.insertBefore(node, baseElement) : header.appendChild(node);
-}
+	if(baseElement){
+		header.insertBefore(node, baseElement);
+	}else{
+		header.appendChild(node);
+	}
+};
 
