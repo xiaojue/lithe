@@ -22,114 +22,118 @@ lithe
 		jsRequireRegExp = /[^.]\s*require\s*\(\s*["']([^'"\s]+)["']\s*\)/g;
 
 		var forEach = Arr.forEach ? function(arr, fn) {
-			arr.forEach(fn);
+		  arr.forEach(fn);
 		}: function(arr, fn) {
-			for (var i = 0; i < arr.length; i++){
-				fn(arr[i], i, arr);
-			}
+		  for (var i = 0; i < arr.length; i++){
+		    fn(arr[i], i, arr);
+		  }
 		};
 
 		var filter = Arr.filter ? function(arr, fn) {
-			return arr.filter(fn);
+		  return arr.filter(fn);
 		}: function(arr,fn) {
-			var ret = [];
-			forEach(arr, function(item, i, arr) {
-				if (fn(item, i, arr)){
-					ret.push(item);
-				}
-			});
-			return ret;
+		  var ret = [];
+		  forEach(arr, function(item, i, arr) {
+		    if (fn(item, i, arr)){
+		      ret.push(item);
+		    }
+		  });
+		  return ret;
 		};
 
 		var map = Arr.map ? function(arr, fn) {
-			return arr.map(fn);
+		  return arr.map(fn);
 		}: function(arr, fn) {
-			var ret = [];
-			forEach(arr, function(item, i, arr) {
-				ret.push(fn(item, i, arr));
-			});
-			return ret;
+		  var ret = [];
+		  forEach(arr, function(item, i, arr) {
+		    ret.push(fn(item, i, arr));
+		  });
+		  return ret;
 		};
 
 		var keys = Obj.keys ? Obj.keys: function(o) {
-			var ret = [];
-			for (var p in o) {
-				if (o.hasOwnProperty(p)){
-					ret.push(p);
-				}
-			}
-			return ret;
+		  var ret = [];
+		  for (var p in o) {
+		    if (o.hasOwnProperty(p)){
+		      ret.push(p);
+		    }
+		  }
+		  return ret;
 		};
 
 		var indexOf = Arr.indexOf ? function(arr, selector) {
-			return arr.indexOf(selector);
+		  return arr.indexOf(selector);
 		}: function(arr, selector) {
-			for (var i = 0; i < arr.length; i++) {
-				if (arr[i] === selector){
-					return i;
-				}
-			}
-			return - 1;
+		  for (var i = 0; i < arr.length; i++) {
+		    if (arr[i] === selector){
+		      return i;
+		    }
+		  }
+		  return - 1;
 		};
 
 		var getByTagName = function(tag, ele) {
-			ele = ele || doc;
-			return ele ? ele.getElementsByTagName(tag) : ele;
+		  ele = ele || doc;
+		  return ele ? ele.getElementsByTagName(tag) : ele;
 		};
 
 		var noop = function(){};
 
 		var getAttr = function(ele, ns) {
-			return ele.getAttribute(ns);
+		  return ele.getAttribute(ns);
 		};
 
 		var extend = function(source, options) {
-			for (var i in options) {
-				if (options.hasOwnProperty(i)){
-					source[i] = options[i];
-				}
-			}
-			return source;
+		  for (var i in options) {
+		    if (options.hasOwnProperty(i)){
+		      source[i] = options[i];
+		    }
+		  }
+		  return source;
 		};
 
 		var isString = function(v) {
-			return toString.call(v) === '[object String]';
+		  return toString.call(v) === '[object String]';
 		};
 
 		var isFunction = function isFunction(v) {
-			return toString.call(v) === '[object Function]';
+		  return toString.call(v) === '[object Function]';
+		};
+
+		var isArray = function isFunction(v) {
+		  return toString.call(v) === '[object Array]';
 		};
 
 		var isObject = function isObject(v) {
-			return v === Obj(v);
+		  return v === Obj(v);
 		};
 
 		var unique = function unique(arr) {
-			var o = {};
-			forEach(arr, function(item) {
-				o[item] = 1;
-			});
-			return keys(o);
+		  var o = {};
+		  forEach(arr, function(item) {
+		    o[item] = 1;
+		  });
+		  return keys(o);
 		};
 
 		var attr = function attr(node, ns) {
-			return node.getAttribute(ns);
+		  return node.getAttribute(ns);
 		};
 
 		//处理依赖部分
 		var getDependencies = function(code) {
-			var deps = [];
-			code.replace(commentRegExp, '').replace(jsRequireRegExp, function(match, dep) {
-				deps.push(dep);
-			});
-			return unique(deps);
+		  var deps = [];
+		  code.replace(commentRegExp, '').replace(jsRequireRegExp, function(match, dep) {
+		    deps.push(dep);
+		  });
+		  return unique(deps);
 		};
 
 		var runModuleContext = function(fn, mod) {
-			var ret = fn(mod.require, mod.exports, mod);
-			if (ret !== undef){
-				mod.exports = ret;
-			}
+		  var ret = fn(mod.require, mod.exports, mod);
+		  if (ret !== undef){
+		    mod.exports = ret;
+		  }
 		};
 
 
@@ -297,14 +301,13 @@ lithe
 		};
 
 
-
 		var header = doc.head || getByTagName('head')[0] || doc.documentElement,
 		scripts = getByTagName('script'),
 		currentJs = scripts[scripts.length - 1],
 		currentPath = currentJs.src || attr(currentJs, 'src'),
 		BASEPATH = attr(currentJs, 'data-path') || currentPath,
 		CONFIG = attr(currentJs, 'data-config'),
-		CHARSET = attr(currentJs,'charset') || 'utf8',
+		CHARSET = attr(currentJs, 'charset') || 'utf8',
 		DEBUG = attr(currentJs, 'data-debug') === 'true',
 		GLOBALTIMESTAMP = getTimeStamp(currentJs.src),
 		CONFIGSTMAP = null,
@@ -314,7 +317,7 @@ lithe
 		callbacks = {},
 		fetched = {};
 
-		BASEPATH = (BASEPATH === currentPath) ? dirname(currentPath) : resolve(BASEPATH,dirname(currentPath));
+		BASEPATH = (BASEPATH === currentPath) ? dirname(currentPath) : resolve(BASEPATH, dirname(currentPath));
 
 		var fetch = function(url, cb) {
 		  LEVENTS.trigger('fetch', [url, cb]);
@@ -347,40 +350,47 @@ lithe
 		  }
 		});
 
-		var getscript = function(url, cb, charset) {
+		var getscript = function(urls, cb, charset) {
 		  var node = createNode('script', charset);
-		  node.onload = node.onerror = node.onreadystatechange = function() {
-		    if (/loaded|complete|undefined/.test(node.readyState)) {
-		      node.onload = node.onerror = node.onreadystatechange = null;
-		      if (node.parentNode && ! DEBUG){
-		        node.parentNode.removeChild(node);
+		  var url = isArray(urls) ? urls.shift() : urls;
+		  if (url) {
+		    node.onload = node.onerror = node.onreadystatechange = function() {
+		      if (/loaded|complete|undefined/.test(node.readyState)) {
+		        node.onload = node.onerror = node.onreadystatechange = null;
+		        if (node.parentNode && ! DEBUG) {
+		          node.parentNode.removeChild(node);
+		        }
+		        node = undef;
+		        if (isArray(urls) && urls.length) {
+		          getscript(urls, cb, charset);
+		        } else {
+		          if (isFunction(cb)) {
+		            cb();
+		          }
+		        }
 		      }
-		      node = undef;
-		      if (isFunction(cb)){
-		        cb();
-		      }
-		    }
-		  };
-		  node.async = 'async';
-		  var timestamp = CONFIGSTMAP ? CONFIGSTMAP : GLOBALTIMESTAMP;
-		  url = timestamp ? url + '?timestamp=' + timestamp : url;
-		  node.src = url;
-		  insertscript(node);
+		    };
+		    node.async = 'async';
+		    var timestamp = CONFIGSTMAP ? CONFIGSTMAP: GLOBALTIMESTAMP;
+		    url = timestamp ? url + '?timestamp=' + timestamp: url;
+		    node.src = url;
+		    insertscript(node);
+		  }else{
+		    throw new Error('getscript url is '+url);
+		  }
 		};
 
 		var createNode = function(tag, charset) {
 		  var node = doc.createElement(tag);
-		  if (charset){
-		    node.charset = charset;
-		  }
+		  node.charset = charset ? charset: CHARSET;
 		  return node;
 		};
 
 		var insertscript = function(node) {
 		  var baseElement = getByTagName('base', header)[0];
-		  if(baseElement){
+		  if (baseElement) {
 		    header.insertBefore(node, baseElement);
-		  }else{
+		  } else {
 		    header.appendChild(node);
 		  }
 		};
@@ -631,7 +641,8 @@ lithe
 		        realUse(urls, cb);
 		      });
 		    }
-		  }
+		  },
+		  load:getscript
 		});
 
 		if (CONFIG){

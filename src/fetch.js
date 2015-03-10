@@ -1,11 +1,10 @@
-
 var header = doc.head || getByTagName('head')[0] || doc.documentElement,
 scripts = getByTagName('script'),
 currentJs = scripts[scripts.length - 1],
 currentPath = currentJs.src || attr(currentJs, 'src'),
 BASEPATH = attr(currentJs, 'data-path') || currentPath,
 CONFIG = attr(currentJs, 'data-config'),
-CHARSET = attr(currentJs,'charset') || 'utf8',
+CHARSET = attr(currentJs, 'charset') || 'utf8',
 DEBUG = attr(currentJs, 'data-debug') === 'true',
 GLOBALTIMESTAMP = getTimeStamp(currentJs.src),
 CONFIGSTMAP = null,
@@ -15,7 +14,7 @@ fetching = {},
 callbacks = {},
 fetched = {};
 
-BASEPATH = (BASEPATH === currentPath) ? dirname(currentPath) : resolve(BASEPATH,dirname(currentPath));
+BASEPATH = (BASEPATH === currentPath) ? dirname(currentPath) : resolve(BASEPATH, dirname(currentPath));
 
 var fetch = function(url, cb) {
   LEVENTS.trigger('fetch', [url, cb]);
@@ -48,40 +47,47 @@ LEVENTS.on('fetch', function(url, cb) {
   }
 });
 
-var getscript = function(url, cb, charset) {
+var getscript = function(urls, cb, charset) {
   var node = createNode('script', charset);
-  node.onload = node.onerror = node.onreadystatechange = function() {
-    if (/loaded|complete|undefined/.test(node.readyState)) {
-      node.onload = node.onerror = node.onreadystatechange = null;
-      if (node.parentNode && ! DEBUG){
-        node.parentNode.removeChild(node);
+  var url = isArray(urls) ? urls.shift() : urls;
+  if (url) {
+    node.onload = node.onerror = node.onreadystatechange = function() {
+      if (/loaded|complete|undefined/.test(node.readyState)) {
+        node.onload = node.onerror = node.onreadystatechange = null;
+        if (node.parentNode && ! DEBUG) {
+          node.parentNode.removeChild(node);
+        }
+        node = undef;
+        if (isArray(urls) && urls.length) {
+          getscript(urls, cb, charset);
+        } else {
+          if (isFunction(cb)) {
+            cb();
+          }
+        }
       }
-      node = undef;
-      if (isFunction(cb)){
-        cb();
-      }
-    }
-  };
-  node.async = 'async';
-  var timestamp = CONFIGSTMAP ? CONFIGSTMAP : GLOBALTIMESTAMP;
-  url = timestamp ? url + '?timestamp=' + timestamp : url;
-  node.src = url;
-  insertscript(node);
+    };
+    node.async = 'async';
+    var timestamp = CONFIGSTMAP ? CONFIGSTMAP: GLOBALTIMESTAMP;
+    url = timestamp ? url + '?timestamp=' + timestamp: url;
+    node.src = url;
+    insertscript(node);
+  }else{
+    throw new Error('getscript url is '+url);
+  }
 };
 
 var createNode = function(tag, charset) {
   var node = doc.createElement(tag);
-  if (charset){
-    node.charset = charset;
-  }
+  node.charset = charset ? charset: CHARSET;
   return node;
 };
 
 var insertscript = function(node) {
   var baseElement = getByTagName('base', header)[0];
-  if(baseElement){
+  if (baseElement) {
     header.insertBefore(node, baseElement);
-  }else{
+  } else {
     header.appendChild(node);
   }
 };

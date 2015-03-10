@@ -243,7 +243,8 @@ var lithe = extend({
         realUse(urls, cb);
       });
     }
-  }
+  },
+  load:getscript
 });
 
 if (CONFIG){
