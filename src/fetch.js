@@ -47,10 +47,25 @@ LEVENTS.on('fetch', function(url, cb) {
   }
 });
 
+var loadeds = {};
+
 var getscript = function(urls, cb, charset) {
-  var node = createNode('script', charset);
   var url = isArray(urls) ? urls.shift() : urls;
+  function success() {
+    if (isArray(urls) && urls.length) {
+      getscript(urls, cb, charset);
+    } else {
+      if (isFunction(cb)) {
+        cb();
+      }
+    }
+  }
+  if (loadeds[url]) {
+    success();
+    return;
+  }
   if (url) {
+    var node = createNode('script', charset);
     node.onload = node.onerror = node.onreadystatechange = function() {
       if (/loaded|complete|undefined/.test(node.readyState)) {
         node.onload = node.onerror = node.onreadystatechange = null;
@@ -58,13 +73,8 @@ var getscript = function(urls, cb, charset) {
           node.parentNode.removeChild(node);
         }
         node = undef;
-        if (isArray(urls) && urls.length) {
-          getscript(urls, cb, charset);
-        } else {
-          if (isFunction(cb)) {
-            cb();
-          }
-        }
+        loadeds[url] = true;
+        success();
       }
     };
     node.async = 'async';
@@ -72,8 +82,8 @@ var getscript = function(urls, cb, charset) {
     url = timestamp ? url + '?timestamp=' + timestamp: url;
     node.src = url;
     insertscript(node);
-  }else{
-    throw new Error('getscript url is '+url);
+  } else {
+    throw new Error('getscript url is ' + url);
   }
 };
 
