@@ -244,7 +244,8 @@ var lithe = extend({
       });
     }
   },
-  load:getscript
+  load:getscript,
+  setConfig:setConfig
 });
 
 if (CONFIG){

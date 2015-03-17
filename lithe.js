@@ -652,7 +652,8 @@ lithe
 		      });
 		    }
 		  },
-		  load:getscript
+		  load:getscript,
+		  setConfig:setConfig
 		});
 
 		if (CONFIG){
