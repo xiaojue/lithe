@@ -6,6 +6,7 @@ BASEPATH = attr(currentJs, 'data-path') || currentPath,
 CONFIG = attr(currentJs, 'data-config'),
 CHARSET = attr(currentJs, 'charset') || 'utf8',
 DEBUG = attr(currentJs, 'data-debug') === 'true',
+DYNAMICCONFIG = attr(currentJs,'data-config-dynamic') === 'true',
 GLOBALTIMESTAMP = getTimeStamp(currentJs.src),
 CONFIGSTMAP = null,
 mainjs = attr(currentJs, 'data-main'),
@@ -78,7 +79,12 @@ var getscript = function(urls, cb, charset) {
       }
     };
     node.async = 'async';
-    var timestamp = CONFIGSTMAP ? CONFIGSTMAP: GLOBALTIMESTAMP;
+    var timestamp;
+    if(DYNAMICCONFIG){
+      timestamp = CONFIGSTMAP ? CONFIGSTMAP : new Date().valueOf();
+    }else{
+      timestamp = CONFIGSTMAP ? CONFIGSTMAP : GLOBALTIMESTAMP;
+    }
     url = timestamp ? url + '?timestamp=' + timestamp: url;
     node.src = url;
     insertscript(node);
