@@ -8,7 +8,9 @@ module.exports = function(grunt) {
 			example: {
 				options: {
 					basepath: __dirname,
-					alias: config.alias
+					alias: config.alias,
+					publicpath:config.publicpath,
+					publicdeps:config.publicdeps
 				},
 				files: {
 					"../assest/conf/": "conf/"
@@ -25,7 +27,7 @@ module.exports = function(grunt) {
 		uglify: {
 			options: {
 				mangle: {
-					except: ['require']
+					except: ['require','$']
 				},
 				banner: banner
 			},
@@ -38,7 +40,7 @@ module.exports = function(grunt) {
 			},
 			config: {
 				files: {
-					"../assest/config.js": ['config.js']
+					'../assest/config.js': ['config.js']
 				}
 			}
 		}
