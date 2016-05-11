@@ -12,14 +12,60 @@ circularStack = [],
 directorys = [],
 isInitConfig;
 
+// 改动
+
+var _verifyDeps = function (deps, dep) {
+  if (deps.indexOf(dep) !== -1) {
+    return {
+      isPublicDeps : true,
+      dep : dep
+    };
+  }else {
+    return {
+      isPublicDeps : false,
+      dep : null
+    };
+  }
+};
+
+//改动
+
+var isPublicDeps = function(dep) {
+  if (lithe.config.publicdeps) {
+    var deps = Object.keys(lithe.config.publicdeps),
+        isDeps;
+    dep = lithe.config.alias && lithe.config.alias[dep] ? lithe.config.alias[dep] : dep;
+
+    // 如果结尾有js
+
+    if ((/\.(?:js)$/).test(dep)) {
+      isDeps = _verifyDeps(deps, dep);
+    }
+
+    if (!(/\.(?:js)$/).test(dep)) {
+      isDeps = _verifyDeps(deps, dep + ".js");
+    }
+
+    return isDeps;
+  }else {
+    return {
+      isPublicDeps : false,
+      dep : null
+    };
+  }
+};
+
 //help
 var getPureDependencies = function(mod) {
   var id = mod.id;
   var deps = filter(mod.dependencies, function(dep) {
+
     // 改动,过滤当前模块所有依赖的pubic依赖,并存储到publicDeps数组中
+
     if (lithe.config.publicdeps) {
-      if (lithe.config.publicdeps.indexOf(dep) !== -1) {
-        savePublicDeps(dep);
+      var flag = isPublicDeps(dep);
+      if (flag.isPublicDeps) {
+        savePublicDeps(flag.dep);
         return;
       }
     }
@@ -33,9 +79,9 @@ var getPureDependencies = function(mod) {
     circularStack.pop();
     return ! isCircular;
   });
+
   // 改动,返回非public依赖
 
-  // console.log("getPureDependencies...",deps);
   var businessDeps = createUrls(deps);
   return businessDeps;
 };
@@ -45,7 +91,6 @@ var getPureDependencies = function(mod) {
 var savePublicDeps = function(dep) {
   publicDeps.push(dep);
   publicDeps = unique(publicDeps);
-  // console.log("getPublicDeps...",dep);
 };
 
 var isCircularWaiting = function(mod) {
@@ -165,15 +210,13 @@ var loadPublicDeps = function(cb) {
   if (lithe.publicpath && publicDeps.length) {
     var pDeps = map(publicDeps, function (deps) {
       if (deps.lastIndexOf(".js") < 0){
-        return deps + ".js";
+        return lithe.config.publicdeps[deps] + ".js";
       }else {
-        return deps;
+        return lithe.config.publicdeps[deps];
       }
     });
     var pm = pDeps.join(",");
-    console.log("pm.....",pm);
-    //var ngixPublic = lithe.publicpath + "??" + pm;
-    var ngixPublic = lithe.publicpath + pDeps[0];
+    var ngixPublic = lithe.publicpath + "??" + pm;
     forEach(publicDeps,function(mod){
       lithe.get(createUrls(mod)[0]);
     });
