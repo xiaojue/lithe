@@ -113,7 +113,14 @@ var replaceId = function(id) {
 };
 
 var resolve = function(id, path) {
-  path = dirname(path || lithe.basepath);
+  // 改动,处理public依赖的路径
+
+  if (lithe.publicpath && lithe.config.publicdeps.indexOf(id) !== -1) {
+    path = lithe.publicpath;
+  }else {
+    path = dirname(path || lithe.basepath);
+  }
+
   if (isAbsolute(id)){
     return id;
   }

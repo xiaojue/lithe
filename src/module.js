@@ -16,6 +16,14 @@ isInitConfig;
 var getPureDependencies = function(mod) {
   var id = mod.id;
   var deps = filter(mod.dependencies, function(dep) {
+    // 改动,过滤当前模块所有依赖的pubic依赖,并存储到publicDeps数组中
+    if (lithe.config.publicdeps) {
+      if (lithe.config.publicdeps.indexOf(dep) !== -1) {
+        savePublicDeps(dep);
+        return;
+      }
+    }
+
     circularStack.push(id);
     var isCircular = isCircularWaiting(lithe.cache[resolve(dep)]);
     if (isCircular) {
@@ -25,7 +33,19 @@ var getPureDependencies = function(mod) {
     circularStack.pop();
     return ! isCircular;
   });
-  return createUrls(deps);
+  // 改动,返回非public依赖
+
+  // console.log("getPureDependencies...",deps);
+  var businessDeps = createUrls(deps);
+  return businessDeps;
+};
+
+// 改动,存储public依赖
+
+var savePublicDeps = function(dep) {
+  publicDeps.push(dep);
+  publicDeps = unique(publicDeps);
+  // console.log("getPublicDeps...",dep);
 };
 
 var isCircularWaiting = function(mod) {
@@ -123,16 +143,45 @@ var saveAnonymouse = function() {
 var realUse = function(urls, cb) {
   fetchMods(urls, function() {
     urls = createUrls(urls);
-    var args = map(urls, function(url) {
-      return url ? lithe.get(url)._compile() : null;
+    // 改动,加载public依赖
+
+    loadPublicDeps(function(){
+      var args = map(urls, function(url) {
+        return url ? lithe.get(url)._compile() : null;
+      });
+
+      if (isFunction(cb)) {
+        cb.apply(null, args);
+      }
+
+      LEVENTS.trigger('end');
     });
-    if (isFunction(cb)) {
-      cb.apply(null, args);
-    }
-    LEVENTS.trigger('end');
   });
 };
 
+// 改动,加载public依赖jsFile
+
+var loadPublicDeps = function(cb) {
+  if (lithe.publicpath && publicDeps.length) {
+    var pDeps = map(publicDeps, function (deps) {
+      if (deps.lastIndexOf(".js") < 0){
+        return deps + ".js";
+      }else {
+        return deps;
+      }
+    });
+    var pm = pDeps.join(",");
+    console.log("pm.....",pm);
+    //var ngixPublic = lithe.publicpath + "??" + pm;
+    var ngixPublic = lithe.publicpath + pDeps[0];
+    forEach(publicDeps,function(mod){
+      lithe.get(createUrls(mod)[0]);
+    });
+    getscript(ngixPublic, cb);
+  }else{
+    cb();
+  }
+};
 
 var setConfig = function(cg) {
   config = cg;
@@ -152,6 +201,10 @@ var setConfig = function(cg) {
   isInitConfig = true;
   if (config.basepath){
     lithe.basepath = config.basepath;
+  }
+  // 改动,publicpath
+  if (config.publicpath) {
+    lithe.publicpath = config.publicpath;
   }
   lithe.config = config;
   CONFIGSTMAP = config.timestamp;

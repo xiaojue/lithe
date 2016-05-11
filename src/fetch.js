@@ -13,7 +13,8 @@ mainjs = attr(currentJs, 'data-main'),
 
 fetching = {},
 callbacks = {},
-fetched = {};
+fetched = {},
+publicDeps = []; // 改动,增加public依赖数组;
 
 BASEPATH = (BASEPATH === currentPath) ? dirname(currentPath) : resolve(BASEPATH, dirname(currentPath));
 
