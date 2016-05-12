@@ -115,7 +115,7 @@ var replaceId = function(id) {
 var resolve = function(id, path) {
   // 改动,处理public依赖的路径
 
-  if (lithe.publicpath && lithe.config.publicdeps.indexOf(id) !== -1) {
+  if (lithe.publicpath && isPublicDeps(id).isPublicDeps) {
     path = lithe.publicpath;
   }else {
     path = dirname(path || lithe.basepath);

@@ -9,7 +9,7 @@
 
 		// 改动,根据实际配置
 
-		publicpath = location.href.slice(0, location.href.lastIndexOf('/'));
+		publicpath = "http://localhost:8081";
 	}
 	var mod = {
 		basepath: debug ? basepath + '/src/': basepath + '/assest/',
@@ -20,9 +20,9 @@
 		// 改动,根据实际src/dist 路径配置
 
 		publicpath : debug ? publicpath + "/public/src/" : publicpath + "/public/src/",
-		publicdeps : [
-			"vendors/zepto.js"
-		]
+		publicdeps : {
+				"vendors/zepto.js" : "vendors/v1/zepto.js"
+		}
 	};
 	if (global.define && isBrowser) {
 		define('config', function() {
