@@ -14,8 +14,8 @@ isInitConfig;
 
 // 改动
 
-var _verifyDeps = function (deps, dep) {
-  if (deps.indexOf(dep) !== -1) {
+var _verifyDeps = function (deps, dep, ext) {
+  if (deps.indexOf(dep + ext) !== -1) {
     return {
       isPublicDeps : true,
       dep : dep
@@ -34,16 +34,25 @@ var isPublicDeps = function(dep) {
   if (lithe.config.publicdeps) {
     var deps = Object.keys(lithe.config.publicdeps),
         isDeps;
+
     dep = lithe.config.alias && lithe.config.alias[dep] ? lithe.config.alias[dep] : dep;
+
+    var pDeps = map(deps, function (d) {
+      if (d.lastIndexOf(jsExt) < 0){
+        return d + jsExt;
+      }else {
+        return d;
+      }
+    });
 
     // 如果结尾有js
 
     if ((/\.(?:js)$/).test(dep)) {
-      isDeps = _verifyDeps(deps, dep);
+      isDeps = _verifyDeps(pDeps, dep, "");
     }
 
     if (!(/\.(?:js)$/).test(dep)) {
-      isDeps = _verifyDeps(deps, dep + ".js");
+      isDeps = _verifyDeps(pDeps, dep, jsExt);
     }
 
     return isDeps;
@@ -208,19 +217,46 @@ var realUse = function(urls, cb) {
 
 var loadPublicDeps = function(cb) {
   if (lithe.publicpath && publicDeps.length) {
-    var pDeps = map(publicDeps, function (deps) {
-      if (deps.lastIndexOf(".js") < 0){
-        return lithe.config.publicdeps[deps] + ".js";
+    var pDeps = [],
+        fDeps = [];
+
+    // 汇总public依赖的依赖包
+
+    forEach(publicDeps, function (deps) {
+      values(lithe.config.publicdeps[deps]).forEach(function(rdeps) {
+        if (keys(lithe.config.publicdeps).indexOf(rdeps) !== -1) {
+          publicDeps.push(rdeps);
+        }
+      });
+    });
+
+    // 如果依赖没有js后缀,就加上js后缀然后汇总
+    // 汇总结果有js后缀的和没有js后缀的,用户在config配置的时候有可能有js后缀,也有可能
+    // 不写js后缀
+
+    forEach(unique(publicDeps), function(deps){
+      if (deps.lastIndexOf(jsExt) < 0){
+        pDeps.push(deps);
+        pDeps.push(deps + jsExt);
       }else {
-        return lithe.config.publicdeps[deps];
+        pDeps.push(deps);
       }
     });
-    var pm = pDeps.join(",");
-    var ngixPublic = lithe.publicpath + "??" + pm;
+
+    // 获取public依赖的真实路径
+
+    forEach(pDeps, function(deps){
+      if (lithe.config.publicdeps[deps]) {
+        fDeps.push(keys(lithe.config.publicdeps[deps])[0]);
+      }
+    });
+
+    var pm = unique(fDeps).join(",");
+    var nginxPublic = lithe.publicpath + "??" + pm;
     forEach(publicDeps,function(mod){
       lithe.get(createUrls(mod)[0]);
     });
-    getscript(ngixPublic, cb);
+    getscript(nginxPublic, cb);
   }else{
     cb();
   }

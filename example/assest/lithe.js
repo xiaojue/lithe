@@ -60,6 +60,22 @@
 			return ret;
 		};
 
+		var values = function(obj) {
+			var values = [];
+			for(var pro in obj){
+				if (obj.hasOwnProperty(pro)){
+					if (isArray(obj[pro])) {
+						forEach(obj[pro], function(current){
+							values.push(current);
+						});
+					}else {
+						values.push(obj[pro]);
+					}
+				}
+			}
+			return values;
+		};
+
 		var indexOf = Arr.indexOf ? function(arr, selector) {
 			return arr.indexOf(selector);
 		}: function(arr, selector) {
@@ -231,7 +247,7 @@
 				url = url.slice(0, - 1);
 			}
 			else if (url.indexOf('?') === - 1 && ! (/\.(?:js|css)$/).test(url)) {
-				url += '.js';
+				url += jsExt;
 			}
 			if (url.indexOf(':80/') > 0) {
 				url = url.replace(':80/', '/');
@@ -323,7 +339,8 @@
 				fetching = {},
 				callbacks = {},
 				fetched = {},
-				publicDeps = []; // 改动,增加public依赖数组;
+				publicDeps = [], // 改动,增加public依赖数组;
+				jsExt = ".js"; // 改动,js后缀
 
 		BASEPATH = (BASEPATH === currentPath) ? dirname(currentPath) : resolve(BASEPATH, dirname(currentPath));
 
@@ -433,18 +450,15 @@
 				directorys = [],
 				isInitConfig;
 
-		var _verifyDeps = function (deps, dep) {
-			if (deps.indexOf(dep) !== -1) {
+		// 改动
+
+		var _verifyDeps = function (deps, dep, ext) {
+			if (deps.indexOf(dep + ext) !== -1) {
 				return {
 					isPublicDeps : true,
 					dep : dep
 				};
-			}/*else if (lithe.config.alias && lithe.config.alias[dep]){
-			 return {
-			 isPublicDeps : true,
-			 dep : alias[dep]
-			 };
-			 } */else {
+			}else {
 				return {
 					isPublicDeps : false,
 					dep : null
@@ -452,20 +466,31 @@
 			}
 		};
 
+		// 改动
+
 		var isPublicDeps = function(dep) {
 			if (lithe.config.publicdeps) {
 				var deps = Object.keys(lithe.config.publicdeps),
 						isDeps;
+
 				dep = lithe.config.alias && lithe.config.alias[dep] ? lithe.config.alias[dep] : dep;
+
+				var pDeps = map(deps, function (d) {
+					if (d.lastIndexOf(jsExt) < 0){
+						return d + jsExt;
+					}else {
+						return d;
+					}
+				});
 
 				// 如果结尾有js
 
 				if ((/\.(?:js)$/).test(dep)) {
-					isDeps = _verifyDeps(deps, dep);
+					isDeps = _verifyDeps(pDeps, dep, "");
 				}
 
 				if (!(/\.(?:js)$/).test(dep)) {
-					isDeps = _verifyDeps(deps, dep + ".js");
+					isDeps = _verifyDeps(pDeps, dep, jsExt);
 				}
 
 				return isDeps;
@@ -481,8 +506,9 @@
 		var getPureDependencies = function(mod) {
 			var id = mod.id;
 			var deps = filter(mod.dependencies, function(dep) {
-				// console.log("dependencies...",dep);
+
 				// 改动,过滤当前模块所有依赖的pubic依赖,并存储到publicDeps数组中
+
 				if (lithe.config.publicdeps) {
 					var flag = isPublicDeps(dep);
 					if (flag.isPublicDeps) {
@@ -502,7 +528,6 @@
 			});
 			// 改动,返回非public依赖
 
-			console.log("getPureDependencies...",deps);
 			var businessDeps = createUrls(deps);
 			return businessDeps;
 		};
@@ -512,7 +537,6 @@
 		var savePublicDeps = function(dep) {
 			publicDeps.push(dep);
 			publicDeps = unique(publicDeps);
-			console.log("getPublicDeps...",dep);
 		};
 
 		var isCircularWaiting = function(mod) {
@@ -610,6 +634,7 @@
 		var realUse = function(urls, cb) {
 			fetchMods(urls, function() {
 				urls = createUrls(urls);
+
 				// 改动,加载public依赖
 
 				loadPublicDeps(function(){
@@ -626,25 +651,50 @@
 			});
 		};
 
-		// 改动,加载public依赖jsFile
+		// 改动,加载public依赖jsFile,修改公共依赖
 
 		var loadPublicDeps = function(cb) {
 			if (lithe.publicpath && publicDeps.length) {
-				var pDeps = map(publicDeps, function (deps) {
-					if (deps.lastIndexOf(".js") < 0){
-						return lithe.config.publicdeps[deps] + ".js";
+				var pDeps = [],
+						fDeps = [];
+
+				// 汇总public依赖的依赖包
+
+				forEach(publicDeps, function (deps) {
+					values(lithe.config.publicdeps[deps]).forEach(function(rdeps) {
+						if (keys(lithe.config.publicdeps).indexOf(rdeps) !== -1) {
+							publicDeps.push(rdeps);
+						}
+					});
+				});
+
+				// 如果依赖没有js后缀,就加上js后缀然后汇总
+				// 汇总结果有js后缀的和没有js后缀的,用户在config配置的时候有可能有js后缀,也有可能
+				// 不写js后缀
+
+				forEach(unique(publicDeps), function(deps){
+					if (deps.lastIndexOf(jsExt) < 0){
+						pDeps.push(deps);
+						pDeps.push(deps + jsExt);
 					}else {
-						return lithe.config.publicdeps[deps];
+						pDeps.push(deps);
 					}
 				});
-				var pm = pDeps.join(",");
-				// console.log("pm.....",pm);
-				var ngixPublic = lithe.publicpath + "??" + pm;
-				// var ngixPublic = lithe.publicpath + pDeps[0];
+
+				// 获取public依赖的真实路径
+
+				forEach(pDeps, function(deps){
+					if (lithe.config.publicdeps[deps]) {
+						fDeps.push(keys(lithe.config.publicdeps[deps])[0]);
+					}
+				});
+
+				var pm = unique(fDeps).join(",");
+				var nginxPublic = lithe.publicpath + "??" + pm;
 				forEach(publicDeps,function(mod){
 					lithe.get(createUrls(mod)[0]);
 				});
-				getscript(ngixPublic, cb);
+				getscript(nginxPublic, cb);
 			}else{
 				cb();
 			}

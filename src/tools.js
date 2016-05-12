@@ -46,6 +46,22 @@ var keys = Obj.keys ? Obj.keys: function(o) {
   return ret;
 };
 
+var values = function(obj) {
+  var values = [];
+  for(var pro in obj){
+    if (obj.hasOwnProperty(pro)){
+      if (isArray(obj[pro])) {
+        forEach(obj[pro], function(current){
+          values.push(current);
+        });
+      }else {
+        values.push(obj[pro]);
+      }
+    }
+  }
+  return values;
+};
+
 var indexOf = Arr.indexOf ? function(arr, selector) {
   return arr.indexOf(selector);
 }: function(arr, selector) {

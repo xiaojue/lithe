@@ -14,7 +14,8 @@ mainjs = attr(currentJs, 'data-main'),
 fetching = {},
 callbacks = {},
 fetched = {},
-publicDeps = []; // 改动,增加public依赖数组;
+publicDeps = [], // 改动,增加public依赖数组;
+jsExt = ".js"; // 改动,js后缀
 
 BASEPATH = (BASEPATH === currentPath) ? dirname(currentPath) : resolve(BASEPATH, dirname(currentPath));
 
