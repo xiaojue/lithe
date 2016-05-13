@@ -46,6 +46,8 @@ var keys = Obj.keys ? Obj.keys: function(o) {
   return ret;
 };
 
+// 改动
+
 var values = function(obj) {
   var values = [];
   for(var pro in obj){
