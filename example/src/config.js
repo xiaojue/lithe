@@ -21,7 +21,15 @@
 
 		publicpath : debug ? publicpath + "/public/src/" : publicpath + "/public/src/",
 		publicdeps : {
-				"vendors/zepto.js" : "vendors/v1/zepto.js"
+				"vendors/zepto" : {
+					"vendors/v1/zepto.js" : []
+				},
+				"vendors/zepto-fx.js" : {
+					"vendors/zepto-fx.js" : []
+				},
+			  "vendors/lazyload.js" : {
+					"vendors/lazyload.js" : ["vendors/zepto", "vendors/zepto-fx.js"]
+				}
 		}
 	};
 	if (global.define && isBrowser) {

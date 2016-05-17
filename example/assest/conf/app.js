@@ -1,2 +1,1768 @@
-/* lithe-example |  | vserion 0.0.1*/
-define("mods/markdown",function(require,e,t){(function(e){function r(){return"Markdown.mk_block( "+uneval(""+this)+", "+uneval(this.trailing)+", "+uneval(this.lineNumber)+" )"}function n(){return function(){}}function i(e){for(var t=0,r=-1;-1!==(r=e.indexOf("\n",r+1));)t++;return t}function l(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}function a(e){if("string"==typeof e)return l(e);var t=e.shift(),r={},n=[];for(!e.length||"object"!=typeof e[0]||e[0]instanceof Array||(r=e.shift());e.length;)n.push(a(e.shift()));var i="";for(var s in r)i+=" "+s+'="'+l(r[s])+'"';return"img"===t||"br"===t||"hr"===t?"<"+t+i+"/>":"<"+t+i+">"+n.join("")+"</"+t+">"}function s(e,t,r){var n;r=r||{};var i=e.slice(0);"function"==typeof r.preprocessTreeNode&&(i=r.preprocessTreeNode(i,t));var l=v(i);if(l){i[1]={};for(n in l)i[1][n]=l[n];l=i[1]}if("string"==typeof i)return i;switch(i[0]){case"header":i[0]="h"+i[1].level,delete i[1].level;break;case"bulletlist":i[0]="ul";break;case"numberlist":i[0]="ol";break;case"listitem":i[0]="li";break;case"para":i[0]="p";break;case"markdown":i[0]="html",l&&delete l.references;break;case"code_block":i[0]="pre",n=l?2:1;var a=["code"];a.push.apply(a,i.splice(n,i.length-n)),i[n]=a;break;case"inlinecode":i[0]="code";break;case"img":i[1].src=i[1].href,delete i[1].href;break;case"linebreak":i[0]="br";break;case"link":i[0]="a";break;case"link_ref":i[0]="a";var o=t[l.ref];if(!o)return l.original;delete l.ref,l.href=o.href,o.title&&(l.title=o.title),delete l.original;break;case"img_ref":i[0]="img";var o=t[l.ref];if(!o)return l.original;delete l.ref,l.src=o.href,o.title&&(l.title=o.title),delete l.original}if(n=1,l){for(var c in i[1]){n=2;break}1===n&&i.splice(n,1)}for(;i.length>n;++n)i[n]=s(i[n],t,r);return i}function o(e){for(var t=v(e)?2:1;e.length>t;)"string"==typeof e[t]?e.length>t+1&&"string"==typeof e[t+1]?e[t]+=e.splice(t+1,1)[0]:++t:(o(e[t]),++t)}function c(e,t){function r(e){this.len_after=e,this.name="close_"+t}var n=e+"_state",i="strong"===e?"em_state":"strong_state";return function(l){if(this[n][0]===t)return this[n].shift(),[l.length,new r(l.length-t.length)];var a=this[i].slice(),s=this[n].slice();this[n].unshift(t);var o=this.processInline(l.substr(t.length)),c=o[o.length-1];if(this[n].shift(),c instanceof r){o.pop();var h=l.length-c.len_after;return[h,[e].concat(o)]}return this[i]=a,this[n]=s,[t.length,t]}}function h(e){for(var t=e.split(""),r=[""],n=!1;t.length;){var i=t.shift();switch(i){case" ":n?r[r.length-1]+=i:r.push("");break;case"'":case'"':n=!n;break;case"\\":i=t.shift();default:r[r.length-1]+=i}}return r}var u={};u.mk_block=function(e,t,i){1===arguments.length&&(t="\n\n");var l=new String(e);return l.trailing=t,l.inspect=n,l.toSource=r,void 0!==i&&(l.lineNumber=i),l};var f=u.isArray=Array.isArray||function(e){return"[object Array]"===Object.prototype.toString.call(e)};u.forEach=Array.prototype.forEach?function p(e,t,r){return e.forEach(t,r)}:function p(e,t,r){for(var n=0;e.length>n;n++)t.call(r||e,e[n],n,e)},u.isEmpty=function g(e){for(var t in e)if(hasOwnProperty.call(e,t))return!1;return!0},u.extract_attr=function v(e){return f(e)&&e.length>1&&"object"==typeof e[1]&&!f(e[1])?e[1]:void 0};var d=function(e){switch(typeof e){case"undefined":this.dialect=d.dialects.Gruber;break;case"object":this.dialect=e;break;default:if(!(e in d.dialects))throw Error("Unknown Markdown dialect '"+(e+"")+"'");this.dialect=d.dialects[e]}this.em_state=[],this.strong_state=[],this.debug_indent=""};d.dialects={};var _=d.mk_block=u.mk_block,f=u.isArray;d.parse=function(e,t){var r=new d(t);return r.toTree(e)},d.prototype.split_blocks=function(e){e=e.replace(/(\r\n|\n|\r)/g,"\n");var t,r=/([\s\S]+?)($|\n#|\n(?:\s*\n|$)+)/g,n=[],l=1;for(null!==(t=/^(\s*\n)/.exec(e))&&(l+=i(t[0]),r.lastIndex=t[0].length);null!==(t=r.exec(e));)"\n#"===t[2]&&(t[2]="\n",r.lastIndex--),n.push(_(t[1],t[2],l)),l+=i(t[0]);return n},d.prototype.processBlock=function(e,t){var r=this.dialect.block,n=r.__order__;if("__call__"in r)return r.__call__.call(this,e,t);for(var i=0;n.length>i;i++){var l=r[n[i]].call(this,e,t);if(l)return(!f(l)||l.length>0&&!f(l[0]))&&this.debug(n[i],"didn't return a proper array"),l}return[]},d.prototype.processInline=function(e){return this.dialect.inline.__call__.call(this,e+"")},d.prototype.toTree=function(e,t){var r=e instanceof Array?e:this.split_blocks(e),n=this.tree;try{for(this.tree=t||this.tree||["markdown"];r.length;){var i=this.processBlock(r.shift(),r);i.length&&this.tree.push.apply(this.tree,i)}return this.tree}finally{t&&(this.tree=n)}},d.prototype.debug=function(){var e=Array.prototype.slice.call(arguments);e.unshift(this.debug_indent),"undefined"!=typeof print&&print.apply(print,e),"undefined"!=typeof console&&console.log!==void 0&&console.log.apply(null,e)},d.prototype.loop_re_over_block=function(e,t,r){for(var n,i=t.valueOf();i.length&&null!==(n=e.exec(i));)i=i.substr(n[0].length),r.call(this,n);return i},d.buildBlockOrder=function(e){var t=[];for(var r in e)"__order__"!==r&&"__call__"!==r&&t.push(r);e.__order__=t},d.buildInlinePatterns=function(e){var t=[];for(var r in e)if(!r.match(/^__.*__$/)){var n=r.replace(/([\\.*+?|()\[\]{}])/g,"\\$1").replace(/\n/,"\\n");t.push(1===r.length?n:"(?:"+n+")")}t=t.join("|"),e.__patterns__=t;var i=e.__call__;e.__call__=function(e,r){return void 0!==r?i.call(this,e,r):i.call(this,e,t)}};var v=u.extract_attr;d.renderJsonML=function(e,t){t=t||{},t.root=t.root||!1;var r=[];if(t.root)r.push(a(e));else for(e.shift(),!e.length||"object"!=typeof e[0]||e[0]instanceof Array||e.shift();e.length;)r.push(a(e.shift()));return r.join("\n\n")},d.toHTMLTree=function(e,t,r){"string"==typeof e&&(e=this.parse(e,t));var n=v(e),i={};n&&n.references&&(i=n.references);var l=s(e,i,r);return o(l),l},d.toHTML=function(e,t,r){var n=this.toHTMLTree(e,t,r);return this.renderJsonML(n)};var b={};b.inline_until_char=function(e,t){for(var r=0,n=[];;){if(e.charAt(r)===t)return r++,[r,n];if(r>=e.length)return null;var i=this.dialect.inline.__oneElement__.call(this,e.substr(r));r+=i[0],n.push.apply(n,i.slice(1))}},b.subclassDialect=function(e){function t(){}function r(){}return t.prototype=e.block,r.prototype=e.inline,{block:new t,inline:new r}};var p=u.forEach,v=u.extract_attr,_=u.mk_block,g=u.isEmpty,m=b.inline_until_char,k={block:{atxHeader:function(e,t){var r=e.match(/^(#{1,6})\s*(.*?)\s*#*\s*(?:\n|$)/);if(!r)return void 0;var n=["header",{level:r[1].length}];return Array.prototype.push.apply(n,this.processInline(r[2])),r[0].length<e.length&&t.unshift(_(e.substr(r[0].length),e.trailing,e.lineNumber+2)),[n]},setextHeader:function(e,t){var r=e.match(/^(.*)\n([-=])\2\2+(?:\n|$)/);if(!r)return void 0;var n="="===r[2]?1:2,i=["header",{level:n},r[1]];return r[0].length<e.length&&t.unshift(_(e.substr(r[0].length),e.trailing,e.lineNumber+2)),[i]},code:function(e,t){var r=[],n=/^(?: {0,3}\t| {4})(.*)\n?/;if(!e.match(n))return void 0;e:for(;;){var i=this.loop_re_over_block(n,e.valueOf(),function(e){r.push(e[1])});if(i.length){t.unshift(_(i,e.trailing));break e}if(!t.length)break e;if(!t[0].match(n))break e;r.push(e.trailing.replace(/[^\n]/g,"").substring(2)),e=t.shift()}return[["code_block",r.join("\n")]]},horizRule:function(e,t){var r=e.match(/^(?:([\s\S]*?)\n)?[ \t]*([-_*])(?:[ \t]*\2){2,}[ \t]*(?:\n([\s\S]*))?$/);if(!r)return void 0;var n=[["hr"]];if(r[1]){var i=_(r[1],"",e.lineNumber);n.unshift.apply(n,this.toTree(i,[]))}return r[3]&&t.unshift(_(r[3],e.trailing,e.lineNumber+1)),n},lists:function(){function e(e){return RegExp("(?:^("+o+"{0,"+e+"} {0,3})("+l+")\\s+)|"+"(^"+o+"{0,"+(e-1)+"}[ ]{0,4})")}function t(e){return e.replace(/ {0,3}\t/g,"    ")}function r(e,t,r,n){if(t)return e.push(["para"].concat(r)),void 0;var i=e[e.length-1]instanceof Array&&"para"===e[e.length-1][0]?e[e.length-1]:e;n&&e.length>1&&r.unshift(n);for(var l=0;r.length>l;l++){var a=r[l],s="string"==typeof a;s&&i.length>1&&"string"==typeof i[i.length-1]?i[i.length-1]+=a:i.push(a)}}function n(e,t){for(var r=RegExp("^("+o+"{"+e+"}.*?\\n?)*$"),n=RegExp("^"+o+"{"+e+"}","gm"),i=[];t.length>0&&r.exec(t[0]);){var l=t.shift(),a=l.replace(n,"");i.push(_(a,l.trailing,l.lineNumber))}return i}function i(e,t,r){var n=e.list,i=n[n.length-1];if(!(i[1]instanceof Array&&"para"===i[1][0]))if(t+1===r.length)i.push(["para"].concat(i.splice(1,i.length-1)));else{var l=i.pop();i.push(["para"].concat(i.splice(1,i.length-1)),l)}}var l="[*+-]|\\d+\\.",a=/[*+-]/,s=RegExp("^( {0,3})("+l+")[ 	]+"),o="(?: {0,3}\\t| {4})";return function(l,o){function c(e){var t=a.exec(e[2])?["bulletlist"]:["numberlist"];return g.push({list:t,indent:e[1]}),t}var h=l.match(s);if(!h)return void 0;for(var u,f,g=[],v=c(h),d=!1,_=[g[0].list];;){for(var b=l.split(/(?=\n)/),m="",k="",y=0;b.length>y;y++){k="";var w=b[y].replace(/^\n/,function(e){return k=e,""}),$=e(g.length);if(h=w.match($),void 0!==h[1]){m.length&&(r(u,d,this.processInline(m),k),d=!1,m=""),h[1]=t(h[1]);var x=Math.floor(h[1].length/4)+1;if(x>g.length)v=c(h),u.push(v),u=v[1]=["listitem"];else{var M=!1;for(f=0;g.length>f;f++)if(g[f].indent===h[1]){v=g[f].list,g.splice(f+1,g.length-(f+1)),M=!0;break}M||(x++,g.length>=x?(g.splice(x,g.length-x),v=g[x-1].list):(v=c(h),u.push(v))),u=["listitem"],v.push(u)}k=""}w.length>h[0].length&&(m+=k+w.substr(h[0].length))}m.length&&(r(u,d,this.processInline(m),k),d=!1,m="");var T=n(g.length,o);T.length>0&&(p(g,i,this),u.push.apply(u,this.toTree(T,[])));var E=o[0]&&o[0].valueOf()||"";if(!E.match(s)&&!E.match(/^ /))break;l=o.shift();var L=this.dialect.block.horizRule(l,o);if(L){_.push.apply(_,L);break}p(g,i,this),d=!0}return _}}(),blockquote:function(e,t){if(!e.match(/^>/m))return void 0;var r=[];if(">"!==e[0]){for(var n=e.split(/\n/),i=[],l=e.lineNumber;n.length&&">"!==n[0][0];)i.push(n.shift()),l++;var a=_(i.join("\n"),"\n",e.lineNumber);r.push.apply(r,this.processBlock(a,[])),e=_(n.join("\n"),e.trailing,l)}for(;t.length&&">"===t[0][0];){var s=t.shift();e=_(e+e.trailing+s,s.trailing,e.lineNumber)}var o=e.replace(/^> ?/gm,""),c=(this.tree,this.toTree(o,["blockquote"])),h=v(c);return h&&h.references&&(delete h.references,g(h)&&c.splice(1,1)),r.push(c),r},referenceDefn:function(e,t){var r=/^\s*\[(.*?)\]:\s*(\S+)(?:\s+(?:(['"])(.*?)\3|\((.*?)\)))?\n?/;if(!e.match(r))return void 0;v(this.tree)||this.tree.splice(1,0,{});var n=v(this.tree);void 0===n.references&&(n.references={});var i=this.loop_re_over_block(r,e,function(e){e[2]&&"<"===e[2][0]&&">"===e[2][e[2].length-1]&&(e[2]=e[2].substring(1,e[2].length-1));var t=n.references[e[1].toLowerCase()]={href:e[2]};void 0!==e[4]?t.title=e[4]:void 0!==e[5]&&(t.title=e[5])});return i.length&&t.unshift(_(i,e.trailing)),[]},para:function(e){return[["para"].concat(this.processInline(e))]}},inline:{__oneElement__:function(e,t,r){var n,i;t=t||this.dialect.inline.__patterns__;var l=RegExp("([\\s\\S]*?)("+(t.source||t)+")");if(n=l.exec(e),!n)return[e.length,e];if(n[1])return[n[1].length,n[1]];var i;return n[2]in this.dialect.inline&&(i=this.dialect.inline[n[2]].call(this,e.substr(n.index),n,r||[])),i=i||[n[2].length,n[2]]},__call__:function(e,t){function r(e){"string"==typeof e&&"string"==typeof i[i.length-1]?i[i.length-1]+=e:i.push(e)}for(var n,i=[];e.length>0;)n=this.dialect.inline.__oneElement__.call(this,e,t,i),e=e.substr(n.shift()),p(n,r);return i},"]":function(){},"}":function(){},__escape__:/^\\[\\`\*_{}\[\]()#\+.!\-]/,"\\":function(e){return this.dialect.inline.__escape__.exec(e)?[2,e.charAt(1)]:[1,"\\"]},"![":function(e){var t=e.match(/^!\[(.*?)\][ \t]*\([ \t]*([^")]*?)(?:[ \t]+(["'])(.*?)\3)?[ \t]*\)/);if(t){t[2]&&"<"===t[2][0]&&">"===t[2][t[2].length-1]&&(t[2]=t[2].substring(1,t[2].length-1)),t[2]=this.dialect.inline.__call__.call(this,t[2],/\\/)[0];var r={alt:t[1],href:t[2]||""};return void 0!==t[4]&&(r.title=t[4]),[t[0].length,["img",r]]}return t=e.match(/^!\[(.*?)\][ \t]*\[(.*?)\]/),t?[t[0].length,["img_ref",{alt:t[1],ref:t[2].toLowerCase(),original:t[0]}]]:[2,"!["]},"[":function(e){var t=e+"",r=m.call(this,e.substr(1),"]");if(!r)return[1,"["];var n,i,l=1+r[0],a=r[1];e=e.substr(l);var s=e.match(/^\s*\([ \t]*([^"']*)(?:[ \t]+(["'])(.*?)\2)?[ \t]*\)/);if(s){var o=s[1];if(l+=s[0].length,o&&"<"===o[0]&&">"===o[o.length-1]&&(o=o.substring(1,o.length-1)),!s[3])for(var c=1,h=0;o.length>h;h++)switch(o[h]){case"(":c++;break;case")":0===--c&&(l-=o.length-h,o=o.substring(0,h))}return o=this.dialect.inline.__call__.call(this,o,/\\/)[0],i={href:o||""},void 0!==s[3]&&(i.title=s[3]),n=["link",i].concat(a),[l,n]}return s=e.match(/^\s*\[(.*?)\]/),s?(l+=s[0].length,i={ref:(s[1]||a+"").toLowerCase(),original:t.substr(0,l)},n=["link_ref",i].concat(a),[l,n]):1===a.length&&"string"==typeof a[0]?(i={ref:a[0].toLowerCase(),original:t.substr(0,l)},n=["link_ref",i,a[0]],[l,n]):[1,"["]},"<":function(e){var t;return null!==(t=e.match(/^<(?:((https?|ftp|mailto):[^>]+)|(.*?@.*?\.[a-zA-Z]+))>/))?t[3]?[t[0].length,["link",{href:"mailto:"+t[3]},t[3]]]:"mailto"===t[2]?[t[0].length,["link",{href:t[1]},t[1].substr("mailto:".length)]]:[t[0].length,["link",{href:t[1]},t[1]]]:[1,"<"]},"`":function(e){var t=e.match(/(`+)(([\s\S]*?)\1)/);return t&&t[2]?[t[1].length+t[2].length,["inlinecode",t[3]]]:[1,"`"]},"  \n":function(){return[3,["linebreak"]]}}};k.inline["**"]=c("strong","**"),k.inline.__=c("strong","__"),k.inline["*"]=c("em","*"),k.inline._=c("em","_"),d.dialects.Gruber=k,d.buildBlockOrder(d.dialects.Gruber.block),d.buildInlinePatterns(d.dialects.Gruber.inline);var y=b.subclassDialect(k),v=u.extract_attr,p=u.forEach;y.processMetaHash=function(e){for(var t=h(e),r={},n=0;t.length>n;++n)if(/^#/.test(t[n]))r.id=t[n].substring(1);else if(/^\./.test(t[n]))r["class"]=r["class"]?r["class"]+t[n].replace(/./," "):t[n].substring(1);else if(/\=/.test(t[n])){var i=t[n].split(/\=/);r[i[0]]=i[1]}return r},y.block.document_meta=function(e){if(e.lineNumber>1)return void 0;if(!e.match(/^(?:\w+:.*\n)*\w+:.*$/))return void 0;v(this.tree)||this.tree.splice(1,0,{});var t=e.split(/\n/);for(var r in t){var n=t[r].match(/(\w+):\s*(.*)$/),i=n[1].toLowerCase(),l=n[2];this.tree[1][i]=l}return[]},y.block.block_meta=function(e){var t=e.match(/(^|\n) {0,3}\{:\s*((?:\\\}|[^\}])*)\s*\}$/);if(!t)return void 0;var r,n=this.dialect.processMetaHash(t[2]);if(""===t[1]){var i=this.tree[this.tree.length-1];if(r=v(i),"string"==typeof i)return void 0;r||(r={},i.splice(1,0,r));for(var l in n)r[l]=n[l];return[]}var a=e.replace(/\n.*$/,""),s=this.processBlock(a,[]);r=v(s[0]),r||(r={},s[0].splice(1,0,r));for(var l in n)r[l]=n[l];return s},y.block.definition_list=function(e,t){var r,n,i=/^((?:[^\s:].*\n)+):\s+([\s\S]+)$/,l=["dl"];if(!(n=e.match(i)))return void 0;for(var a=[e];t.length&&i.exec(t[0]);)a.push(t.shift());for(var s=0;a.length>s;++s){var n=a[s].match(i),o=n[1].replace(/\n$/,"").split(/\n/),c=n[2].split(/\n:\s+/);for(r=0;o.length>r;++r)l.push(["dt",o[r]]);for(r=0;c.length>r;++r)l.push(["dd"].concat(this.processInline(c[r].replace(/(\n)\s+/,"$1"))))}return[l]},y.block.table=function(e){var t,r,n=function(e,t){t=t||"\\s",t.match(/^[\\|\[\]{}?*.+^$]$/)&&(t="\\"+t);for(var r,n=[],i=RegExp("^((?:\\\\.|[^\\\\"+t+"])*)"+t+"(.*)");r=e.match(i);)n.push(r[1]),e=r[2];return n.push(e),n},i=/^ {0,3}\|(.+)\n {0,3}\|\s*([\-:]+[\-| :]*)\n((?:\s*\|.*(?:\n|$))*)(?=\n|$)/,l=/^ {0,3}(\S(?:\\.|[^\\|])*\|.*)\n {0,3}([\-:]+\s*\|[\-| :]*)\n((?:(?:\\.|[^\\|])*\|.*(?:\n|$))*)(?=\n|$)/;if(r=e.match(i))r[3]=r[3].replace(/^\s*\|/gm,"");else if(!(r=e.match(l)))return void 0;var a=["table",["thead",["tr"]],["tbody"]];r[2]=r[2].replace(/\|\s*$/,"").split("|");var s=[];for(p(r[2],function(e){e.match(/^\s*-+:\s*$/)?s.push({align:"right"}):e.match(/^\s*:-+\s*$/)?s.push({align:"left"}):e.match(/^\s*:-+:\s*$/)?s.push({align:"center"}):s.push({})}),r[1]=n(r[1].replace(/\|\s*$/,""),"|"),t=0;r[1].length>t;t++)a[1][1].push(["th",s[t]||{}].concat(this.processInline(r[1][t].trim())));return p(r[3].replace(/\|\s*$/gm,"").split("\n"),function(e){var r=["tr"];for(e=n(e,"|"),t=0;e.length>t;t++)r.push(["td",s[t]||{}].concat(this.processInline(e[t].trim())));a[2].push(r)},this),[a]},y.inline["{:"]=function(e,t,r){if(!r.length)return[2,"{:"];var n=r[r.length-1];if("string"==typeof n)return[2,"{:"];var i=e.match(/^\{:\s*((?:\\\}|[^\}])*)\s*\}/);if(!i)return[2,"{:"];var l=this.dialect.processMetaHash(i[1]),a=v(n);a||(a={},n.splice(1,0,a));for(var s in l)a[s]=l[s];return[i[0].length,""]},d.dialects.Maruku=y,d.dialects.Maruku.inline.__escape__=/^\\[\\`\*_{}\[\]()#\+.!\-|:]/,d.buildBlockOrder(d.dialects.Maruku.block),d.buildInlinePatterns(d.dialects.Maruku.inline),e.Markdown=d,e.parse=d.parse,e.toHTML=d.toHTML,e.toHTMLTree=d.toHTMLTree,e.renderJsonML=d.renderJsonML,t.exports=e})(function(){return{}}())}),define("common/readme",function(require,e,t){var r="#lithe.js hello world!";r+="\r\n-----\r\n",r+="1.使用?debug参数切换上线与开发模式.",r+="\r\n-----\r\n",r+="2.删除data-debug选项，关闭head头中的节点",t.exports=r}),define("conf/app",function(require){var e=require("markdown"),t=require("common/readme"),$=require("vendors/zepto.js");$("#readme").html(e.toHTML(t))});
+// Released under MIT license
+// Copyright (c) 2009-2010 Dominic Baggott
+// Copyright (c) 2009-2010 Ash Berlin
+// Copyright (c) 2011 Christoph Dorn <christoph@christophdorn.com> (http://www.christophdorn.com)
+// Date: 2013-09-15T16:12Z
+define('mods/markdown',function(require,exports,module){
+
+(function(expose) {
+
+
+
+
+  var MarkdownHelpers = {};
+
+  // For Spidermonkey based engines
+  function mk_block_toSource() {
+    return "Markdown.mk_block( " +
+            uneval(this.toString()) +
+            ", " +
+            uneval(this.trailing) +
+            ", " +
+            uneval(this.lineNumber) +
+            " )";
+  }
+
+  // node
+  function mk_block_inspect() {
+    //var util = require("util");
+    return function(){};
+    /*
+    "Markdown.mk_block( " +
+            util.inspect(this.toString()) +
+            ", " +
+            util.inspect(this.trailing) +
+            ", " +
+            util.inspect(this.lineNumber) +
+            " )";
+    */
+  }
+
+  MarkdownHelpers.mk_block = function(block, trail, line) {
+    // Be helpful for default case in tests.
+    if ( arguments.length === 1 )
+      trail = "\n\n";
+
+    // We actually need a String object, not a string primitive
+    /* jshint -W053 */
+    var s = new String(block);
+    s.trailing = trail;
+    // To make it clear its not just a string
+    s.inspect = mk_block_inspect;
+    s.toSource = mk_block_toSource;
+
+    if ( line !== undefined )
+      s.lineNumber = line;
+
+    return s;
+  };
+
+
+  var isArray = MarkdownHelpers.isArray = Array.isArray || function(obj) {
+    return Object.prototype.toString.call(obj) === "[object Array]";
+  };
+
+  // Don't mess with Array.prototype. Its not friendly
+  if ( Array.prototype.forEach ) {
+    MarkdownHelpers.forEach = function forEach( arr, cb, thisp ) {
+      return arr.forEach( cb, thisp );
+    };
+  }
+  else {
+    MarkdownHelpers.forEach = function forEach(arr, cb, thisp) {
+      for (var i = 0; i < arr.length; i++)
+        cb.call(thisp || arr, arr[i], i, arr);
+    };
+  }
+
+  MarkdownHelpers.isEmpty = function isEmpty( obj ) {
+    for ( var key in obj ) {
+      if ( hasOwnProperty.call( obj, key ) )
+        return false;
+    }
+    return true;
+  };
+
+  MarkdownHelpers.extract_attr = function extract_attr( jsonml ) {
+    return isArray(jsonml)
+        && jsonml.length > 1
+        && typeof jsonml[ 1 ] === "object"
+        && !( isArray(jsonml[ 1 ]) )
+        ? jsonml[ 1 ]
+        : undefined;
+  };
+
+
+
+
+ /**
+   *  class Markdown
+   *
+   *  Markdown processing in Javascript done right. We have very particular views
+   *  on what constitutes 'right' which include:
+   *
+   *  - produces well-formed HTML (this means that em and strong nesting is
+   *    important)
+   *
+   *  - has an intermediate representation to allow processing of parsed data (We
+   *    in fact have two, both as [JsonML]: a markdown tree and an HTML tree).
+   *
+   *  - is easily extensible to add new dialects without having to rewrite the
+   *    entire parsing mechanics
+   *
+   *  - has a good test suite
+   *
+   *  This implementation fulfills all of these (except that the test suite could
+   *  do with expanding to automatically run all the fixtures from other Markdown
+   *  implementations.)
+   *
+   *  ##### Intermediate Representation
+   *
+   *  *TODO* Talk about this :) Its JsonML, but document the node names we use.
+   *
+   *  [JsonML]: http://jsonml.org/ "JSON Markup Language"
+   **/
+  var Markdown = function(dialect) {
+    switch (typeof dialect) {
+    case "undefined":
+      this.dialect = Markdown.dialects.Gruber;
+      break;
+    case "object":
+      this.dialect = dialect;
+      break;
+    default:
+      if ( dialect in Markdown.dialects )
+        this.dialect = Markdown.dialects[dialect];
+      else
+        throw new Error("Unknown Markdown dialect '" + String(dialect) + "'");
+      break;
+    }
+    this.em_state = [];
+    this.strong_state = [];
+    this.debug_indent = "";
+  };
+
+  /**
+   * Markdown.dialects
+   *
+   * Namespace of built-in dialects.
+   **/
+  Markdown.dialects = {};
+
+
+
+
+  // Imported functions
+  var mk_block = Markdown.mk_block = MarkdownHelpers.mk_block,
+      isArray = MarkdownHelpers.isArray;
+
+  /**
+   *  parse( markdown, [dialect] ) -> JsonML
+   *  - markdown (String): markdown string to parse
+   *  - dialect (String | Dialect): the dialect to use, defaults to gruber
+   *
+   *  Parse `markdown` and return a markdown document as a Markdown.JsonML tree.
+   **/
+  Markdown.parse = function( source, dialect ) {
+    // dialect will default if undefined
+    var md = new Markdown( dialect );
+    return md.toTree( source );
+  };
+
+  function count_lines( str ) {
+    var n = 0,
+        i = -1;
+    while ( ( i = str.indexOf("\n", i + 1) ) !== -1 )
+      n++;
+    return n;
+  }
+
+  // Internal - split source into rough blocks
+  Markdown.prototype.split_blocks = function splitBlocks( input ) {
+    input = input.replace(/(\r\n|\n|\r)/g, "\n");
+    // [\s\S] matches _anything_ (newline or space)
+    // [^] is equivalent but doesn't work in IEs.
+    var re = /([\s\S]+?)($|\n#|\n(?:\s*\n|$)+)/g,
+        blocks = [],
+        m;
+
+    var line_no = 1;
+
+    if ( ( m = /^(\s*\n)/.exec(input) ) !== null ) {
+      // skip (but count) leading blank lines
+      line_no += count_lines( m[0] );
+      re.lastIndex = m[0].length;
+    }
+
+    while ( ( m = re.exec(input) ) !== null ) {
+      if (m[2] === "\n#") {
+        m[2] = "\n";
+        re.lastIndex--;
+      }
+      blocks.push( mk_block( m[1], m[2], line_no ) );
+      line_no += count_lines( m[0] );
+    }
+
+    return blocks;
+  };
+
+  /**
+   *  Markdown#processBlock( block, next ) -> undefined | [ JsonML, ... ]
+   *  - block (String): the block to process
+   *  - next (Array): the following blocks
+   *
+   * Process `block` and return an array of JsonML nodes representing `block`.
+   *
+   * It does this by asking each block level function in the dialect to process
+   * the block until one can. Succesful handling is indicated by returning an
+   * array (with zero or more JsonML nodes), failure by a false value.
+   *
+   * Blocks handlers are responsible for calling [[Markdown#processInline]]
+   * themselves as appropriate.
+   *
+   * If the blocks were split incorrectly or adjacent blocks need collapsing you
+   * can adjust `next` in place using shift/splice etc.
+   *
+   * If any of this default behaviour is not right for the dialect, you can
+   * define a `__call__` method on the dialect that will get invoked to handle
+   * the block processing.
+   */
+  Markdown.prototype.processBlock = function processBlock( block, next ) {
+    var cbs = this.dialect.block,
+        ord = cbs.__order__;
+
+    if ( "__call__" in cbs )
+      return cbs.__call__.call(this, block, next);
+
+    for ( var i = 0; i < ord.length; i++ ) {
+      //D:this.debug( "Testing", ord[i] );
+      var res = cbs[ ord[i] ].call( this, block, next );
+      if ( res ) {
+        //D:this.debug("  matched");
+        if ( !isArray(res) || ( res.length > 0 && !( isArray(res[0]) ) ) )
+          this.debug(ord[i], "didn't return a proper array");
+        //D:this.debug( "" );
+        return res;
+      }
+    }
+
+    // Uhoh! no match! Should we throw an error?
+    return [];
+  };
+
+  Markdown.prototype.processInline = function processInline( block ) {
+    return this.dialect.inline.__call__.call( this, String( block ) );
+  };
+
+  /**
+   *  Markdown#toTree( source ) -> JsonML
+   *  - source (String): markdown source to parse
+   *
+   *  Parse `source` into a JsonML tree representing the markdown document.
+   **/
+  // custom_tree means set this.tree to `custom_tree` and restore old value on return
+  Markdown.prototype.toTree = function toTree( source, custom_root ) {
+    var blocks = source instanceof Array ? source : this.split_blocks( source );
+
+    // Make tree a member variable so its easier to mess with in extensions
+    var old_tree = this.tree;
+    try {
+      this.tree = custom_root || this.tree || [ "markdown" ];
+
+      blocks_loop:
+      while ( blocks.length ) {
+        var b = this.processBlock( blocks.shift(), blocks );
+
+        // Reference blocks and the like won't return any content
+        if ( !b.length )
+          continue blocks_loop;
+
+        this.tree.push.apply( this.tree, b );
+      }
+      return this.tree;
+    }
+    finally {
+      if ( custom_root )
+        this.tree = old_tree;
+    }
+  };
+
+  // Noop by default
+  Markdown.prototype.debug = function () {
+    var args = Array.prototype.slice.call( arguments);
+    args.unshift(this.debug_indent);
+    if ( typeof print !== "undefined" )
+      print.apply( print, args );
+    if ( typeof console !== "undefined" && typeof console.log !== "undefined" )
+      console.log.apply( null, args );
+  };
+
+  Markdown.prototype.loop_re_over_block = function( re, block, cb ) {
+    // Dont use /g regexps with this
+    var m,
+        b = block.valueOf();
+
+    while ( b.length && (m = re.exec(b) ) !== null ) {
+      b = b.substr( m[0].length );
+      cb.call(this, m);
+    }
+    return b;
+  };
+
+  // Build default order from insertion order.
+  Markdown.buildBlockOrder = function(d) {
+    var ord = [];
+    for ( var i in d ) {
+      if ( i === "__order__" || i === "__call__" )
+        continue;
+      ord.push( i );
+    }
+    d.__order__ = ord;
+  };
+
+  // Build patterns for inline matcher
+  Markdown.buildInlinePatterns = function(d) {
+    var patterns = [];
+
+    for ( var i in d ) {
+      // __foo__ is reserved and not a pattern
+      if ( i.match( /^__.*__$/) )
+        continue;
+      var l = i.replace( /([\\.*+?|()\[\]{}])/g, "\\$1" )
+               .replace( /\n/, "\\n" );
+      patterns.push( i.length === 1 ? l : "(?:" + l + ")" );
+    }
+
+    patterns = patterns.join("|");
+    d.__patterns__ = patterns;
+    //print("patterns:", uneval( patterns ) );
+
+    var fn = d.__call__;
+    d.__call__ = function(text, pattern) {
+      if ( pattern !== undefined )
+        return fn.call(this, text, pattern);
+      else
+        return fn.call(this, text, patterns);
+    };
+  };
+
+
+
+
+  var extract_attr = MarkdownHelpers.extract_attr;
+
+  /**
+   *  renderJsonML( jsonml[, options] ) -> String
+   *  - jsonml (Array): JsonML array to render to XML
+   *  - options (Object): options
+   *
+   *  Converts the given JsonML into well-formed XML.
+   *
+   *  The options currently understood are:
+   *
+   *  - root (Boolean): wether or not the root node should be included in the
+   *    output, or just its children. The default `false` is to not include the
+   *    root itself.
+   */
+  Markdown.renderJsonML = function( jsonml, options ) {
+    options = options || {};
+    // include the root element in the rendered output?
+    options.root = options.root || false;
+
+    var content = [];
+
+    if ( options.root ) {
+      content.push( render_tree( jsonml ) );
+    }
+    else {
+      jsonml.shift(); // get rid of the tag
+      if ( jsonml.length && typeof jsonml[ 0 ] === "object" && !( jsonml[ 0 ] instanceof Array ) )
+        jsonml.shift(); // get rid of the attributes
+
+      while ( jsonml.length )
+        content.push( render_tree( jsonml.shift() ) );
+    }
+
+    return content.join( "\n\n" );
+  };
+
+
+  /**
+   *  toHTMLTree( markdown, [dialect] ) -> JsonML
+   *  toHTMLTree( md_tree ) -> JsonML
+   *  - markdown (String): markdown string to parse
+   *  - dialect (String | Dialect): the dialect to use, defaults to gruber
+   *  - md_tree (Markdown.JsonML): parsed markdown tree
+   *
+   *  Turn markdown into HTML, represented as a JsonML tree. If a string is given
+   *  to this function, it is first parsed into a markdown tree by calling
+   *  [[parse]].
+   **/
+  Markdown.toHTMLTree = function toHTMLTree( input, dialect , options ) {
+
+    // convert string input to an MD tree
+    if ( typeof input === "string" )
+      input = this.parse( input, dialect );
+
+    // Now convert the MD tree to an HTML tree
+
+    // remove references from the tree
+    var attrs = extract_attr( input ),
+        refs = {};
+
+    if ( attrs && attrs.references )
+      refs = attrs.references;
+
+    var html = convert_tree_to_html( input, refs , options );
+    merge_text_nodes( html );
+    return html;
+  };
+
+  /**
+   *  toHTML( markdown, [dialect]  ) -> String
+   *  toHTML( md_tree ) -> String
+   *  - markdown (String): markdown string to parse
+   *  - md_tree (Markdown.JsonML): parsed markdown tree
+   *
+   *  Take markdown (either as a string or as a JsonML tree) and run it through
+   *  [[toHTMLTree]] then turn it into a well-formated HTML fragment.
+   **/
+  Markdown.toHTML = function toHTML( source , dialect , options ) {
+    var input = this.toHTMLTree( source , dialect , options );
+
+    return this.renderJsonML( input );
+  };
+
+
+  function escapeHTML( text ) {
+    return text.replace( /&/g, "&amp;" )
+               .replace( /</g, "&lt;" )
+               .replace( />/g, "&gt;" )
+               .replace( /"/g, "&quot;" )
+               .replace( /'/g, "&#39;" );
+  }
+
+  function render_tree( jsonml ) {
+    // basic case
+    if ( typeof jsonml === "string" )
+      return escapeHTML( jsonml );
+
+    var tag = jsonml.shift(),
+        attributes = {},
+        content = [];
+
+    if ( jsonml.length && typeof jsonml[ 0 ] === "object" && !( jsonml[ 0 ] instanceof Array ) )
+      attributes = jsonml.shift();
+
+    while ( jsonml.length )
+      content.push( render_tree( jsonml.shift() ) );
+
+    var tag_attrs = "";
+    for ( var a in attributes )
+      tag_attrs += " " + a + '="' + escapeHTML( attributes[ a ] ) + '"';
+
+    // be careful about adding whitespace here for inline elements
+    if ( tag === "img" || tag === "br" || tag === "hr" )
+      return "<"+ tag + tag_attrs + "/>";
+    else
+      return "<"+ tag + tag_attrs + ">" + content.join( "" ) + "</" + tag + ">";
+  }
+
+  function convert_tree_to_html( tree, references, options ) {
+    var i;
+    options = options || {};
+
+    // shallow clone
+    var jsonml = tree.slice( 0 );
+
+    if ( typeof options.preprocessTreeNode === "function" )
+      jsonml = options.preprocessTreeNode(jsonml, references);
+
+    // Clone attributes if they exist
+    var attrs = extract_attr( jsonml );
+    if ( attrs ) {
+      jsonml[ 1 ] = {};
+      for ( i in attrs ) {
+        jsonml[ 1 ][ i ] = attrs[ i ];
+      }
+      attrs = jsonml[ 1 ];
+    }
+
+    // basic case
+    if ( typeof jsonml === "string" )
+      return jsonml;
+
+    // convert this node
+    switch ( jsonml[ 0 ] ) {
+    case "header":
+      jsonml[ 0 ] = "h" + jsonml[ 1 ].level;
+      delete jsonml[ 1 ].level;
+      break;
+    case "bulletlist":
+      jsonml[ 0 ] = "ul";
+      break;
+    case "numberlist":
+      jsonml[ 0 ] = "ol";
+      break;
+    case "listitem":
+      jsonml[ 0 ] = "li";
+      break;
+    case "para":
+      jsonml[ 0 ] = "p";
+      break;
+    case "markdown":
+      jsonml[ 0 ] = "html";
+      if ( attrs )
+        delete attrs.references;
+      break;
+    case "code_block":
+      jsonml[ 0 ] = "pre";
+      i = attrs ? 2 : 1;
+      var code = [ "code" ];
+      code.push.apply( code, jsonml.splice( i, jsonml.length - i ) );
+      jsonml[ i ] = code;
+      break;
+    case "inlinecode":
+      jsonml[ 0 ] = "code";
+      break;
+    case "img":
+      jsonml[ 1 ].src = jsonml[ 1 ].href;
+      delete jsonml[ 1 ].href;
+      break;
+    case "linebreak":
+      jsonml[ 0 ] = "br";
+      break;
+    case "link":
+      jsonml[ 0 ] = "a";
+      break;
+    case "link_ref":
+      jsonml[ 0 ] = "a";
+
+      // grab this ref and clean up the attribute node
+      var ref = references[ attrs.ref ];
+
+      // if the reference exists, make the link
+      if ( ref ) {
+        delete attrs.ref;
+
+        // add in the href and title, if present
+        attrs.href = ref.href;
+        if ( ref.title )
+          attrs.title = ref.title;
+
+        // get rid of the unneeded original text
+        delete attrs.original;
+      }
+      // the reference doesn't exist, so revert to plain text
+      else {
+        return attrs.original;
+      }
+      break;
+    case "img_ref":
+      jsonml[ 0 ] = "img";
+
+      // grab this ref and clean up the attribute node
+      var ref = references[ attrs.ref ];
+
+      // if the reference exists, make the link
+      if ( ref ) {
+        delete attrs.ref;
+
+        // add in the href and title, if present
+        attrs.src = ref.href;
+        if ( ref.title )
+          attrs.title = ref.title;
+
+        // get rid of the unneeded original text
+        delete attrs.original;
+      }
+      // the reference doesn't exist, so revert to plain text
+      else {
+        return attrs.original;
+      }
+      break;
+    }
+
+    // convert all the children
+    i = 1;
+
+    // deal with the attribute node, if it exists
+    if ( attrs ) {
+      // if there are keys, skip over it
+      for ( var key in jsonml[ 1 ] ) {
+        i = 2;
+        break;
+      }
+      // if there aren't, remove it
+      if ( i === 1 )
+        jsonml.splice( i, 1 );
+    }
+
+    for ( ; i < jsonml.length; ++i ) {
+      jsonml[ i ] = convert_tree_to_html( jsonml[ i ], references, options );
+    }
+
+    return jsonml;
+  }
+
+
+  // merges adjacent text nodes into a single node
+  function merge_text_nodes( jsonml ) {
+    // skip the tag name and attribute hash
+    var i = extract_attr( jsonml ) ? 2 : 1;
+
+    while ( i < jsonml.length ) {
+      // if it's a string check the next item too
+      if ( typeof jsonml[ i ] === "string" ) {
+        if ( i + 1 < jsonml.length && typeof jsonml[ i + 1 ] === "string" ) {
+          // merge the second string into the first and remove it
+          jsonml[ i ] += jsonml.splice( i + 1, 1 )[ 0 ];
+        }
+        else {
+          ++i;
+        }
+      }
+      // if it's not a string recurse
+      else {
+        merge_text_nodes( jsonml[ i ] );
+        ++i;
+      }
+    }
+  };
+
+
+
+  var DialectHelpers = {};
+  DialectHelpers.inline_until_char = function( text, want ) {
+    var consumed = 0,
+        nodes = [];
+
+    while ( true ) {
+      if ( text.charAt( consumed ) === want ) {
+        // Found the character we were looking for
+        consumed++;
+        return [ consumed, nodes ];
+      }
+
+      if ( consumed >= text.length ) {
+        // No closing char found. Abort.
+        return null;
+      }
+
+      var res = this.dialect.inline.__oneElement__.call(this, text.substr( consumed ) );
+      consumed += res[ 0 ];
+      // Add any returned nodes.
+      nodes.push.apply( nodes, res.slice( 1 ) );
+    }
+  };
+
+  // Helper function to make sub-classing a dialect easier
+  DialectHelpers.subclassDialect = function( d ) {
+    function Block() {}
+    Block.prototype = d.block;
+    function Inline() {}
+    Inline.prototype = d.inline;
+
+    return { block: new Block(), inline: new Inline() };
+  };
+
+
+
+
+  var forEach = MarkdownHelpers.forEach,
+      extract_attr = MarkdownHelpers.extract_attr,
+      mk_block = MarkdownHelpers.mk_block,
+      isEmpty = MarkdownHelpers.isEmpty,
+      inline_until_char = DialectHelpers.inline_until_char;
+
+  /**
+   * Gruber dialect
+   *
+   * The default dialect that follows the rules set out by John Gruber's
+   * markdown.pl as closely as possible. Well actually we follow the behaviour of
+   * that script which in some places is not exactly what the syntax web page
+   * says.
+   **/
+  var Gruber = {
+    block: {
+      atxHeader: function atxHeader( block, next ) {
+        var m = block.match( /^(#{1,6})\s*(.*?)\s*#*\s*(?:\n|$)/ );
+
+        if ( !m )
+          return undefined;
+
+        var header = [ "header", { level: m[ 1 ].length } ];
+        Array.prototype.push.apply(header, this.processInline(m[ 2 ]));
+
+        if ( m[0].length < block.length )
+          next.unshift( mk_block( block.substr( m[0].length ), block.trailing, block.lineNumber + 2 ) );
+
+        return [ header ];
+      },
+
+      setextHeader: function setextHeader( block, next ) {
+        var m = block.match( /^(.*)\n([-=])\2\2+(?:\n|$)/ );
+
+        if ( !m )
+          return undefined;
+
+        var level = ( m[ 2 ] === "=" ) ? 1 : 2,
+            header = [ "header", { level : level }, m[ 1 ] ];
+
+        if ( m[0].length < block.length )
+          next.unshift( mk_block( block.substr( m[0].length ), block.trailing, block.lineNumber + 2 ) );
+
+        return [ header ];
+      },
+
+      code: function code( block, next ) {
+        // |    Foo
+        // |bar
+        // should be a code block followed by a paragraph. Fun
+        //
+        // There might also be adjacent code block to merge.
+
+        var ret = [],
+            re = /^(?: {0,3}\t| {4})(.*)\n?/;
+
+        // 4 spaces + content
+        if ( !block.match( re ) )
+          return undefined;
+
+        block_search:
+        do {
+          // Now pull out the rest of the lines
+          var b = this.loop_re_over_block(
+                    re, block.valueOf(), function( m ) { ret.push( m[1] ); } );
+
+          if ( b.length ) {
+            // Case alluded to in first comment. push it back on as a new block
+            next.unshift( mk_block(b, block.trailing) );
+            break block_search;
+          }
+          else if ( next.length ) {
+            // Check the next block - it might be code too
+            if ( !next[0].match( re ) )
+              break block_search;
+
+            // Pull how how many blanks lines follow - minus two to account for .join
+            ret.push ( block.trailing.replace(/[^\n]/g, "").substring(2) );
+
+            block = next.shift();
+          }
+          else {
+            break block_search;
+          }
+        } while ( true );
+
+        return [ [ "code_block", ret.join("\n") ] ];
+      },
+
+      horizRule: function horizRule( block, next ) {
+        // this needs to find any hr in the block to handle abutting blocks
+        var m = block.match( /^(?:([\s\S]*?)\n)?[ \t]*([-_*])(?:[ \t]*\2){2,}[ \t]*(?:\n([\s\S]*))?$/ );
+
+        if ( !m )
+          return undefined;
+
+        var jsonml = [ [ "hr" ] ];
+
+        // if there's a leading abutting block, process it
+        if ( m[ 1 ] ) {
+          var contained = mk_block( m[ 1 ], "", block.lineNumber );
+          jsonml.unshift.apply( jsonml, this.toTree( contained, [] ) );
+        }
+
+        // if there's a trailing abutting block, stick it into next
+        if ( m[ 3 ] )
+          next.unshift( mk_block( m[ 3 ], block.trailing, block.lineNumber + 1 ) );
+
+        return jsonml;
+      },
+
+      // There are two types of lists. Tight and loose. Tight lists have no whitespace
+      // between the items (and result in text just in the <li>) and loose lists,
+      // which have an empty line between list items, resulting in (one or more)
+      // paragraphs inside the <li>.
+      //
+      // There are all sorts weird edge cases about the original markdown.pl's
+      // handling of lists:
+      //
+      // * Nested lists are supposed to be indented by four chars per level. But
+      //   if they aren't, you can get a nested list by indenting by less than
+      //   four so long as the indent doesn't match an indent of an existing list
+      //   item in the 'nest stack'.
+      //
+      // * The type of the list (bullet or number) is controlled just by the
+      //    first item at the indent. Subsequent changes are ignored unless they
+      //    are for nested lists
+      //
+      lists: (function( ) {
+        // Use a closure to hide a few variables.
+        var any_list = "[*+-]|\\d+\\.",
+            bullet_list = /[*+-]/,
+            // Capture leading indent as it matters for determining nested lists.
+            is_list_re = new RegExp( "^( {0,3})(" + any_list + ")[ \t]+" ),
+            indent_re = "(?: {0,3}\\t| {4})";
+
+        // TODO: Cache this regexp for certain depths.
+        // Create a regexp suitable for matching an li for a given stack depth
+        function regex_for_depth( depth ) {
+
+          return new RegExp(
+            // m[1] = indent, m[2] = list_type
+            "(?:^(" + indent_re + "{0," + depth + "} {0,3})(" + any_list + ")\\s+)|" +
+            // m[3] = cont
+            "(^" + indent_re + "{0," + (depth-1) + "}[ ]{0,4})"
+          );
+        }
+        function expand_tab( input ) {
+          return input.replace( / {0,3}\t/g, "    " );
+        }
+
+        // Add inline content `inline` to `li`. inline comes from processInline
+        // so is an array of content
+        function add(li, loose, inline, nl) {
+          if ( loose ) {
+            li.push( [ "para" ].concat(inline) );
+            return;
+          }
+          // Hmmm, should this be any block level element or just paras?
+          var add_to = li[li.length -1] instanceof Array && li[li.length - 1][0] === "para"
+                     ? li[li.length -1]
+                     : li;
+
+          // If there is already some content in this list, add the new line in
+          if ( nl && li.length > 1 )
+            inline.unshift(nl);
+
+          for ( var i = 0; i < inline.length; i++ ) {
+            var what = inline[i],
+                is_str = typeof what === "string";
+            if ( is_str && add_to.length > 1 && typeof add_to[add_to.length-1] === "string" )
+              add_to[ add_to.length-1 ] += what;
+            else
+              add_to.push( what );
+          }
+        }
+
+        // contained means have an indent greater than the current one. On
+        // *every* line in the block
+        function get_contained_blocks( depth, blocks ) {
+
+          var re = new RegExp( "^(" + indent_re + "{" + depth + "}.*?\\n?)*$" ),
+              replace = new RegExp("^" + indent_re + "{" + depth + "}", "gm"),
+              ret = [];
+
+          while ( blocks.length > 0 ) {
+            if ( re.exec( blocks[0] ) ) {
+              var b = blocks.shift(),
+                  // Now remove that indent
+                  x = b.replace( replace, "");
+
+              ret.push( mk_block( x, b.trailing, b.lineNumber ) );
+            }
+            else
+              break;
+          }
+          return ret;
+        }
+
+        // passed to stack.forEach to turn list items up the stack into paras
+        function paragraphify(s, i, stack) {
+          var list = s.list;
+          var last_li = list[list.length-1];
+
+          if ( last_li[1] instanceof Array && last_li[1][0] === "para" )
+            return;
+          if ( i + 1 === stack.length ) {
+            // Last stack frame
+            // Keep the same array, but replace the contents
+            last_li.push( ["para"].concat( last_li.splice(1, last_li.length - 1) ) );
+          }
+          else {
+            var sublist = last_li.pop();
+            last_li.push( ["para"].concat( last_li.splice(1, last_li.length - 1) ), sublist );
+          }
+        }
+
+        // The matcher function
+        return function( block, next ) {
+          var m = block.match( is_list_re );
+          if ( !m )
+            return undefined;
+
+          function make_list( m ) {
+            var list = bullet_list.exec( m[2] )
+                     ? ["bulletlist"]
+                     : ["numberlist"];
+
+            stack.push( { list: list, indent: m[1] } );
+            return list;
+          }
+
+
+          var stack = [], // Stack of lists for nesting.
+              list = make_list( m ),
+              last_li,
+              loose = false,
+              ret = [ stack[0].list ],
+              i;
+
+          // Loop to search over block looking for inner block elements and loose lists
+          loose_search:
+          while ( true ) {
+            // Split into lines preserving new lines at end of line
+            var lines = block.split( /(?=\n)/ );
+
+            // We have to grab all lines for a li and call processInline on them
+            // once as there are some inline things that can span lines.
+            var li_accumulate = "", nl = "";
+
+            // Loop over the lines in this block looking for tight lists.
+            tight_search:
+            for ( var line_no = 0; line_no < lines.length; line_no++ ) {
+              nl = "";
+              var l = lines[line_no].replace(/^\n/, function(n) { nl = n; return ""; });
+
+
+              // TODO: really should cache this
+              var line_re = regex_for_depth( stack.length );
+
+              m = l.match( line_re );
+              //print( "line:", uneval(l), "\nline match:", uneval(m) );
+
+              // We have a list item
+              if ( m[1] !== undefined ) {
+                // Process the previous list item, if any
+                if ( li_accumulate.length ) {
+                  add( last_li, loose, this.processInline( li_accumulate ), nl );
+                  // Loose mode will have been dealt with. Reset it
+                  loose = false;
+                  li_accumulate = "";
+                }
+
+                m[1] = expand_tab( m[1] );
+                var wanted_depth = Math.floor(m[1].length/4)+1;
+                //print( "want:", wanted_depth, "stack:", stack.length);
+                if ( wanted_depth > stack.length ) {
+                  // Deep enough for a nested list outright
+                  //print ( "new nested list" );
+                  list = make_list( m );
+                  last_li.push( list );
+                  last_li = list[1] = [ "listitem" ];
+                }
+                else {
+                  // We aren't deep enough to be strictly a new level. This is
+                  // where Md.pl goes nuts. If the indent matches a level in the
+                  // stack, put it there, else put it one deeper then the
+                  // wanted_depth deserves.
+                  var found = false;
+                  for ( i = 0; i < stack.length; i++ ) {
+                    if ( stack[ i ].indent !== m[1] )
+                      continue;
+
+                    list = stack[ i ].list;
+                    stack.splice( i+1, stack.length - (i+1) );
+                    found = true;
+                    break;
+                  }
+
+                  if (!found) {
+                    //print("not found. l:", uneval(l));
+                    wanted_depth++;
+                    if ( wanted_depth <= stack.length ) {
+                      stack.splice(wanted_depth, stack.length - wanted_depth);
+                      //print("Desired depth now", wanted_depth, "stack:", stack.length);
+                      list = stack[wanted_depth-1].list;
+                      //print("list:", uneval(list) );
+                    }
+                    else {
+                      //print ("made new stack for messy indent");
+                      list = make_list(m);
+                      last_li.push(list);
+                    }
+                  }
+
+                  //print( uneval(list), "last", list === stack[stack.length-1].list );
+                  last_li = [ "listitem" ];
+                  list.push(last_li);
+                } // end depth of shenegains
+                nl = "";
+              }
+
+              // Add content
+              if ( l.length > m[0].length )
+                li_accumulate += nl + l.substr( m[0].length );
+            } // tight_search
+
+            if ( li_accumulate.length ) {
+              add( last_li, loose, this.processInline( li_accumulate ), nl );
+              // Loose mode will have been dealt with. Reset it
+              loose = false;
+              li_accumulate = "";
+            }
+
+            // Look at the next block - we might have a loose list. Or an extra
+            // paragraph for the current li
+            var contained = get_contained_blocks( stack.length, next );
+
+            // Deal with code blocks or properly nested lists
+            if ( contained.length > 0 ) {
+              // Make sure all listitems up the stack are paragraphs
+              forEach( stack, paragraphify, this);
+
+              last_li.push.apply( last_li, this.toTree( contained, [] ) );
+            }
+
+            var next_block = next[0] && next[0].valueOf() || "";
+
+            if ( next_block.match(is_list_re) || next_block.match( /^ / ) ) {
+              block = next.shift();
+
+              // Check for an HR following a list: features/lists/hr_abutting
+              var hr = this.dialect.block.horizRule( block, next );
+
+              if ( hr ) {
+                ret.push.apply(ret, hr);
+                break;
+              }
+
+              // Make sure all listitems up the stack are paragraphs
+              forEach( stack, paragraphify, this);
+
+              loose = true;
+              continue loose_search;
+            }
+            break;
+          } // loose_search
+
+          return ret;
+        };
+      })(),
+
+      blockquote: function blockquote( block, next ) {
+        if ( !block.match( /^>/m ) )
+          return undefined;
+
+        var jsonml = [];
+
+        // separate out the leading abutting block, if any. I.e. in this case:
+        //
+        //  a
+        //  > b
+        //
+        if ( block[ 0 ] !== ">" ) {
+          var lines = block.split( /\n/ ),
+              prev = [],
+              line_no = block.lineNumber;
+
+          // keep shifting lines until you find a crotchet
+          while ( lines.length && lines[ 0 ][ 0 ] !== ">" ) {
+            prev.push( lines.shift() );
+            line_no++;
+          }
+
+          var abutting = mk_block( prev.join( "\n" ), "\n", block.lineNumber );
+          jsonml.push.apply( jsonml, this.processBlock( abutting, [] ) );
+          // reassemble new block of just block quotes!
+          block = mk_block( lines.join( "\n" ), block.trailing, line_no );
+        }
+
+
+        // if the next block is also a blockquote merge it in
+        while ( next.length && next[ 0 ][ 0 ] === ">" ) {
+          var b = next.shift();
+          block = mk_block( block + block.trailing + b, b.trailing, block.lineNumber );
+        }
+
+        // Strip off the leading "> " and re-process as a block.
+        var input = block.replace( /^> ?/gm, "" ),
+            old_tree = this.tree,
+            processedBlock = this.toTree( input, [ "blockquote" ] ),
+            attr = extract_attr( processedBlock );
+
+        // If any link references were found get rid of them
+        if ( attr && attr.references ) {
+          delete attr.references;
+          // And then remove the attribute object if it's empty
+          if ( isEmpty( attr ) )
+            processedBlock.splice( 1, 1 );
+        }
+
+        jsonml.push( processedBlock );
+        return jsonml;
+      },
+
+      referenceDefn: function referenceDefn( block, next) {
+        var re = /^\s*\[(.*?)\]:\s*(\S+)(?:\s+(?:(['"])(.*?)\3|\((.*?)\)))?\n?/;
+        // interesting matches are [ , ref_id, url, , title, title ]
+
+        if ( !block.match(re) )
+          return undefined;
+
+        // make an attribute node if it doesn't exist
+        if ( !extract_attr( this.tree ) )
+          this.tree.splice( 1, 0, {} );
+
+        var attrs = extract_attr( this.tree );
+
+        // make a references hash if it doesn't exist
+        if ( attrs.references === undefined )
+          attrs.references = {};
+
+        var b = this.loop_re_over_block(re, block, function( m ) {
+
+          if ( m[2] && m[2][0] === "<" && m[2][m[2].length-1] === ">" )
+            m[2] = m[2].substring( 1, m[2].length - 1 );
+
+          var ref = attrs.references[ m[1].toLowerCase() ] = {
+            href: m[2]
+          };
+
+          if ( m[4] !== undefined )
+            ref.title = m[4];
+          else if ( m[5] !== undefined )
+            ref.title = m[5];
+
+        } );
+
+        if ( b.length )
+          next.unshift( mk_block( b, block.trailing ) );
+
+        return [];
+      },
+
+      para: function para( block ) {
+        // everything's a para!
+        return [ ["para"].concat( this.processInline( block ) ) ];
+      }
+    },
+
+    inline: {
+
+      __oneElement__: function oneElement( text, patterns_or_re, previous_nodes ) {
+        var m,
+            res;
+
+        patterns_or_re = patterns_or_re || this.dialect.inline.__patterns__;
+        var re = new RegExp( "([\\s\\S]*?)(" + (patterns_or_re.source || patterns_or_re) + ")" );
+
+        m = re.exec( text );
+        if (!m) {
+          // Just boring text
+          return [ text.length, text ];
+        }
+        else if ( m[1] ) {
+          // Some un-interesting text matched. Return that first
+          return [ m[1].length, m[1] ];
+        }
+
+        var res;
+        if ( m[2] in this.dialect.inline ) {
+          res = this.dialect.inline[ m[2] ].call(
+                    this,
+                    text.substr( m.index ), m, previous_nodes || [] );
+        }
+        // Default for now to make dev easier. just slurp special and output it.
+        res = res || [ m[2].length, m[2] ];
+        return res;
+      },
+
+      __call__: function inline( text, patterns ) {
+
+        var out = [],
+            res;
+
+        function add(x) {
+          //D:self.debug("  adding output", uneval(x));
+          if ( typeof x === "string" && typeof out[out.length-1] === "string" )
+            out[ out.length-1 ] += x;
+          else
+            out.push(x);
+        }
+
+        while ( text.length > 0 ) {
+          res = this.dialect.inline.__oneElement__.call(this, text, patterns, out );
+          text = text.substr( res.shift() );
+          forEach(res, add );
+        }
+
+        return out;
+      },
+
+      // These characters are intersting elsewhere, so have rules for them so that
+      // chunks of plain text blocks don't include them
+      "]": function () {},
+      "}": function () {},
+
+      __escape__ : /^\\[\\`\*_{}\[\]()#\+.!\-]/,
+
+      "\\": function escaped( text ) {
+        // [ length of input processed, node/children to add... ]
+        // Only esacape: \ ` * _ { } [ ] ( ) # * + - . !
+        if ( this.dialect.inline.__escape__.exec( text ) )
+          return [ 2, text.charAt( 1 ) ];
+        else
+          // Not an esacpe
+          return [ 1, "\\" ];
+      },
+
+      "![": function image( text ) {
+
+        // Unlike images, alt text is plain text only. no other elements are
+        // allowed in there
+
+        // ![Alt text](/path/to/img.jpg "Optional title")
+        //      1          2            3       4         <--- captures
+        var m = text.match( /^!\[(.*?)\][ \t]*\([ \t]*([^")]*?)(?:[ \t]+(["'])(.*?)\3)?[ \t]*\)/ );
+
+        if ( m ) {
+          if ( m[2] && m[2][0] === "<" && m[2][m[2].length-1] === ">" )
+            m[2] = m[2].substring( 1, m[2].length - 1 );
+
+          m[2] = this.dialect.inline.__call__.call( this, m[2], /\\/ )[0];
+
+          var attrs = { alt: m[1], href: m[2] || "" };
+          if ( m[4] !== undefined)
+            attrs.title = m[4];
+
+          return [ m[0].length, [ "img", attrs ] ];
+        }
+
+        // ![Alt text][id]
+        m = text.match( /^!\[(.*?)\][ \t]*\[(.*?)\]/ );
+
+        if ( m ) {
+          // We can't check if the reference is known here as it likely wont be
+          // found till after. Check it in md tree->hmtl tree conversion
+          return [ m[0].length, [ "img_ref", { alt: m[1], ref: m[2].toLowerCase(), original: m[0] } ] ];
+        }
+
+        // Just consume the '!['
+        return [ 2, "![" ];
+      },
+
+      "[": function link( text ) {
+
+        var orig = String(text);
+        // Inline content is possible inside `link text`
+        var res = inline_until_char.call( this, text.substr(1), "]" );
+
+        // No closing ']' found. Just consume the [
+        if ( !res )
+          return [ 1, "[" ];
+
+        var consumed = 1 + res[ 0 ],
+            children = res[ 1 ],
+            link,
+            attrs;
+
+        // At this point the first [...] has been parsed. See what follows to find
+        // out which kind of link we are (reference or direct url)
+        text = text.substr( consumed );
+
+        // [link text](/path/to/img.jpg "Optional title")
+        //                 1            2       3         <--- captures
+        // This will capture up to the last paren in the block. We then pull
+        // back based on if there a matching ones in the url
+        //    ([here](/url/(test))
+        // The parens have to be balanced
+        var m = text.match( /^\s*\([ \t]*([^"']*)(?:[ \t]+(["'])(.*?)\2)?[ \t]*\)/ );
+        if ( m ) {
+          var url = m[1];
+          consumed += m[0].length;
+
+          if ( url && url[0] === "<" && url[url.length-1] === ">" )
+            url = url.substring( 1, url.length - 1 );
+
+          // If there is a title we don't have to worry about parens in the url
+          if ( !m[3] ) {
+            var open_parens = 1; // One open that isn't in the capture
+            for ( var len = 0; len < url.length; len++ ) {
+              switch ( url[len] ) {
+              case "(":
+                open_parens++;
+                break;
+              case ")":
+                if ( --open_parens === 0) {
+                  consumed -= url.length - len;
+                  url = url.substring(0, len);
+                }
+                break;
+              }
+            }
+          }
+
+          // Process escapes only
+          url = this.dialect.inline.__call__.call( this, url, /\\/ )[0];
+
+          attrs = { href: url || "" };
+          if ( m[3] !== undefined)
+            attrs.title = m[3];
+
+          link = [ "link", attrs ].concat( children );
+          return [ consumed, link ];
+        }
+
+        // [Alt text][id]
+        // [Alt text] [id]
+        m = text.match( /^\s*\[(.*?)\]/ );
+
+        if ( m ) {
+
+          consumed += m[ 0 ].length;
+
+          // [links][] uses links as its reference
+          attrs = { ref: ( m[ 1 ] || String(children) ).toLowerCase(),  original: orig.substr( 0, consumed ) };
+
+          link = [ "link_ref", attrs ].concat( children );
+
+          // We can't check if the reference is known here as it likely wont be
+          // found till after. Check it in md tree->hmtl tree conversion.
+          // Store the original so that conversion can revert if the ref isn't found.
+          return [ consumed, link ];
+        }
+
+        // [id]
+        // Only if id is plain (no formatting.)
+        if ( children.length === 1 && typeof children[0] === "string" ) {
+
+          attrs = { ref: children[0].toLowerCase(),  original: orig.substr( 0, consumed ) };
+          link = [ "link_ref", attrs, children[0] ];
+          return [ consumed, link ];
+        }
+
+        // Just consume the "["
+        return [ 1, "[" ];
+      },
+
+
+      "<": function autoLink( text ) {
+        var m;
+
+        if ( ( m = text.match( /^<(?:((https?|ftp|mailto):[^>]+)|(.*?@.*?\.[a-zA-Z]+))>/ ) ) !== null ) {
+          if ( m[3] )
+            return [ m[0].length, [ "link", { href: "mailto:" + m[3] }, m[3] ] ];
+          else if ( m[2] === "mailto" )
+            return [ m[0].length, [ "link", { href: m[1] }, m[1].substr("mailto:".length ) ] ];
+          else
+            return [ m[0].length, [ "link", { href: m[1] }, m[1] ] ];
+        }
+
+        return [ 1, "<" ];
+      },
+
+      "`": function inlineCode( text ) {
+        // Inline code block. as many backticks as you like to start it
+        // Always skip over the opening ticks.
+        var m = text.match( /(`+)(([\s\S]*?)\1)/ );
+
+        if ( m && m[2] )
+          return [ m[1].length + m[2].length, [ "inlinecode", m[3] ] ];
+        else {
+          // TODO: No matching end code found - warn!
+          return [ 1, "`" ];
+        }
+      },
+
+      "  \n": function lineBreak() {
+        return [ 3, [ "linebreak" ] ];
+      }
+
+    }
+  };
+
+  // Meta Helper/generator method for em and strong handling
+  function strong_em( tag, md ) {
+
+    var state_slot = tag + "_state",
+        other_slot = tag === "strong" ? "em_state" : "strong_state";
+
+    function CloseTag(len) {
+      this.len_after = len;
+      this.name = "close_" + md;
+    }
+
+    return function ( text ) {
+
+      if ( this[state_slot][0] === md ) {
+        // Most recent em is of this type
+        //D:this.debug("closing", md);
+        this[state_slot].shift();
+
+        // "Consume" everything to go back to the recrusion in the else-block below
+        return[ text.length, new CloseTag(text.length-md.length) ];
+      }
+      else {
+        // Store a clone of the em/strong states
+        var other = this[other_slot].slice(),
+            state = this[state_slot].slice();
+
+        this[state_slot].unshift(md);
+
+        //D:this.debug_indent += "  ";
+
+        // Recurse
+        var res = this.processInline( text.substr( md.length ) );
+        //D:this.debug_indent = this.debug_indent.substr(2);
+
+        var last = res[res.length - 1];
+
+        //D:this.debug("processInline from", tag + ": ", uneval( res ) );
+
+        var check = this[state_slot].shift();
+        if ( last instanceof CloseTag ) {
+          res.pop();
+          // We matched! Huzzah.
+          var consumed = text.length - last.len_after;
+          return [ consumed, [ tag ].concat(res) ];
+        }
+        else {
+          // Restore the state of the other kind. We might have mistakenly closed it.
+          this[other_slot] = other;
+          this[state_slot] = state;
+
+          // We can't reuse the processed result as it could have wrong parsing contexts in it.
+          return [ md.length, md ];
+        }
+      }
+    }; // End returned function
+  }
+
+  Gruber.inline["**"] = strong_em("strong", "**");
+  Gruber.inline["__"] = strong_em("strong", "__");
+  Gruber.inline["*"]  = strong_em("em", "*");
+  Gruber.inline["_"]  = strong_em("em", "_");
+
+  Markdown.dialects.Gruber = Gruber;
+  Markdown.buildBlockOrder ( Markdown.dialects.Gruber.block );
+  Markdown.buildInlinePatterns( Markdown.dialects.Gruber.inline );
+
+
+
+  var Maruku = DialectHelpers.subclassDialect( Gruber ),
+      extract_attr = MarkdownHelpers.extract_attr,
+      forEach = MarkdownHelpers.forEach;
+
+  Maruku.processMetaHash = function processMetaHash( meta_string ) {
+    var meta = split_meta_hash( meta_string ),
+        attr = {};
+
+    for ( var i = 0; i < meta.length; ++i ) {
+      // id: #foo
+      if ( /^#/.test( meta[ i ] ) )
+        attr.id = meta[ i ].substring( 1 );
+      // class: .foo
+      else if ( /^\./.test( meta[ i ] ) ) {
+        // if class already exists, append the new one
+        if ( attr["class"] )
+          attr["class"] = attr["class"] + meta[ i ].replace( /./, " " );
+        else
+          attr["class"] = meta[ i ].substring( 1 );
+      }
+      // attribute: foo=bar
+      else if ( /\=/.test( meta[ i ] ) ) {
+        var s = meta[ i ].split( /\=/ );
+        attr[ s[ 0 ] ] = s[ 1 ];
+      }
+    }
+
+    return attr;
+  };
+
+  function split_meta_hash( meta_string ) {
+    var meta = meta_string.split( "" ),
+        parts = [ "" ],
+        in_quotes = false;
+
+    while ( meta.length ) {
+      var letter = meta.shift();
+      switch ( letter ) {
+      case " " :
+        // if we're in a quoted section, keep it
+        if ( in_quotes )
+          parts[ parts.length - 1 ] += letter;
+        // otherwise make a new part
+        else
+          parts.push( "" );
+        break;
+      case "'" :
+      case '"' :
+        // reverse the quotes and move straight on
+        in_quotes = !in_quotes;
+        break;
+      case "\\" :
+        // shift off the next letter to be used straight away.
+        // it was escaped so we'll keep it whatever it is
+        letter = meta.shift();
+        /* falls through */
+      default :
+        parts[ parts.length - 1 ] += letter;
+        break;
+      }
+    }
+
+    return parts;
+  }
+
+  Maruku.block.document_meta = function document_meta( block ) {
+    // we're only interested in the first block
+    if ( block.lineNumber > 1 )
+      return undefined;
+
+    // document_meta blocks consist of one or more lines of `Key: Value\n`
+    if ( ! block.match( /^(?:\w+:.*\n)*\w+:.*$/ ) )
+      return undefined;
+
+    // make an attribute node if it doesn't exist
+    if ( !extract_attr( this.tree ) )
+      this.tree.splice( 1, 0, {} );
+
+    var pairs = block.split( /\n/ );
+    for ( var p in pairs ) {
+      var m = pairs[ p ].match( /(\w+):\s*(.*)$/ ),
+          key = m[ 1 ].toLowerCase(),
+          value = m[ 2 ];
+
+      this.tree[ 1 ][ key ] = value;
+    }
+
+    // document_meta produces no content!
+    return [];
+  };
+
+  Maruku.block.block_meta = function block_meta( block ) {
+    // check if the last line of the block is an meta hash
+    var m = block.match( /(^|\n) {0,3}\{:\s*((?:\\\}|[^\}])*)\s*\}$/ );
+    if ( !m )
+      return undefined;
+
+    // process the meta hash
+    var attr = this.dialect.processMetaHash( m[ 2 ] ),
+        hash;
+
+    // if we matched ^ then we need to apply meta to the previous block
+    if ( m[ 1 ] === "" ) {
+      var node = this.tree[ this.tree.length - 1 ];
+      hash = extract_attr( node );
+
+      // if the node is a string (rather than JsonML), bail
+      if ( typeof node === "string" )
+        return undefined;
+
+      // create the attribute hash if it doesn't exist
+      if ( !hash ) {
+        hash = {};
+        node.splice( 1, 0, hash );
+      }
+
+      // add the attributes in
+      for ( var a in attr )
+        hash[ a ] = attr[ a ];
+
+      // return nothing so the meta hash is removed
+      return [];
+    }
+
+    // pull the meta hash off the block and process what's left
+    var b = block.replace( /\n.*$/, "" ),
+        result = this.processBlock( b, [] );
+
+    // get or make the attributes hash
+    hash = extract_attr( result[ 0 ] );
+    if ( !hash ) {
+      hash = {};
+      result[ 0 ].splice( 1, 0, hash );
+    }
+
+    // attach the attributes to the block
+    for ( var a in attr )
+      hash[ a ] = attr[ a ];
+
+    return result;
+  };
+
+  Maruku.block.definition_list = function definition_list( block, next ) {
+    // one or more terms followed by one or more definitions, in a single block
+    var tight = /^((?:[^\s:].*\n)+):\s+([\s\S]+)$/,
+        list = [ "dl" ],
+        i, m;
+
+    // see if we're dealing with a tight or loose block
+    if ( ( m = block.match( tight ) ) ) {
+      // pull subsequent tight DL blocks out of `next`
+      var blocks = [ block ];
+      while ( next.length && tight.exec( next[ 0 ] ) )
+        blocks.push( next.shift() );
+
+      for ( var b = 0; b < blocks.length; ++b ) {
+        var m = blocks[ b ].match( tight ),
+            terms = m[ 1 ].replace( /\n$/, "" ).split( /\n/ ),
+            defns = m[ 2 ].split( /\n:\s+/ );
+
+        // print( uneval( m ) );
+
+        for ( i = 0; i < terms.length; ++i )
+          list.push( [ "dt", terms[ i ] ] );
+
+        for ( i = 0; i < defns.length; ++i ) {
+          // run inline processing over the definition
+          list.push( [ "dd" ].concat( this.processInline( defns[ i ].replace( /(\n)\s+/, "$1" ) ) ) );
+        }
+      }
+    }
+    else {
+      return undefined;
+    }
+
+    return [ list ];
+  };
+
+  // splits on unescaped instances of @ch. If @ch is not a character the result
+  // can be unpredictable
+
+  Maruku.block.table = function table ( block ) {
+
+    var _split_on_unescaped = function( s, ch ) {
+      ch = ch || '\\s';
+      if ( ch.match(/^[\\|\[\]{}?*.+^$]$/) )
+        ch = '\\' + ch;
+      var res = [ ],
+          r = new RegExp('^((?:\\\\.|[^\\\\' + ch + '])*)' + ch + '(.*)'),
+          m;
+      while ( ( m = s.match( r ) ) ) {
+        res.push( m[1] );
+        s = m[2];
+      }
+      res.push(s);
+      return res;
+    };
+
+    var leading_pipe = /^ {0,3}\|(.+)\n {0,3}\|\s*([\-:]+[\-| :]*)\n((?:\s*\|.*(?:\n|$))*)(?=\n|$)/,
+        // find at least an unescaped pipe in each line
+        no_leading_pipe = /^ {0,3}(\S(?:\\.|[^\\|])*\|.*)\n {0,3}([\-:]+\s*\|[\-| :]*)\n((?:(?:\\.|[^\\|])*\|.*(?:\n|$))*)(?=\n|$)/,
+        i,
+        m;
+    if ( ( m = block.match( leading_pipe ) ) ) {
+      // remove leading pipes in contents
+      // (header and horizontal rule already have the leading pipe left out)
+      m[3] = m[3].replace(/^\s*\|/gm, '');
+    } else if ( ! ( m = block.match( no_leading_pipe ) ) ) {
+      return undefined;
+    }
+
+    var table = [ "table", [ "thead", [ "tr" ] ], [ "tbody" ] ];
+
+    // remove trailing pipes, then split on pipes
+    // (no escaped pipes are allowed in horizontal rule)
+    m[2] = m[2].replace(/\|\s*$/, '').split('|');
+
+    // process alignment
+    var html_attrs = [ ];
+    forEach (m[2], function (s) {
+      if (s.match(/^\s*-+:\s*$/))
+        html_attrs.push({align: "right"});
+      else if (s.match(/^\s*:-+\s*$/))
+        html_attrs.push({align: "left"});
+      else if (s.match(/^\s*:-+:\s*$/))
+        html_attrs.push({align: "center"});
+      else
+        html_attrs.push({});
+    });
+
+    // now for the header, avoid escaped pipes
+    m[1] = _split_on_unescaped(m[1].replace(/\|\s*$/, ''), '|');
+    for (i = 0; i < m[1].length; i++) {
+      table[1][1].push(['th', html_attrs[i] || {}].concat(
+        this.processInline(m[1][i].trim())));
+    }
+
+    // now for body contents
+    forEach (m[3].replace(/\|\s*$/mg, '').split('\n'), function (row) {
+      var html_row = ['tr'];
+      row = _split_on_unescaped(row, '|');
+      for (i = 0; i < row.length; i++)
+        html_row.push(['td', html_attrs[i] || {}].concat(this.processInline(row[i].trim())));
+      table[2].push(html_row);
+    }, this);
+
+    return [table];
+  };
+
+  Maruku.inline[ "{:" ] = function inline_meta( text, matches, out ) {
+    if ( !out.length )
+      return [ 2, "{:" ];
+
+    // get the preceeding element
+    var before = out[ out.length - 1 ];
+
+    if ( typeof before === "string" )
+      return [ 2, "{:" ];
+
+    // match a meta hash
+    var m = text.match( /^\{:\s*((?:\\\}|[^\}])*)\s*\}/ );
+
+    // no match, false alarm
+    if ( !m )
+      return [ 2, "{:" ];
+
+    // attach the attributes to the preceeding element
+    var meta = this.dialect.processMetaHash( m[ 1 ] ),
+        attr = extract_attr( before );
+
+    if ( !attr ) {
+      attr = {};
+      before.splice( 1, 0, attr );
+    }
+
+    for ( var k in meta )
+      attr[ k ] = meta[ k ];
+
+    // cut out the string and replace it with nothing
+    return [ m[ 0 ].length, "" ];
+  };
+
+
+  Markdown.dialects.Maruku = Maruku;
+  Markdown.dialects.Maruku.inline.__escape__ = /^\\[\\`\*_{}\[\]()#\+.!\-|:]/;
+  Markdown.buildBlockOrder ( Markdown.dialects.Maruku.block );
+  Markdown.buildInlinePatterns( Markdown.dialects.Maruku.inline );
+
+
+// Include all our depndencies and;
+  expose.Markdown = Markdown;
+  expose.parse = Markdown.parse;
+  expose.toHTML = Markdown.toHTML;
+  expose.toHTMLTree = Markdown.toHTMLTree;
+  expose.renderJsonML = Markdown.renderJsonML;
+  module.exports = expose;
+})(function() {
+  //window.markdown = {};
+  //return window.markdown;
+  return {};
+}());
+});
+define('common/readme',function(require,exports,module){
+    var readme = '#lithe.js hello world!';
+    readme += '\r\n-----\r\n';
+    readme += '1.使用?debug参数切换上线与开发模式.';
+    readme += '\r\n-----\r\n';
+    readme += '2.删除data-debug选项，关闭head头中的节点';
+    module.exports = readme;
+});
+define('conf/app', function(require, exports, module) {
+	var markdown = require('markdown');
+	var readme = require('common/readme');
+
+	// 改动,引入zepto和knowme
+	 var $ = require("vendors/zepto.js");
+
+	 var ll = require("vendors/lazyload.js");
+	 // document.getElementById('readme').innerHTML = markdown.toHTML(readme);
+
+	 console.log("ll...", ll);
+
+	 $('#readme').html(markdown.toHTML(readme));
+});
+
