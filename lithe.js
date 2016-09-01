@@ -2,7 +2,7 @@
 lithe
 @author  []
 @fileoverview a javascript common loader
-@vserion 0.3.4
+@vserion 0.3.5
 **/
 
 (function(global, undef) {
@@ -15,26 +15,42 @@ lithe
 	if (isBrowser) {
 		//tools function
 		var doc = global.document,
-		Arr = Array.prototype,
-		Obj = Object,
-		toString = Obj.prototype.toString,
-		commentRegExp = /(\/\*([\s\S]*?)\*\/|([^:]|^)\/\/(.*)$)/mg,
-		jsRequireRegExp = /[^.]\s*require\s*\(\s*["']([^'"\s]+)["']\s*\)/g;
+		  Arr = Array.prototype,
+		  Obj = Object,
+		  toString = Obj.prototype.toString,
+		  commentRegExp = /(\/\*([\s\S]*?)\*\/|([^:]|^)\/\/(.*)$)/mg,
+		  jsRequireRegExp = /[^.]\s*require\s*\(\s*["']([^'"\s]+)["']\s*\)/g;
+
+		var isString = function(v) {
+		  return toString.call(v) === '[object String]';
+		};
+
+		var isFunction = function(v) {
+		  return toString.call(v) === '[object Function]';
+		};
+
+		var isArray = function(v) {
+		  return toString.call(v) === '[object Array]';
+		};
+
+		var isObject = function(v) {
+		  return v === Obj(v);
+		};
 
 		var forEach = Arr.forEach ? function(arr, fn) {
 		  arr.forEach(fn);
-		}: function(arr, fn) {
-		  for (var i = 0; i < arr.length; i++){
+		} : function(arr, fn) {
+		  for (var i = 0; i < arr.length; i++) {
 		    fn(arr[i], i, arr);
 		  }
 		};
 
 		var filter = Arr.filter ? function(arr, fn) {
 		  return arr.filter(fn);
-		}: function(arr,fn) {
+		} : function(arr, fn) {
 		  var ret = [];
 		  forEach(arr, function(item, i, arr) {
-		    if (fn(item, i, arr)){
+		    if (fn(item, i, arr)) {
 		      ret.push(item);
 		    }
 		  });
@@ -43,7 +59,7 @@ lithe
 
 		var map = Arr.map ? function(arr, fn) {
 		  return arr.map(fn);
-		}: function(arr, fn) {
+		} : function(arr, fn) {
 		  var ret = [];
 		  forEach(arr, function(item, i, arr) {
 		    ret.push(fn(item, i, arr));
@@ -51,10 +67,10 @@ lithe
 		  return ret;
 		};
 
-		var keys = Obj.keys ? Obj.keys: function(o) {
+		var keys = Obj.keys ? Obj.keys : function(o) {
 		  var ret = [];
 		  for (var p in o) {
-		    if (o.hasOwnProperty(p)){
+		    if (o.hasOwnProperty(p)) {
 		      ret.push(p);
 		    }
 		  }
@@ -65,14 +81,17 @@ lithe
 
 		var values = function(obj) {
 		  var values = [];
-		  for(var pro in obj){
-		    if (obj.hasOwnProperty(pro)){
+
+		  function addValues(item) {
+		    values.push(item);
+		  }
+
+		  for (var pro in obj) {
+		    if (obj.hasOwnProperty(pro)) {
 		      if (isArray(obj[pro])) {
-		        forEach(obj[pro], function(current){
-		          values.push(current);
-		        });
-		      }else {
-		        values.push(obj[pro]);
+		        forEach(obj[pro], addValues);
+		      } else {
+		        addValues(obj[pro]);
 		      }
 		    }
 		  }
@@ -81,13 +100,13 @@ lithe
 
 		var indexOf = Arr.indexOf ? function(arr, selector) {
 		  return arr.indexOf(selector);
-		}: function(arr, selector) {
+		} : function(arr, selector) {
 		  for (var i = 0; i < arr.length; i++) {
-		    if (arr[i] === selector){
+		    if (arr[i] === selector) {
 		      return i;
 		    }
 		  }
-		  return - 1;
+		  return -1;
 		};
 
 		var getByTagName = function(tag, ele) {
@@ -95,7 +114,7 @@ lithe
 		  return ele ? ele.getElementsByTagName(tag) : ele;
 		};
 
-		var noop = function(){};
+		var noop = function() {};
 
 		var getAttr = function(ele, ns) {
 		  return ele.getAttribute(ns);
@@ -103,28 +122,13 @@ lithe
 
 		var extend = function(source, options) {
 		  for (var i in options) {
-		    if (options.hasOwnProperty(i)){
+		    if (options.hasOwnProperty(i)) {
 		      source[i] = options[i];
 		    }
 		  }
 		  return source;
 		};
 
-		var isString = function(v) {
-		  return toString.call(v) === '[object String]';
-		};
-
-		var isFunction = function isFunction(v) {
-		  return toString.call(v) === '[object Function]';
-		};
-
-		var isArray = function isFunction(v) {
-		  return toString.call(v) === '[object Array]';
-		};
-
-		var isObject = function isObject(v) {
-		  return v === Obj(v);
-		};
 
 		var unique = function unique(arr) {
 		  var o = {};
@@ -149,11 +153,10 @@ lithe
 
 		var runModuleContext = function(fn, mod) {
 		  var ret = fn(mod.require, mod.exports, mod);
-		  if (ret !== undef){
+		  if (ret !== undef) {
 		    mod.exports = ret;
 		  }
 		};
-
 
 
 		var Events = function() {
@@ -182,14 +185,13 @@ lithe
 		var LEVENTS = new Events();
 
 
-
 		var getTimeStamp = function(url) {
 		  var query = url.slice(url.lastIndexOf('?') + 1).split('&');
 		  for (var i = 0; i < query.length; i++) {
 		    var item = query[i].split('='),
-		    key = item[0],
-		    val = item[1];
-		    if (key === 'timestamp'){
+		      key = item[0],
+		      val = item[1];
+		    if (key === 'timestamp') {
 		      return val;
 		    }
 		  }
@@ -200,9 +202,6 @@ lithe
 		  return url.indexOf('://') > 0 || url.indexOf('//') === 0;
 		};
 
-		var isDir = function(url) {
-		  return ! filename(url);
-		};
 
 		var dirname = function(url) {
 		  var s = url.match(/[^?]*(?=\/.*$)/);
@@ -213,18 +212,22 @@ lithe
 		  return url.slice(url.lastIndexOf('/') + 1).replace(/\?.*$/, '');
 		};
 
-		var realpath = function(path){
+		var isDir = function(url) {
+		  return !filename(url);
+		};
+
+		var realpath = function(path) {
 		  var multiple_slash_re = /([^:\/])\/\/+/g;
 		  multiple_slash_re.lastIndex = 0;
 		  if (multiple_slash_re.test(path)) {
 		    path = path.replace(multiple_slash_re, '$1\/');
 		  }
-		  if (path.indexOf('.') === - 1) {
+		  if (path.indexOf('.') === -1) {
 		    return path;
 		  }
 		  var original = path.split('/'),
-		  ret = [],
-		  part;
+		    ret = [],
+		    part;
 		  for (var i = 0; i < original.length; i++) {
 		    part = original[i];
 		    if (part === '..') {
@@ -232,8 +235,7 @@ lithe
 		        throw new Error('The path is invalid: ' + path);
 		      }
 		      ret.pop();
-		    }
-		    else if (part !== '.') {
+		    } else if (part !== '.') {
 		      ret.push(part);
 		    }
 		  }
@@ -247,15 +249,14 @@ lithe
 		    return url;
 		  }
 		  if (lastChar === '#') {
-		    url = url.slice(0, - 1);
-		  }
-		  else if (url.indexOf('?') === - 1 && ! (/\.(?:js|css)$/).test(url)) {
+		    url = url.slice(0, -1);
+		  } else if (url.indexOf('?') === -1 && !(/\.(?:js|css)$/).test(url)) {
 		    url += '.js';
 		  }
 		  if (url.indexOf(':80/') > 0) {
 		    url = url.replace(':80/', '/');
 		  }
-		  if (t){
+		  if (t) {
 		    url = url.replace(/\?.+$/, '');
 		  }
 		  return url;
@@ -268,16 +269,16 @@ lithe
 		  // UI:../ -> ../a/UI/test = ../a/UI/test [不会替换]
 		  // UI:../ -> a/UI/test = a/UI/test [不会替换]
 		  var locks = {},
-		  k, path, reg, dir, j;
+		    k, path, reg, dir, j;
 		  for (k = 0; k < directorys.length; k++) {
-		    if (locks[id]){
+		    if (locks[id]) {
 		      break;
 		    }
 		    dir = directorys[k];
 		    for (j in dir) {
 		      path = dir[j];
 		      reg = new RegExp("^" + j + "\/");
-		      if (reg.test(id) && ! locks[id]) {
+		      if (reg.test(id) && !locks[id]) {
 		        id = id.replace(reg, path);
 		        locks[id] = true;
 		        break;
@@ -291,7 +292,7 @@ lithe
 		  var alias = config.alias;
 		  if (alias) {
 		    var newid = alias[id];
-		    return newid ? newid: replaceDir(id);
+		    return newid ? newid : replaceDir(id);
 		  }
 		  return id;
 		};
@@ -299,16 +300,16 @@ lithe
 		var resolve = function(id, path) {
 		  // 改动,处理public依赖的路径
 
-		  if (lithe.publicpath && isPublicDeps(id).isPublicDeps) {
+		  if (lithe && lithe.publicpath && isPublicDeps(id).isPublicDeps) {
 		    path = lithe.publicpath;
-		  }else {
+		  } else {
 		    path = dirname(path || lithe.basepath);
 		  }
 
-		  if (isAbsolute(id)){
+		  if (isAbsolute(id)) {
 		    return id;
 		  }
-		  if (isInitConfig){
+		  if (isInitConfig) {
 		    id = replaceId(id);
 		  }
 		  var url = '';
@@ -324,7 +325,6 @@ lithe
 		  }
 		  return normalize(url);
 		};
-
 
 		var header = doc.head || getByTagName('head')[0] || doc.documentElement,
 		scripts = getByTagName('script'),
@@ -512,7 +512,7 @@ lithe
 
 		    // 改动,过滤当前模块所有依赖的pubic依赖,并存储到publicDeps数组中
 
-		    if (lithe.config.publicdeps) {
+		    if (lithe && lithe.config && lithe.config.publicdeps) {
 		      var flag = isPublicDeps(dep);
 		      if (flag.isPublicDeps) {
 		        savePublicDeps(flag.dep);

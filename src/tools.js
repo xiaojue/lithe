@@ -1,25 +1,41 @@
 //tools function
 var doc = global.document,
-Arr = Array.prototype,
-Obj = Object,
-toString = Obj.prototype.toString,
-commentRegExp = /(\/\*([\s\S]*?)\*\/|([^:]|^)\/\/(.*)$)/mg,
-jsRequireRegExp = /[^.]\s*require\s*\(\s*["']([^'"\s]+)["']\s*\)/g;
+  Arr = Array.prototype,
+  Obj = Object,
+  toString = Obj.prototype.toString,
+  commentRegExp = /(\/\*([\s\S]*?)\*\/|([^:]|^)\/\/(.*)$)/mg,
+  jsRequireRegExp = /[^.]\s*require\s*\(\s*["']([^'"\s]+)["']\s*\)/g;
+
+var isString = function(v) {
+  return toString.call(v) === '[object String]';
+};
+
+var isFunction = function(v) {
+  return toString.call(v) === '[object Function]';
+};
+
+var isArray = function(v) {
+  return toString.call(v) === '[object Array]';
+};
+
+var isObject = function(v) {
+  return v === Obj(v);
+};
 
 var forEach = Arr.forEach ? function(arr, fn) {
   arr.forEach(fn);
-}: function(arr, fn) {
-  for (var i = 0; i < arr.length; i++){
+} : function(arr, fn) {
+  for (var i = 0; i < arr.length; i++) {
     fn(arr[i], i, arr);
   }
 };
 
 var filter = Arr.filter ? function(arr, fn) {
   return arr.filter(fn);
-}: function(arr,fn) {
+} : function(arr, fn) {
   var ret = [];
   forEach(arr, function(item, i, arr) {
-    if (fn(item, i, arr)){
+    if (fn(item, i, arr)) {
       ret.push(item);
     }
   });
@@ -28,7 +44,7 @@ var filter = Arr.filter ? function(arr, fn) {
 
 var map = Arr.map ? function(arr, fn) {
   return arr.map(fn);
-}: function(arr, fn) {
+} : function(arr, fn) {
   var ret = [];
   forEach(arr, function(item, i, arr) {
     ret.push(fn(item, i, arr));
@@ -36,10 +52,10 @@ var map = Arr.map ? function(arr, fn) {
   return ret;
 };
 
-var keys = Obj.keys ? Obj.keys: function(o) {
+var keys = Obj.keys ? Obj.keys : function(o) {
   var ret = [];
   for (var p in o) {
-    if (o.hasOwnProperty(p)){
+    if (o.hasOwnProperty(p)) {
       ret.push(p);
     }
   }
@@ -50,14 +66,17 @@ var keys = Obj.keys ? Obj.keys: function(o) {
 
 var values = function(obj) {
   var values = [];
-  for(var pro in obj){
-    if (obj.hasOwnProperty(pro)){
+
+  function addValues(item) {
+    values.push(item);
+  }
+
+  for (var pro in obj) {
+    if (obj.hasOwnProperty(pro)) {
       if (isArray(obj[pro])) {
-        forEach(obj[pro], function(current){
-          values.push(current);
-        });
-      }else {
-        values.push(obj[pro]);
+        forEach(obj[pro], addValues);
+      } else {
+        addValues(obj[pro]);
       }
     }
   }
@@ -66,13 +85,13 @@ var values = function(obj) {
 
 var indexOf = Arr.indexOf ? function(arr, selector) {
   return arr.indexOf(selector);
-}: function(arr, selector) {
+} : function(arr, selector) {
   for (var i = 0; i < arr.length; i++) {
-    if (arr[i] === selector){
+    if (arr[i] === selector) {
       return i;
     }
   }
-  return - 1;
+  return -1;
 };
 
 var getByTagName = function(tag, ele) {
@@ -80,7 +99,7 @@ var getByTagName = function(tag, ele) {
   return ele ? ele.getElementsByTagName(tag) : ele;
 };
 
-var noop = function(){};
+var noop = function() {};
 
 var getAttr = function(ele, ns) {
   return ele.getAttribute(ns);
@@ -88,28 +107,13 @@ var getAttr = function(ele, ns) {
 
 var extend = function(source, options) {
   for (var i in options) {
-    if (options.hasOwnProperty(i)){
+    if (options.hasOwnProperty(i)) {
       source[i] = options[i];
     }
   }
   return source;
 };
 
-var isString = function(v) {
-  return toString.call(v) === '[object String]';
-};
-
-var isFunction = function isFunction(v) {
-  return toString.call(v) === '[object Function]';
-};
-
-var isArray = function isFunction(v) {
-  return toString.call(v) === '[object Array]';
-};
-
-var isObject = function isObject(v) {
-  return v === Obj(v);
-};
 
 var unique = function unique(arr) {
   var o = {};
@@ -134,8 +138,7 @@ var getDependencies = function(code) {
 
 var runModuleContext = function(fn, mod) {
   var ret = fn(mod.require, mod.exports, mod);
-  if (ret !== undef){
+  if (ret !== undef) {
     mod.exports = ret;
   }
 };
-

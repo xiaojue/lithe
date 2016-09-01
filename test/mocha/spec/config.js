@@ -1,5 +1,5 @@
 describe('Config', function(){
-
+  
   it('可以通过标签属性 data-config 来指定配置文件路径', function(done){
     var script = document.getElementById('lithe');
     expect(script.getAttribute('data-config')).to.equal('config.js');

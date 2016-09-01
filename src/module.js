@@ -71,7 +71,7 @@ var getPureDependencies = function(mod) {
 
     // 改动,过滤当前模块所有依赖的pubic依赖,并存储到publicDeps数组中
 
-    if (lithe.config.publicdeps) {
+    if (lithe && lithe.config && lithe.config.publicdeps) {
       var flag = isPublicDeps(dep);
       if (flag.isPublicDeps) {
         savePublicDeps(flag.dep);
