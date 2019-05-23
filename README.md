@@ -1,5 +1,6 @@
 # Lithe
-[![Build Status](https://travis-ci.org/litheModule/lithe.png?branch=master)](https://travis-ci.org/litheModule/lithe) [![依赖模块状态](https://david-dm.org/litheModule/lithe.png)](http://david-dm.org/litheModule/lithe)
+[![Build Status](https://travis-ci.org/xiaojue/lithe.svg?branch=master)](https://travis-ci.org/xiaojue/lithe)
+[![依赖模块状态](https://david-dm.org/litheModule/lithe.png)](http://david-dm.org/litheModule/lithe)
 
 
 A browser-side script loader,compatible with the de facto standards(NodeJS/CommonJS).
